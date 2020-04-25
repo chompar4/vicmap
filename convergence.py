@@ -1,5 +1,7 @@
 import math
 
+from declination.geomag import gda20_declination
+
 
 def gda20_convergence(lat, lng):
     """
@@ -26,3 +28,14 @@ def gda20_convergence(lat, lng):
     grid_convergence_deg = math.degrees(grid_convergence_rad)
 
     return grid_convergence_deg
+
+
+def gda20_grid_magnetic_angle(lat, lng):
+    """
+    Compute the grid magnetic angle at a position (lat, lng).
+    Difference in decimal degrees between grid north and magnetic north.
+    """
+
+    conv = gda20_convergence(lat, lng)
+    dec = gda20_declination(lat, lng)
+    return dec - conv
