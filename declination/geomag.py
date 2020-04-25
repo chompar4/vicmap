@@ -19,7 +19,7 @@ import os
 from datetime import date
 
 
-def declination(*args, **kargs):
+def gda20_declination(*args, **kargs):
     """Calculate magnetic declination in degrees
     dlat = latitude in degrees
     dlon = longitude in degrees
