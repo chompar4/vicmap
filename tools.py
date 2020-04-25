@@ -1,3 +1,4 @@
+import csv
 import math
 
 
@@ -11,18 +12,18 @@ def gda20_convergence(lat, lng):
 
     lat, lng = float(lat), float(lng)
 
-    assert -85 < lat < 85, "latitude value is outside zone 54 & 55"
-    assert 138 < lng < 150, "longitude value is outside zone 54 & 55"
+    assert -85 < lat < 85, "latitude value {} is outside zone 54 & 55".format(lat)
+    assert 138 < lng < 150, "longitude value {} is outside zone 54 & 55".format(lng)
 
-    z54, z55 = 141, 147  # TODO: generalize
-    zone = 54 if lng < 144 else 55
-    o = z54 if zone == 54 else z55
+    # central meridian longitude of MGA zone
+    cm_long = {49: 111, 50: 117, 51: 123, 52: 129, 53: 135, 54: 141, 55: 147, 56: 153}
 
-    h = math.tan(math.pi * (lng - o) / 180)
+    zone = 54 if 138 < lng < 144 else 55
+    dev = math.radians(lng - cm_long[zone])
 
     latitude, longitude = math.radians(lat), math.radians(lng)
 
-    grid_convergence_rad = math.atan(-math.sin(latitude) * h)
+    grid_convergence_rad = math.atan(-math.sin(latitude) * math.tan(dev))
     grid_convergence_deg = math.degrees(grid_convergence_rad)
 
     return grid_convergence_deg
