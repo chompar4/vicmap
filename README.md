@@ -5,6 +5,9 @@ Cartographic tools for working with the MGA (Map Grid of Australia) & GDA20 (Geo
 
 <img src="assets/declination.png" width="300">
 
+<img src="assets/wmm-2015.png" width="800">
+
+
 
 ## Installation
 ```
