@@ -1,5 +1,5 @@
 # gda20
-Cartographic tools for working with the MGA (Map Grid of Australia) & GDA20 (Geographic Datum of Australia).
+Cartographic tools for working with the MGA (Map Grid of Australia) & GDA20 (Geographic Datum of Australia 2020).
 * function for calculating grid convergence within zones 54 & 55 (to be generalized)
 * function for computing magnetic declination and grid magnetic angle using World Magnetic Model of 2020. 
 
