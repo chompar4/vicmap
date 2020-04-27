@@ -6,8 +6,8 @@ from declination.geomag import gda20_declination
 def gda20_convergence(lat, lng):
     """
     Compute the grid convergence in decimal degrees for
-    latitude and longitude coordinates in the MGA (Map Grid of Australia)
-    zones 54 & 55 (VIC). Does not depend on datum so should work for gda94 & gda20
+    latitude and longitude coordinates in the MGA (Map Grid of Australia) zones.
+    Does not depend on datum so should work for gda94 & gda20 (and future datums)
     """
 
     lat, lng = float(lat), float(lng)

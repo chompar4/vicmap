@@ -22,6 +22,7 @@ All height calculations have been stripped so the calculation is valid at the su
 
 ## Reference: 
 ```
+https://www.ngdc.noaa.gov/geomag/WMM/data/WMM2020/WMM2020_Report.pdf
 http://www.ga.gov.au/scientific-topics/positioning-navigation/geodesy/datums-projections/gda2020
 https://www.ga.gov.au/scientific-topics/positioning-navigation/australian-geospatial-reference-system
 https://www.ga.gov.au/scientific-topics/positioning-navigation/geodesy/transform-convert
