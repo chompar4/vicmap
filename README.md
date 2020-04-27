@@ -4,7 +4,6 @@ Cartographic tools for working with the MGA (Map Grid of Australia) & GDA20 (Geo
 * function for computing magnetic declination and grid magnetic angle using World Magnetic Model of 2020. 
 
 <img src="assets/declination.png" width="300">
-
 <img src="assets/wmm-2015.png" width="800">
 
 
