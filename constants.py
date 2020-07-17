@@ -44,3 +44,31 @@ assert -180 < central_meridian <= 180, 'please specify central meridian in range
 # in defined coords
 a = semi_major_axis[coordinate_set]
 _f = inverse_flattening[coordinate_set]
+
+
+# GDA / MGA Zones 
+# ---------------
+
+# MGA zones of longitude: independant of 94/20
+mga_zones = {
+    (108, 114): 49,
+    (114, 120): 50,
+    (120, 126): 51,
+    (126, 132): 52,
+    (132, 138): 53,
+    (138, 144): 54,
+    (144, 150): 55,
+    (150, 156): 56,
+}
+
+# Central meridian longitude of MGA zones
+cm_mga_zone = {
+    49: 111, 
+    50: 117, 
+    51: 123, 
+    52: 129, 
+    53: 135, 
+    54: 141, 
+    55: 147, 
+    56: 153
+}  
