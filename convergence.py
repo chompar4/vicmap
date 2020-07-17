@@ -1,13 +1,13 @@
 import math
 
-from declination.geomag import gda20_declination
-
-
-def gda20_convergence(lat, lng):
+def convergence(lat, lng):
     """
     Compute the grid convergence in decimal degrees for
     latitude and longitude coordinates in the MGA (Map Grid of Australia) zones.
-    Does not depend on datum so should work for gda94 & gda20 (and future datums)
+    Does not depend on datum so should work for gda94 & gda20 (and future datums). 
+
+    Grid convergence will increase away from the zone's central meridian,
+    and will equal 0 at the central meridian.
     """
 
     lat, lng = float(lat), float(lng)
@@ -41,14 +41,3 @@ def gda20_convergence(lat, lng):
     grid_convergence_deg = math.degrees(grid_convergence_rad)
 
     return grid_convergence_deg
-
-
-def gda20_grid_magnetic_angle(lat, lng):
-    """
-    Compute the grid magnetic angle at a position (lat, lng).
-    Difference in decimal degrees between grid north and magnetic north.
-    """
-
-    conv = gda20_convergence(lat, lng)
-    dec = gda20_declination(lat, lng)
-    return dec - conv
