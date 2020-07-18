@@ -1,6 +1,6 @@
 from constants import coordinate_set, a, _f, false_easting, false_northing, central_scale_factor, zone_width
 import math
-from utils import get_cm
+from utils import get_cm, krueger_coefficients, rectifying_radius, ellipsoidal_constants
 import numpy as np
 
 tan = math.tan 
@@ -21,108 +21,24 @@ def geographic_to_grid(dLat, dLng):
 
 
     # Step 1: Compute ellipsiodal constants
+    f, e2, n = ellipsoidal_constants(_f)
 
-    f = 1/_f            # flattening 
-    e2 = f * (2-f)      # e^2
-    n = f / (2-f)       # n 
-
-    # TODO: generalise powers of N to arbitrary precision
-
-    # Step 2a: Compute powers of n 
-    n2 = n ** 2
-    n3 = n ** 3
-    n4 = n ** 4
-    n5 = n ** 5
-    n6 = n ** 6 
-    n7 = n ** 7
-    n8 = n ** 8
-
-    # Step 2b: Compute rectifying radius A 
-    A = a / (1 + n) * (
-        1 
-        + (1/4) * n2 
-        + (1/64) * n4
-        + (1/256) * n6 
-        + (25/ 16384) * n8
-    )
-
+    # Step 2: Compute rectifying radius A 
+    A = rectifying_radius(a, n)
     assert round(A, 7)  == 6367449.145771
 
-    # Step 3: {\alpha_2r} coefficients for r = 1, 2, ..., 8
-    # TODO: functionalise
-    α2 = (
-        1/2*n 
-        - 2/3*n2 
-        + 5/16*n3 
-        + 41/180*n4 
-        - 127/288*n5 
-        + 7891/37800*n6 
-        + 72161/387072*n7
-        - 18975107/50803200*n8 
-    )
-    α4 = (
-        13/48*n2 
-        -3/5*n3 
-        + 557/1440*n4
-        +281/630*n5
-        -1983433/1935360*n6 
-        +13769/28800*n7
-        +148003883/174182400*n8
-    )
-    α6 = (
-        61/240*n3
-        - 103/140*n4
-        +15061/26880*n5
-        + 167603/181440*n6 
-        - 67102379/29030400*n7
-        +79682431/79833600*n8
-    )
-    α8 = (
-        49561/161280*n4 
-        - 179/168*n5 
-        + 6601661/7257600*n6 
-        + 97445/49896*n7 
-        - 40176129013/7664025600*n8
-    )
-    α10 = (
-        34729/80640*n5
-        - 3418889/1995840*n6
-        +14644087/9123840*n7 
-        + 2605413599/622702080*n8
-    )
-    α12 = (
-        212378941/319334400*n6
-        -30705481/10378368*n7 
-        + 175214326799/58118860800*n8
-    )
-    α14 = (
-        1522256789/1383782400*n7 
-        - 16759934899/3113510400*n8
-    )
-    α16 = (
-        1424729850961/743921418240*n8
-    )
+    # Step 3: krueger coefficients for r = 1, 2, ..., 8
+    # TODO: generalise to higher r <= 8
+    α = krueger_coefficients(n)
 
-    # store in dict for access
-    α = {
-        2: α2, 
-        4: α4, 
-        6: α6, 
-        8: α8, 
-        10: α10, 
-        12: α12, 
-        14: α14, 
-        16: α16, 
-    }
-
-    assert round(α2, 16) == 8.377318247286E-04, 'a2: {}'.format(round(α2, 16))
-    assert round(α4, 19) == 7.608527848150E-07, 'a4: {}'.format(round(α4, 19))
-    assert round(α6, 21) == 1.197645520855E-09, 'a6: {}'.format(round(α6, 21))
-    assert round(α8, 24) == 2.429170728037E-12, 'a8: {}'.format(round(α8, 24))
-    assert round(α10, 27) == 5.711818510466E-15, 'a10: {}'.format(round(α10, 27))
-    assert round(α12, 29) == 1.479997974926E-17, 'a12: {}'.format(round(α12, 29))
-    assert round(α14, 32) == 4.107624250384E-20, 'a14: {}'.format(round(α14, 32))
-    assert round(α16, 34) == 1.210785086483E-22, 'a16: {}'.format(round(α16, 34))
+    assert round(α[2], 16) == 8.377318247286E-04, 'a2: {}'.format(round(α2, 16))
+    assert round(α[4], 19) == 7.608527848150E-07, 'a4: {}'.format(round(α4, 19))
+    assert round(α[6], 21) == 1.197645520855E-09, 'a6: {}'.format(round(α6, 21))
+    assert round(α[8], 24) == 2.429170728037E-12, 'a8: {}'.format(round(α8, 24))
+    assert round(α[10], 27) == 5.711818510466E-15, 'a10: {}'.format(round(α10, 27))
+    assert round(α[12], 29) == 1.479997974926E-17, 'a12: {}'.format(round(α12, 29))
+    assert round(α[14], 32) == 4.107624250384E-20, 'a14: {}'.format(round(α14, 32))
+    assert round(α[16], 34) == 1.210785086483E-22, 'a16: {}'.format(round(α16, 34))
 
     # Step 4 - conformal latitude _φ
     e = sqrt(e2)
@@ -180,6 +96,23 @@ def geographic_to_grid(dLat, dLng):
     assert round(q, 13) == -4.39817971E-05, 'q: {}'.format(round(q, 13))
     assert round(p, 9) == 1.001141755, 'q: {}'.format(round(p, 9))
 
+    # Step 11 - Point scale factor k
+    k = central_scale_factor * (A/a) * sqrt(q**2 + p**2) * (
+        sqrt(1 + t**2)*sqrt(1-e2*sin(rLat)**2)
+        /
+        sqrt(_t**2 + cos(ω)**2)
+    )
+
+    assert round(k, 10) == round(0.99975953924774, 10), 'k: {}'.format(k)
+
+    # Step 12 - Grid convergence γ
+    γ = atan(abs(q/p)) + atan(
+        abs(_t * tan(ω))
+        /
+        sqrt(1 + _t**2)
+    )
+
+    assert round(γ, 9) == round(0.0078100240938, 9), 'γ: {}'.format(γ)
 
 def q_component(α, r, _ε, _N):
     return 2*r*α[2*r] * sin(2*r*_ε)*sinh(2*r*_N)
