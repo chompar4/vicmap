@@ -58,7 +58,7 @@ def geographic_to_grid(dLat, dLng):
     rLng = math.radians(dLng)
 
     # Step 1: Compute ellipsiodal constants
-    f, e2, n = ellipsoidal_constants(_f)
+    f, e, e2, n = ellipsoidal_constants(_f)
 
     # Step 2: Compute rectifying radius A
     A = rectifying_radius(a, n)
@@ -67,35 +67,17 @@ def geographic_to_grid(dLat, dLng):
     α = krueger_coefficients(n)
 
     # Step 4 - conformal latitude _φ
-    e = sqrt(e2)
-    t = tan(rLat)
-    σ = sinh(e * atanh(e * t / sqrt(1 + t**2)))
-    _t = t*sqrt(1 + σ**2) - σ*sqrt(1 + t**2)
-    _φ = atan(_t)
+    t, σ, _t, _φ = conformal_latitude(rLat, e) 
 
-
-    assert round(e, 12)  == 0.081819191043, "e: {}".format(round(e, 12))
-    assert round(σ, 12) == -0.002688564997, 'σ: {}'.format(round(σ, 12))
-    assert round(_t, 10) == -0.4354135975, "_t: {}".format(round(_t, 10))
-    assert round(_φ, 10) == -0.4106578907, "_φ (rad): {}".format(round(_φ, 10))
-
-    # Step 5 - longitude difference 
+    # Step 5 - longitude difference
     central_meridian = get_cm(dLng)
     ω = rLng - math.radians(central_meridian)
 
     # Step 6 - Gauss-Schreiber 
-    u = a * atan(_t/cos(ω))
-    v = a * asinh(sin(ω) / sqrt(_t**2 + (cos(ω)**2)))
+    _ε, _N = gauss_schreiber(_t, ω, a)
 
-    _ε = u / a 
-    _N = v / a
-
-    assert round(_ε, 9) == -0.410727143, "_e : {}".format(_ε)
-    assert round(_N, 9) == -0.017835003, "_N : {}".format(_N)
-
-    # Step 7 - TM rations 
-    N = _N + sum(TM_n_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
-    E = _ε + sum(TM_e_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    # Step 7 - TM ratios 
+    N, E = tm_ratios(_N, _ε, α)
 
     assert round(N, 9) == -0.017855357, 'N: {}'.format(round(N, 9))
     assert round(E, 9) == -0.411341630, 'E: {}'.format(round(E, 9))

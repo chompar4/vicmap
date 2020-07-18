@@ -1,6 +1,7 @@
 from constants import mga_zones, cm_mga_zone
 
 import math
+import numpy as np
 
 tan = math.tan
 cos = math.cos
@@ -61,13 +62,66 @@ def ellipsoidal_constants(_f):
         _f : inverse flattening
     returns: 
         f: flattening
+        e: eecentricity
         e2: eecentricity^2
         n: 3rd flattening
     """
     f = 1/_f
     e2 = f * (2-f)
+    e = sqrt(e2)
     n = f / (2-f)
-    return f, e2, n   
+    return f, e, e2, n   
+
+def tm_ratios(_N, _ε, α): 
+    """
+    Compute normalised TM coordinates (N, E)
+    Accepts: 
+        _N: normalised gauss-schreiber northing
+        _ε: normalised gauss-schreiber easting
+        α: krueger_coefficients
+    returns
+        N: MGA northing
+        E: MGA easting
+    """
+    N = _N + sum(TM_n_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    E = _ε + sum(TM_e_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    return N, E
+
+def gauss_schreiber(_t, ω, a):
+    """
+    gives a gauss-schreiber projection
+    accepts:
+        - t: tan of conformal latitude
+        - ω: longitudal difference
+        - a: ellipsoidal semi major axis
+    returns: 
+        - _ε, _N : normalised gauss-schreiber coords
+    """
+
+    u = a * atan(_t/cos(ω))
+    v = a * asinh(sin(ω) / sqrt(_t**2 + (cos(ω)**2)))
+
+    _ε = u / a 
+    _N = v / a
+    return _ε, _N
+
+
+def conformal_latitude(φ, e):
+    """
+    gives the latitude of the conformal sphere 
+    with radius a. Accepts: 
+        φ: geographical latitude in radians
+        e: ellipsoidal eecentricity
+    returns 
+        t, σ : geographical properties
+        _t, _σ: conformal properties
+
+    """
+    t = tan(φ)
+    σ = sinh(e * atanh(e * t / sqrt(1 + t**2)))
+    _t = t*sqrt(1 + σ**2) - σ*sqrt(1 + t**2)
+    _φ = atan(_t)
+    return t, σ, _t, _φ
 
 def grid_convergence(q, p, _t, ω):
     """
