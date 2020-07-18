@@ -1,5 +1,6 @@
 import math
 from constants import mga_zones, cm_mga_zone
+from utils import get_cm
 
 def convergence(lat, lng):
     """
@@ -16,8 +17,7 @@ def convergence(lat, lng):
     assert -85 < lat < 85, "latitude value {} is outside feasible bounds".format(lat)
     assert 108 < lng < 156, "longitude value {} is outside MGA zones".format(lng)
 
-    zone = next(zn for (lb, ub), zn in mga_zones.items() if lb < lng <= ub)
-    central_meridial = cm_mga_zone[zone]
+    cm = get_cm(lng)
 
     dev = math.radians(lng - central_meridial)
     latitude = math.radians(lat)

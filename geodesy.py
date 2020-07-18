@@ -1,11 +1,21 @@
 from constants import coordinate_set, a, _f, false_easting, false_northing, central_scale_factor, zone_width, central_meridian
 import math
+from utils import get_cm
+
+tan = math.tan 
+cos = math.cos 
+sin = math.sin
+sinh = math.sinh
+atan = math.atan 
+atanh = math.atanh
+asinh = math.asinh
+sqrt = math.sqrt
 
 def geographic_to_grid(dLat, dLng):
     print('performing conversion using {}'.format(coordinate_set))
 
     rLat = math.radians(dLat)
-    rlng = math.radians(dLng)
+    rLng = math.radians(dLng)
 
 
     # Step 1: Compute ellipsiodal constants
@@ -100,20 +110,33 @@ def geographic_to_grid(dLat, dLng):
 
     # Step 4 - conformal latitude φ
 
-    e = math.sqrt(e2)
-    t = math.tan(rLat)
-    σ = math.sinh(e * math.atanh(e * t / math.sqrt(1 + t**2)))
-    _t = t*math.sqrt(1 + σ**2) - σ*math.sqrt(1 + t**2)
-    _φ = math.atan(_t)
+    e = sqrt(e2)
+    t = tan(rLat)
+    σ = sinh(e * atanh(e * t / sqrt(1 + t**2)))
+    _t = t*sqrt(1 + σ**2) - σ*sqrt(1 + t**2)
+    _φ = atan(_t)
 
 
     assert round(e, 12)  == 0.081819191043, "e: {}".format(round(e, 12))
     assert round(σ, 12) == -0.002688564997, 'σ: {}'.format(round(σ, 12))
-    assert round(_t, 12) == -0.435413597639, "_t: {}".format(round(_t, 12))
+    assert round(_t, 10) == -0.4354135975, "_t: {}".format(round(_t, 10))
+    assert round(_φ, 10) == -0.4106578907, "_φ (rad): {}".format(round(_φ, 10))
 
+    # Step 5 - longitude difference 
+    central_meridian = get_cm(dLng)
+    ω = rLng - math.radians(central_meridian)
 
-    assert _φ == -0.410657890815, "_φ (rad): {}".format(_φ)
-    assert math.degrees(_φ) == -23.528963967453, 'φ (deg): {}'.format(_φ)
+    # Step 6 - Gauss-Schreiber 
+    u = a * atan(_t/cos(ω))
+    v = a * asinh(
+        sin(ω) / sqrt(_t**2 + (cos(ω)**2))
+        )
+
+    _ε = u / a 
+    _N = v / a
+
+    assert round(_ε, 9) == -0.410727143, "_e : {}".format(_ε)
+    assert round(_N, 9) == -0.017835003, "_N : {}".format(_N)
 
 if __name__ == "__main__":
     geographic_to_grid(-23.67012389, 133.8855133)
