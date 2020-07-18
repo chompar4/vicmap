@@ -43,8 +43,10 @@ def rectifying_radius(a, n):
         n: 3rd flattening
     """
     return (
-        a / (1 + n) * (
-            1 
+        (
+            a / (1 + n)
+        ) * (
+            1
             + (1/4) * n**2 
             + (1/64) * n**4
             + (1/256) * n**6 
@@ -80,8 +82,8 @@ def transverse_mercator(_Nu, _ε, α):
         Nu: normalised TM northing
         ε: normalised TM easting
     """
-    Nu = _Nu + sum(TM_n_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
-    ε = _ε + sum(TM_e_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    Nu = _Nu + sum(TM_n_component(α, r, _ε, _Nu) for r in np.linspace(start=1, stop=8, num=8))
+    ε = _ε + sum(TM_e_component(α, r, _ε, _Nu) for r in np.linspace(start=1, stop=8, num=8))
     return ε, Nu
 
 def gauss_schreiber(_t, ω, a):
@@ -92,15 +94,15 @@ def gauss_schreiber(_t, ω, a):
         - ω: longitudal difference
         - a: ellipsoidal semi major axis
     returns: 
-        - _ε, _N : normalised gauss-schreiber coords
+        - _ε, _Nu : normalised gauss-schreiber coords
     """
 
     u = a * atan(_t/cos(ω))
     v = a * asinh(sin(ω) / sqrt(_t**2 + (cos(ω)**2)))
 
     _ε = u / a 
-    _N = v / a
-    return _ε, _N
+    _Nu = v / a
+    return _ε, _Nu
 
 def q_component(α, r, _ε, _N):
     return 2*r*α[2*r] * sin(2*r*_ε)*sinh(2*r*_N)

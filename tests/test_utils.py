@@ -34,7 +34,7 @@ def test_ellipsoidal_constants():
 def test_rectifying_radius():
     a = 6378137
     n = 1.679220395E-03
-    assert round(rectifying_radius(a, n), 7 == 6367449.145771)
+    assert round(rectifying_radius(a, n), 12) == 6367449.14576869
 
 def test_krueger_coefficients():
     n = 1.679220395E-03
