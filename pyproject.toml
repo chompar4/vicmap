@@ -5,7 +5,11 @@ description = "cartographic tools for working with the MGA & GDA20"
 authors = ["Sam <chompar4@gmail.com>"]
 
 [tool.poetry.dependencies]
-geomag = "^0.9.2015"
+python = "3.8.2"
+pytest = "^5.4.3"
+numpy = "^1.19.0"
+isort = "^5.1.2"
+black = "^19.10b0"
 
 [tool.poetry.dev-dependencies]
 ipdb = "^0.13.2"
