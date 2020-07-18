@@ -26,13 +26,13 @@ inverse_flattening = {
 # ------------------------------
 
 # False easting (m)
-false_easting = 500000
+E0 = 500000
 
 # False northing (m)
-false_northing = 10000000
+N0 = 10000000
 
-# Central Scale factor (K0)
-central_scale_factor = 0.9996
+# Central Scale factor (m0)
+m0 = 0.9996
 
 # Zone width (degrees)
 zone_width = 6

@@ -1,4 +1,4 @@
-from constants import cm_mga_zone, cm_zone1, zone0_edge, zone_width, central_scale_factor
+from constants import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0
 
 import math
 import numpy as np
@@ -69,20 +69,20 @@ def ellipsoidal_constants(_f):
     n = f / (2-f)
     return f, e, e2, n   
 
-def transverse_mercator(_N, _ε, α): 
+def transverse_mercator(_Nu, _ε, α): 
     """
-    Compute normalised TM coordinates (N, E)
+    Compute normalised TM coordinates (ε, Nu)
     Accepts: 
-        _N: normalised gauss-schreiber northing
+        _Nu: normalised gauss-schreiber northing
         _ε: normalised gauss-schreiber easting
         α: krueger_coefficients
     returns
-        N: normalised TM northing
-        E: normalised TM easting
+        Nu: normalised TM northing
+        ε: normalised TM easting
     """
-    N = _N + sum(TM_n_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
-    E = _ε + sum(TM_e_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
-    return N, E
+    Nu = _Nu + sum(TM_n_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    ε = _ε + sum(TM_e_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    return ε, Nu
 
 def gauss_schreiber(_t, ω, a):
     """
@@ -146,23 +146,34 @@ def conformal_latitude(φ, e):
     _φ = atan(_t)
     return t, σ, _t, _φ
 
-def grid_convergence(q, p, _t, ω):
+def grid_convergence(q, p, _t, ω, dLat):
     """
     gives the angle between the meridian
     and the grid-line parallel to the u-axis
     """
-    return (
+    g = (
         atan(abs(q/p))
         + atan(
             abs(_t * tan(ω))/ sqrt(1 + _t**2)
         )
     )
 
+    # East or West of Central Meridian
+    ew = 1 if ω > 0 else -1
+    # North or South of Equator
+    ns = 1 if dLat > 0 else -1
+
+    # Grid Convergence Multiplier
+    if ew == ns: 
+        return -g 
+    elif e1 != ns: 
+        return g
+
 def point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω):
     """
     gives the point scale factor
     """
-    return central_scale_factor * (A/a) * sqrt(q**2 + p**2) * (
+    return m0 * (A/a) * sqrt(q**2 + p**2) * (
         sqrt(1 + t**2)*sqrt(1-e2*sin(rLat)**2)
         /
         sqrt(_t**2 + cos(ω)**2)

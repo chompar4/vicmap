@@ -66,14 +66,14 @@ def test_gauss_schreiber():
     assert round(_N, 12) == -0.017835003097, "_N : {}".format(_N)
     
 def test_transverse_mercator():
-    _N = -0.017835003
+    _Nu = -0.017835003
     _ε = -0.410727143
     n = 1.679220395E-03
     α = krueger_coefficients(n)
 
-    N, E = transverse_mercator(_N, _ε, α)
+    E, Nu = transverse_mercator(_Nu, _ε, α)
     
-    assert round(N, 12) == -0.017855357573, 'N: {}'.format(round(N, 9))
+    assert round(Nu, 12) == -0.017855357573, 'N: {}'.format(round(N, 9))
     assert round(E, 12) == -0.411341629424, 'E: {}'.format(round(E, 9))
 
 def test_pq_coefficients():
@@ -91,7 +91,8 @@ def test_grid_convergence():
     p = 1.001141755E+00
     _t = -0.435413597639
     ω = -0.019451463
-    γ = grid_convergence(q, p, _t, ω)
+    dLat = -23.67012389
+    γ = grid_convergence(q, p, _t, ω, dLat)
     assert round(γ, 12) == -0.007810024262, 'γ: {}'.format(γ)
 
 def test_point_scale_factor():

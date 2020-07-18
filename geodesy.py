@@ -2,9 +2,9 @@ from constants import (
     coordinate_set, 
     a, 
     _f, 
-    false_easting,
-    false_northing,
-    central_scale_factor,
+    E0, 
+    N0,
+    m0,
     zone_width
 )
 import math
@@ -77,27 +77,27 @@ def geographic_to_grid(dLat, dLng):
     ω = rLng - math.radians(central_meridian)
 
     # Step 6 - Gauss-Schreiber 
-    _ε, _N = gauss_schreiber(_t, ω, a)
+    _ε, _Nu = gauss_schreiber(_t, ω, a)
 
     # Step 7 - TM ratios 
-    N, E = transverse_mercator(_N, _ε, α)
+    ε, Nu = transverse_mercator(_Nu, _ε, α)
 
     # Step 8 - TM coords
-    X = A*N
-    Y = A*E
+    X = A*Nu
+    Y = A*ε
 
     # Step 9 - MGA2020 coordinates (E, N)
-    easting = central_scale_factor * X + false_easting
-    northing = central_scale_factor * Y + false_northing
+    easting = m0 * X + E0
+    northing = m0 * Y + N0
 
     # Step 10 - q & p
-    q, p = pq_coefficients(α, _ε, _N)
+    q, p = pq_coefficients(α, _ε, _Nu)
 
     # Step 11 - Point scale factor m
     m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
 
     # Step 12 - Grid convergence γ
-    γ = grid_convergence(q, p, _t, ω)
+    γ = grid_convergence(q, p, _t, ω, dLat)
     dγ = math.degrees(γ)
 
     return z, easting, northing, m, dγ
