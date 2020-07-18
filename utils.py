@@ -119,7 +119,7 @@ def pq_coefficients(α, _ε, _N):
         p, q: coeffs
     """
     q = - sum(
-        q_component(α, r, _ε, _N) 
+        q_component(α, r, _ε, _N)
         for r in np.linspace(start=1, stop=8, num=8)
         )
     p = 1 + sum(

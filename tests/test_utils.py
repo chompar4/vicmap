@@ -82,9 +82,9 @@ def test_pq_coefficients():
     n = 1.679220395E-03
     α = krueger_coefficients(n)
 
-    q, p = pq_coefficients(α, _N, _ε)
-    assert round(q, 12) == -4.398179750E-05, 'q: {}'.format(round(q, 13))
-    assert round(p, 12) == 1.001141755E+00, 'p: {}'.format(round(p, 9))
+    q, p = pq_coefficients(α, _ε, _N)
+    assert round(q, 12) == round(-4.398179750E-05, 12), 'q: {}'.format(round(q, 12))
+    assert round(p, 12) == 1.001141754741E+00, 'p: {}'.format(round(p, 12))
 
 def test_grid_convergence():
     q = -4.398179750E-05
