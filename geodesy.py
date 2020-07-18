@@ -18,7 +18,8 @@ from utils import (
     krueger_coefficients,
     rectifying_radius,
     ellipsoidal_constants,
-    grid_convergence
+    grid_convergence, 
+    point_scale_factor
 )
 import numpy as np
 import math
@@ -93,13 +94,7 @@ def geographic_to_grid(dLat, dLng):
     q, p = pq_coefficients(α, _ε, _N)
 
     # Step 11 - Point scale factor m
-    m = central_scale_factor * (A/a) * sqrt(q**2 + p**2) * (
-        sqrt(1 + t**2)*sqrt(1-e2*sin(rLat)**2)
-        /
-        sqrt(_t**2 + cos(ω)**2)
-    )
-
-    assert round(m, 10) == round(0.99975953924774, 10), 'k: {}'.format(k)
+    m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
 
     # Step 12 - Grid convergence γ
     γ = grid_convergence(q, p, _t, ω)

@@ -1,4 +1,4 @@
-from constants import cm_mga_zone, cm_zone1, zone0_edge, zone_width
+from constants import cm_mga_zone, cm_zone1, zone0_edge, zone_width, central_scale_factor
 
 import math
 import numpy as np
@@ -156,6 +156,16 @@ def grid_convergence(q, p, _t, ω):
         + atan(
             abs(_t * tan(ω))/ sqrt(1 + _t**2)
         )
+    )
+
+def point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω):
+    """
+    gives the point scale factor
+    """
+    return central_scale_factor * (A/a) * sqrt(q**2 + p**2) * (
+        sqrt(1 + t**2)*sqrt(1-e2*sin(rLat)**2)
+        /
+        sqrt(_t**2 + cos(ω)**2)
     )
 
 def krueger_coefficients(n):

@@ -1,4 +1,4 @@
-from utils import grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, ellipsoidal_constants, rectifying_radius, krueger_coefficients
+from utils import point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, ellipsoidal_constants, rectifying_radius, krueger_coefficients
 
 import pytest 
 import numpy as np
@@ -93,3 +93,16 @@ def test_grid_convergence():
     ω = -0.019451463
     γ = grid_convergence(q, p, _t, ω)
     assert round(γ, 12) == -0.007810024262, 'γ: {}'.format(γ)
+
+def test_point_scale_factor():
+    e2 = 6.694380023E-03
+    A = 6367449.1457711
+    a = 6378137.0
+    q = -4.398179750E-05
+    p = 1.001141755E+00
+    t = -0.438347538010
+    _t = -0.435413597639 
+    ω = -0.019451463
+    rLat = -0.413121596
+    m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
+    assert round(m, 12) == 0.999759539516, 'm: {}'.format(m)
