@@ -1,4 +1,26 @@
-from utils import tm_ratios, gauss_schreiber, conformal_latitude, ellipsoidal_constants, rectifying_radius, krueger_coefficients
+from utils import get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, ellipsoidal_constants, rectifying_radius, krueger_coefficients
+
+import pytest 
+import numpy as np
+
+zones = [
+    (108, 114, 49),
+    (114, 120, 50),
+    (120, 126, 51),
+    (126, 132, 52),
+    (132, 138, 53),
+    (138, 144, 54),
+    (144, 150, 55),
+    (150, 156, 56),
+]
+
+@pytest.mark.parametrize("west,east,zn", zones)
+def test_get_zone(west, east, zn):
+    for lng in np.linspace(start=west, stop=east, num=10):
+        if lng == east: 
+            assert get_zone(lng) == zn + 1  # range of zones = [west, east) 
+        else:
+            assert get_zone(lng) == zn
 
 def test_ellipsoidal_constants():
 
@@ -43,13 +65,23 @@ def test_gauss_schreiber():
     assert round(_ε, 12) == -0.410727143471, "_e : {}".format(_ε)
     assert round(_N, 12) == -0.017835003097, "_N : {}".format(_N)
     
-def test_TM_ratios():
+def test_transverse_mercator():
     _N = -0.017835003
     _ε = -0.410727143
     n = 1.679220395E-03
     α = krueger_coefficients(n)
 
-    N, E = tm_ratios(_N, _ε, α)
+    N, E = transverse_mercator(_N, _ε, α)
     
     assert round(N, 12) == -0.017855357573, 'N: {}'.format(round(N, 9))
     assert round(E, 12) == -0.411341629424, 'E: {}'.format(round(E, 9))
+
+def test_pq_coefficients():
+    _N = -0.017835003
+    _ε = -0.410727143
+    n = 1.679220395E-03
+    α = krueger_coefficients(n)
+
+    q, p = pq_coefficients(α, _N, _ε)
+    assert round(q, 12) == -4.398179750E-05, 'q: {}'.format(round(q, 13))
+    assert round(p, 12) == 1.001141755E+00, 'p: {}'.format(round(p, 9))

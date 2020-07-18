@@ -1,4 +1,4 @@
-from constants import mga_zones, cm_mga_zone
+from constants import cm_mga_zone, cm_zone1, zone0_edge, zone_width
 
 import math
 import numpy as np
@@ -13,24 +13,21 @@ atanh = math.atanh
 asinh = math.asinh
 sqrt = math.sqrt
 
-def get_mga_zone(lng):
+def get_zone(dLng):
     """
-    Get the mga zone containing longitude 'lng'
+    gives the tranverse mercator zone containing 
+    longitude 'lng', using parameters defined in constants
+    zones have the range [west, east).
     """
-    return next(zn for (lb, ub), zn in mga_zones.items() if lb < lng <= ub)
+    return math.floor((dLng - zone0_edge) / zone_width)
 
 def get_cm(lng):
     """
-    Get the central meridian longitude of the zone
+    # TODO: update cm_mga_zone with values outside MGA zones
+    gives the central meridian longitude of the zone
     containing 'lng'
     """
-    return cm_mga_zone[get_mga_zone(lng)]
-
-def q_component(α, r, _ε, _N):
-    return 2*r*α[2*r] * sin(2*r*_ε)*sinh(2*r*_N)
-
-def p_component(α, r, _ε, _N):
-    return 2*r*α[2*r]*cos(2*r*_ε)*cosh(2*r*_N)
+    return cm_mga_zone[get_zone(lng)]
 
 def TM_n_component(α, r, _ε, _N):
     return α[2*r] * cos(2*r*_ε) * sinh(2*r*_N)
@@ -72,7 +69,7 @@ def ellipsoidal_constants(_f):
     n = f / (2-f)
     return f, e, e2, n   
 
-def tm_ratios(_N, _ε, α): 
+def transverse_mercator(_N, _ε, α): 
     """
     Compute normalised TM coordinates (N, E)
     Accepts: 
@@ -80,8 +77,8 @@ def tm_ratios(_N, _ε, α):
         _ε: normalised gauss-schreiber easting
         α: krueger_coefficients
     returns
-        N: MGA northing
-        E: MGA easting
+        N: normalised TM northing
+        E: normalised TM easting
     """
     N = _N + sum(TM_n_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
     E = _ε + sum(TM_e_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
@@ -104,6 +101,32 @@ def gauss_schreiber(_t, ω, a):
     _ε = u / a 
     _N = v / a
     return _ε, _N
+
+def q_component(α, r, _ε, _N):
+    return 2*r*α[2*r] * sin(2*r*_ε)*sinh(2*r*_N)
+
+def p_component(α, r, _ε, _N):
+    return 2*r*α[2*r]*cos(2*r*_ε)*cosh(2*r*_N)
+
+def pq_coefficients(α, _ε, _N):
+    """
+    gives the p, q coefficients for eq (70-75)
+    accepts: 
+        _N: normalised gauss-schreiber northing
+        _ε: normalised gauss-schreiber easting
+        α: krueger_coefficients
+    returns:
+        p, q: coeffs
+    """
+    q = - sum(
+        q_component(α, r, _ε, _N) 
+        for r in np.linspace(start=1, stop=8, num=8)
+        )
+    p = 1 + sum(
+        p_component(α, r, _ε, _N)
+        for r in np.linspace(start=1, stop=8, num=8)
+        )
+    return q, p
 
 
 def conformal_latitude(φ, e):

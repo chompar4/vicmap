@@ -77,10 +77,7 @@ def geographic_to_grid(dLat, dLng):
     _ε, _N = gauss_schreiber(_t, ω, a)
 
     # Step 7 - TM ratios 
-    N, E = tm_ratios(_N, _ε, α)
-
-    assert round(N, 9) == -0.017855357, 'N: {}'.format(round(N, 9))
-    assert round(E, 9) == -0.411341630, 'E: {}'.format(round(E, 9))
+    N, E = transverse_mercator(_N, _ε, α)
 
     # Step 8 - TM coords
     X = A*N
@@ -90,19 +87,11 @@ def geographic_to_grid(dLat, dLng):
     easting = central_scale_factor * X + false_easting
     northing = central_scale_factor * Y + false_northing
 
-    # currently accurate to 10m - functionalising alpha will fix this
-    # assert round(easting, 4) == 386352.3977, 'Easting: {}'.format(round(easting, 4))
-    # assert round(northing, 4) == 7381850.7688, 'Northing: {}'.format(northing)
-
     print('Easting: {}'.format(easting))
     print('Northing: {}'.format(northing))
 
     # Step 10 - q & p
-    q = - sum(q_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
-    p = 1 + sum(p_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
-
-    assert round(q, 13) == -4.39817971E-05, 'q: {}'.format(round(q, 13))
-    assert round(p, 9) == 1.001141755, 'q: {}'.format(round(p, 9))
+    q, p = pq_coefficients(α, _ε, _N)
 
     # Step 11 - Point scale factor k
     k = central_scale_factor * (A/a) * sqrt(q**2 + p**2) * (

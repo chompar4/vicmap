@@ -1,15 +1,17 @@
 import math
-from constants import mga_zones, cm_mga_zone
 from utils import get_cm
 
 def convergence(lat, lng):
     """
     Compute the grid convergence in decimal degrees for
     latitude and longitude coordinates in the MGA (Map Grid of Australia) zones.
-    Does not depend on datum so should work for gda94 & gda20 (and future datums). 
-
-    Grid convergence will increase away from the zone's central meridian,
-    and will equal 0 at the central meridian.
+    # TODO: get_cm only returns values inside MGA zones
+    Works for both GDA20 and GDA94.
+    accepts: 
+        lat: latitude in decimal degrees 
+        lng: longitude in decimal degrees
+    returns 
+        dG: grid convergence in decical degrees
     """
 
     lat, lng = float(lat), float(lng)
@@ -19,10 +21,10 @@ def convergence(lat, lng):
 
     dev = math.radians(lng - get_cm(lng))
     latitude = math.radians(lat)
-    grid_convergence_rad = math.atan(-math.sin(latitude) * math.tan(dev))
-    grid_convergence_deg = math.degrees(grid_convergence_rad)
+    rG = math.atan(-math.sin(latitude) * math.tan(dev))
+    dG = math.degrees(rG)
 
-    return grid_convergence_deg
+    return dG
 
 
 if __name__ == "__main__":

@@ -45,17 +45,14 @@ _f = inverse_flattening[coordinate_set]
 # GDA / MGA Zones 
 # ---------------
 
-# MGA zones of longitude: independant of datum
-mga_zones = {
-    (108, 114): 49,
-    (114, 120): 50,
-    (120, 126): 51,
-    (126, 132): 52,
-    (132, 138): 53,
-    (138, 144): 54,
-    (144, 150): 55,
-    (150, 156): 56,
-}
+# Longitude of the central meridian of zone 1 (degrees)
+cm_zone1 = -177 # (-180, 180)
+
+# Longitude of western edge of zone zero
+zone0_edge = cm_zone1 - (1.5*zone_width)
+
+# Central meridian of zone zero
+cm_zone0 = cm_zone1 + zone_width / 2
 
 # Central meridian longitude of MGA zones
 cm_mga_zone = {
