@@ -1,9 +1,11 @@
 from constants import coordinate_set, a, _f, false_easting, false_northing, central_scale_factor, zone_width, central_meridian
 import math
 from utils import get_cm
+import numpy as np
 
 tan = math.tan 
 cos = math.cos 
+cosh = math.cosh
 sin = math.sin
 sinh = math.sinh
 atan = math.atan 
@@ -99,6 +101,18 @@ def geographic_to_grid(dLat, dLng):
         1424729850961/743921418240*n8
     )
 
+    # store in dict for access
+    α = {
+        2: α2, 
+        4: α4, 
+        6: α6, 
+        8: α8, 
+        10: α10, 
+        12: α12, 
+        14: α14, 
+        16: α16, 
+    }
+
     assert round(α2, 16) == 8.377318247286E-04, 'a2: {}'.format(round(α2, 16))
     assert round(α4, 19) == 7.608527848150E-07, 'a4: {}'.format(round(α4, 19))
     assert round(α6, 21) == 1.197645520855E-09, 'a6: {}'.format(round(α6, 21))
@@ -137,6 +151,19 @@ def geographic_to_grid(dLat, dLng):
 
     assert round(_ε, 9) == -0.410727143, "_e : {}".format(_ε)
     assert round(_N, 9) == -0.017835003, "_N : {}".format(_N)
+
+    # Step 7 - TM rations 
+    N = _N + sum(TM_n_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    E = _ε + sum(TM_e_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+
+    assert round(N, 9) == -0.017855357, 'N: {}'.format(round(N, 9))
+    assert round(E, 9) == -0.411341630, 'E: {}'.format(round(E, 9))
+
+def TM_n_component(α, r, _ε, _N):
+    return α[2*r] * cos(2*r*_ε) * sinh(2*r*_N)
+
+def TM_e_component(α, r, _ε, _N):
+    return α[2*r] * sin(2*r*_ε) * cosh(2*r*_N)
 
 if __name__ == "__main__":
     geographic_to_grid(-23.67012389, 133.8855133)
