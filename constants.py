@@ -49,7 +49,7 @@ _f = inverse_flattening[coordinate_set]
 # GDA / MGA Zones 
 # ---------------
 
-# MGA zones of longitude: independant of 94/20
+# MGA zones of longitude: independant of datum
 mga_zones = {
     (108, 114): 49,
     (114, 120): 50,
