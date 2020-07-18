@@ -17,9 +17,7 @@ def convergence(lat, lng):
     assert -85 < lat < 85, "latitude value {} is outside feasible bounds".format(lat)
     assert 108 < lng < 156, "longitude value {} is outside MGA zones".format(lng)
 
-    cm = get_cm(lng)
-
-    dev = math.radians(lng - central_meridial)
+    dev = math.radians(lng - get_cm(lng))
     latitude = math.radians(lat)
     grid_convergence_rad = math.atan(-math.sin(latitude) * math.tan(dev))
     grid_convergence_deg = math.degrees(grid_convergence_rad)

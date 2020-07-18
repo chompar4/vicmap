@@ -16,7 +16,8 @@ from utils import (
     q_component,
     p_component,
     TM_n_component,
-    TM_e_component
+    TM_e_component, 
+    grid_convergence
 )
 import numpy as np
 import math
@@ -59,21 +60,11 @@ def geographic_to_grid(dLat, dLng):
     # Step 1: Compute ellipsiodal constants
     f, e2, n = ellipsoidal_constants(_f)
 
-    # Step 2: Compute rectifying radius A 
+    # Step 2: Compute rectifying radius A
     A = rectifying_radius(a, n)
-    assert round(A, 7)  == 6367449.145771
 
     # Step 3: krueger coefficients for r = 1, 2, ..., 8
     α = krueger_coefficients(n)
-
-    assert round(α[2], 16) == 8.377318247286E-04, 'a2: {}'.format(round(α2, 16))
-    assert round(α[4], 19) == 7.608527848150E-07, 'a4: {}'.format(round(α4, 19))
-    assert round(α[6], 21) == 1.197645520855E-09, 'a6: {}'.format(round(α6, 21))
-    assert round(α[8], 24) == 2.429170728037E-12, 'a8: {}'.format(round(α8, 24))
-    assert round(α[10], 27) == 5.711818510466E-15, 'a10: {}'.format(round(α10, 27))
-    assert round(α[12], 29) == 1.479997974926E-17, 'a12: {}'.format(round(α12, 29))
-    assert round(α[14], 32) == 4.107624250384E-20, 'a14: {}'.format(round(α14, 32))
-    assert round(α[16], 34) == 1.210785086483E-22, 'a16: {}'.format(round(α16, 34))
 
     # Step 4 - conformal latitude _φ
     e = sqrt(e2)

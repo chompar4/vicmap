@@ -1,5 +1,17 @@
 from constants import mga_zones, cm_mga_zone
 
+import math
+
+tan = math.tan
+cos = math.cos
+cosh = math.cosh
+sin = math.sin
+sinh = math.sinh
+atan = math.atan 
+atanh = math.atanh
+asinh = math.asinh
+sqrt = math.sqrt
+
 def get_mga_zone(lng):
     """
     Get the mga zone containing longitude 'lng'
