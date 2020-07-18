@@ -13,6 +13,18 @@ def get_cm(lng):
     """
     return cm_mga_zone[get_mga_zone(lng)]
 
+def q_component(α, r, _ε, _N):
+    return 2*r*α[2*r] * sin(2*r*_ε)*sinh(2*r*_N)
+
+def p_component(α, r, _ε, _N):
+    return 2*r*α[2*r]*cos(2*r*_ε)*cosh(2*r*_N)
+
+def TM_n_component(α, r, _ε, _N):
+    return α[2*r] * cos(2*r*_ε) * sinh(2*r*_N)
+
+def TM_e_component(α, r, _ε, _N):
+    return α[2*r] * sin(2*r*_ε) * cosh(2*r*_N)
+
 def rectifying_radius(a, n):
     """
     gives the rectifying radius A of a circle having 
@@ -43,7 +55,18 @@ def ellipsoidal_constants(_f):
     f = 1/_f
     e2 = f * (2-f)
     n = f / (2-f)
-    return f, e2, n    
+    return f, e2, n   
+
+def grid_convergence(q, p, _t, ω):
+    """
+    gives the angle between the meridian
+    and the grid-line parallel to the u-axis
+    """
+    return atan(abs(q/p)) + atan(
+        abs(_t * tan(ω))
+        /
+        sqrt(1 + _t**2)
+    ) 
 
 def krueger_coefficients(n):
     """

@@ -1,10 +1,28 @@
-from constants import coordinate_set, a, _f, false_easting, false_northing, central_scale_factor, zone_width
+from constants import (
+    coordinate_set, 
+    a, 
+    _f, 
+    false_easting,
+    false_northing,
+    central_scale_factor,
+    zone_width
+)
 import math
-from utils import get_cm, krueger_coefficients, rectifying_radius, ellipsoidal_constants
+from utils import (
+    get_cm,
+    krueger_coefficients,
+    rectifying_radius,
+    ellipsoidal_constants,
+    q_component,
+    p_component,
+    TM_n_component,
+    TM_e_component
+)
 import numpy as np
+import math
 
-tan = math.tan 
-cos = math.cos 
+tan = math.tan
+cos = math.cos
 cosh = math.cosh
 sin = math.sin
 sinh = math.sinh
@@ -14,11 +32,29 @@ asinh = math.asinh
 sqrt = math.sqrt
 
 def geographic_to_grid(dLat, dLng):
-    print('performing conversion using {}'.format(coordinate_set))
+    """
+    Perform a transformation from geographic to grid coordinates
+    using the Krueger n-series equations. Ellipsoidal constants
+    are defined in the constants file. In theory these 
+    calculations should be accutate to less than a micrometer. 
+    Accepts:
+        - dLat: latitude in decimal degrees (-90, 90]
+        - dLng: longitude in decimal degrees (-180, 180]
+    returns: 
+        - Zone
+        - Easting 
+        - Northing
+        - Point Scale Factor
+        - Grid Convergence
+    """
+
+    print('performing conversion using {} datum'.format(coordinate_set))
+
+    assert -90 < dLat <= 90, 'latitude out of bounds'
+    assert -180 < dLng < 180, 'longitude out of bounds'
 
     rLat = math.radians(dLat)
     rLng = math.radians(dLng)
-
 
     # Step 1: Compute ellipsiodal constants
     f, e2, n = ellipsoidal_constants(_f)
@@ -28,7 +64,6 @@ def geographic_to_grid(dLat, dLng):
     assert round(A, 7)  == 6367449.145771
 
     # Step 3: krueger coefficients for r = 1, 2, ..., 8
-    # TODO: generalise to higher r <= 8
     α = krueger_coefficients(n)
 
     assert round(α[2], 16) == 8.377318247286E-04, 'a2: {}'.format(round(α2, 16))
@@ -106,25 +141,8 @@ def geographic_to_grid(dLat, dLng):
     assert round(k, 10) == round(0.99975953924774, 10), 'k: {}'.format(k)
 
     # Step 12 - Grid convergence γ
-    γ = atan(abs(q/p)) + atan(
-        abs(_t * tan(ω))
-        /
-        sqrt(1 + _t**2)
-    )
-
+    γ = grid_convergence(q, p, _t, ω)
     assert round(γ, 9) == round(0.0078100240938, 9), 'γ: {}'.format(γ)
-
-def q_component(α, r, _ε, _N):
-    return 2*r*α[2*r] * sin(2*r*_ε)*sinh(2*r*_N)
-
-def p_component(α, r, _ε, _N):
-    return 2*r*α[2*r]*cos(2*r*_ε)*cosh(2*r*_N)
-
-def TM_n_component(α, r, _ε, _N):
-    return α[2*r] * cos(2*r*_ε) * sinh(2*r*_N)
-
-def TM_e_component(α, r, _ε, _N):
-    return α[2*r] * sin(2*r*_ε) * cosh(2*r*_N)
 
 if __name__ == "__main__":
     geographic_to_grid(-23.67012389, 133.8855133)
