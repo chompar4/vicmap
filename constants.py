@@ -37,10 +37,6 @@ central_scale_factor = 0.9996
 # Zone width (degrees)
 zone_width = 6
 
-# Longitude of the central meridian of zone 1 (degrees)
-central_meridian = -177
-assert -180 < central_meridian <= 180, 'please specify central meridian in range (-180, 180]'
-
 # in defined coords
 a = semi_major_axis[coordinate_set]
 _f = inverse_flattening[coordinate_set]

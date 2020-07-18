@@ -1,4 +1,4 @@
-from constants import coordinate_set, a, _f, false_easting, false_northing, central_scale_factor, zone_width, central_meridian
+from constants import coordinate_set, a, _f, false_easting, false_northing, central_scale_factor, zone_width
 import math
 from utils import get_cm
 import numpy as np
@@ -25,6 +25,8 @@ def geographic_to_grid(dLat, dLng):
     f = 1/_f            # flattening 
     e2 = f * (2-f)      # e^2
     n = f / (2-f)       # n 
+
+    # TODO: generalise powers of N to arbitrary precision
 
     # Step 2a: Compute powers of n 
     n2 = n ** 2
@@ -122,8 +124,7 @@ def geographic_to_grid(dLat, dLng):
     assert round(α14, 32) == 4.107624250384E-20, 'a14: {}'.format(round(α14, 32))
     assert round(α16, 34) == 1.210785086483E-22, 'a16: {}'.format(round(α16, 34))
 
-    # Step 4 - conformal latitude φ
-
+    # Step 4 - conformal latitude _φ
     e = sqrt(e2)
     t = tan(rLat)
     σ = sinh(e * atanh(e * t / sqrt(1 + t**2)))
@@ -142,9 +143,7 @@ def geographic_to_grid(dLat, dLng):
 
     # Step 6 - Gauss-Schreiber 
     u = a * atan(_t/cos(ω))
-    v = a * asinh(
-        sin(ω) / sqrt(_t**2 + (cos(ω)**2))
-        )
+    v = a * asinh(sin(ω) / sqrt(_t**2 + (cos(ω)**2)))
 
     _ε = u / a 
     _N = v / a
@@ -158,6 +157,35 @@ def geographic_to_grid(dLat, dLng):
 
     assert round(N, 9) == -0.017855357, 'N: {}'.format(round(N, 9))
     assert round(E, 9) == -0.411341630, 'E: {}'.format(round(E, 9))
+
+    # Step 8 - TM coords
+    X = A*N
+    Y = A*E
+
+    # Step 9 - MGA2020 coordinates (E, N)
+    easting = central_scale_factor * X + false_easting
+    northing = central_scale_factor * Y + false_northing
+
+    # currently accurate to 10m - functionalising alpha will fix this
+    # assert round(easting, 4) == 386352.3977, 'Easting: {}'.format(round(easting, 4))
+    # assert round(northing, 4) == 7381850.7688, 'Northing: {}'.format(northing)
+
+    print('Easting: {}'.format(easting))
+    print('Northing: {}'.format(northing))
+
+    # Step 10 - q & p
+    q = - sum(q_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+    p = 1 + sum(p_component(α, r, _ε, _N) for r in np.linspace(start=1, stop=8, num=8))
+
+    assert round(q, 13) == -4.39817971E-05, 'q: {}'.format(round(q, 13))
+    assert round(p, 9) == 1.001141755, 'q: {}'.format(round(p, 9))
+
+
+def q_component(α, r, _ε, _N):
+    return 2*r*α[2*r] * sin(2*r*_ε)*sinh(2*r*_N)
+
+def p_component(α, r, _ε, _N):
+    return 2*r*α[2*r]*cos(2*r*_ε)*cosh(2*r*_N)
 
 def TM_n_component(α, r, _ε, _N):
     return α[2*r] * cos(2*r*_ε) * sinh(2*r*_N)
