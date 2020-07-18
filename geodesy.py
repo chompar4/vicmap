@@ -10,13 +10,14 @@ from constants import (
 import math
 from utils import (
     get_cm,
+    get_zone,
+    conformal_latitude,
+    gauss_schreiber,
+    transverse_mercator,
+    pq_coefficients,
     krueger_coefficients,
     rectifying_radius,
     ellipsoidal_constants,
-    q_component,
-    p_component,
-    TM_n_component,
-    TM_e_component, 
     grid_convergence
 )
 import numpy as np
@@ -39,14 +40,14 @@ def geographic_to_grid(dLat, dLng):
     are defined in the constants file. In theory these 
     calculations should be accutate to less than a micrometer. 
     Accepts:
-        - dLat: latitude in decimal degrees (-90, 90]
-        - dLng: longitude in decimal degrees (-180, 180]
+        dLat: latitude in decimal degrees (-90, 90]
+        dLng: longitude in decimal degrees (-180, 180]
     returns: 
-        - Zone
-        - Easting 
-        - Northing
-        - Point Scale Factor
-        - Grid Convergence
+        z: Zone
+        E: UTM Easting
+        N: UTM Northing
+        m: Point Scale Factor
+        γ: Grid Convergence
     """
 
     print('performing conversion using {} datum'.format(coordinate_set))
@@ -56,6 +57,7 @@ def geographic_to_grid(dLat, dLng):
 
     rLat = math.radians(dLat)
     rLng = math.radians(dLng)
+    z = get_zone(dLng)
 
     # Step 1: Compute ellipsiodal constants
     f, e, e2, n = ellipsoidal_constants(_f)
@@ -87,24 +89,26 @@ def geographic_to_grid(dLat, dLng):
     easting = central_scale_factor * X + false_easting
     northing = central_scale_factor * Y + false_northing
 
-    print('Easting: {}'.format(easting))
-    print('Northing: {}'.format(northing))
-
     # Step 10 - q & p
     q, p = pq_coefficients(α, _ε, _N)
 
-    # Step 11 - Point scale factor k
-    k = central_scale_factor * (A/a) * sqrt(q**2 + p**2) * (
+    # Step 11 - Point scale factor m
+    m = central_scale_factor * (A/a) * sqrt(q**2 + p**2) * (
         sqrt(1 + t**2)*sqrt(1-e2*sin(rLat)**2)
         /
         sqrt(_t**2 + cos(ω)**2)
     )
 
-    assert round(k, 10) == round(0.99975953924774, 10), 'k: {}'.format(k)
+    assert round(m, 10) == round(0.99975953924774, 10), 'k: {}'.format(k)
 
     # Step 12 - Grid convergence γ
     γ = grid_convergence(q, p, _t, ω)
-    assert round(γ, 9) == round(0.0078100240938, 9), 'γ: {}'.format(γ)
+    dγ = math.degrees(γ)
+
+    return z, easting, northing, m, dγ
 
 if __name__ == "__main__":
-    geographic_to_grid(-23.67012389, 133.8855133)
+    z, E, N, m, γ = geographic_to_grid(-23.67012389, 133.8855133)
+    print(
+        " z: {}\n E: {}\n N: {}\n m: {}\n γ: {}".format(z, E, N, m, γ)
+    )

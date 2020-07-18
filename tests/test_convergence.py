@@ -4,7 +4,7 @@ import numpy as np
 import pytest
 
 def test_known_convergence():
-    assert convergence(80, 150) == 2.9545046305808174
+    assert convergence(80, 150) == -2.9545046305808174
 
 
 meridian_grid = [

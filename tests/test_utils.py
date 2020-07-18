@@ -1,4 +1,4 @@
-from utils import get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, ellipsoidal_constants, rectifying_radius, krueger_coefficients
+from utils import grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, ellipsoidal_constants, rectifying_radius, krueger_coefficients
 
 import pytest 
 import numpy as np
@@ -85,3 +85,11 @@ def test_pq_coefficients():
     q, p = pq_coefficients(α, _N, _ε)
     assert round(q, 12) == -4.398179750E-05, 'q: {}'.format(round(q, 13))
     assert round(p, 12) == 1.001141755E+00, 'p: {}'.format(round(p, 9))
+
+def test_grid_convergence():
+    q = -4.398179750E-05
+    p = 1.001141755E+00
+    _t = -0.435413597639
+    ω = -0.019451463
+    γ = grid_convergence(q, p, _t, ω)
+    assert round(γ, 12) == -0.007810024262, 'γ: {}'.format(γ)
