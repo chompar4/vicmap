@@ -102,12 +102,14 @@ def geographic_to_grid(dLat, dLng):
 
     e = math.sqrt(e2)
     t = math.tan(rLat)
-    σ = math.sinh(e * math.atan(e * t / math.sqrt(1 + t**2)))
+    σ = math.sinh(e * math.atanh(e * t / math.sqrt(1 + t**2)))
     _t = t*math.sqrt(1 + σ**2) - σ*math.sqrt(1 + t**2)
     _φ = math.atan(_t)
 
 
     assert round(e, 12)  == 0.081819191043, "e: {}".format(round(e, 12))
+    assert round(σ, 12) == -0.002688564997, 'σ: {}'.format(round(σ, 12))
+    assert round(_t, 12) == -0.435413597639, "_t: {}".format(round(_t, 12))
 
 
     assert _φ == -0.410657890815, "_φ (rad): {}".format(_φ)
