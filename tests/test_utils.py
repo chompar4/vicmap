@@ -106,8 +106,8 @@ def test_vicgrid94_constants():
     φ0 = radians(-37)
     φ1 = radians(-36)
     φ2 = radians(-38)
-    n, F, ρ0, _, _ = vicgrid94_constants(10, φ0, φ1, φ2, WGS84)
+    n, c, r0, _, _ = vicgrid94_constants(10, φ0, φ1, φ2, WGS84)
 
     assert round(n, 6) == round(-0.6018461056, 6)
-    assert round(F, 1) == -12849334.6
-    assert ρ0 == 8472630.5
+    assert round(c, 1) == -12849334.6
+    assert r0 == 8472630.5

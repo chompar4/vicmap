@@ -254,52 +254,33 @@ def vicgrid94_constants(φ, φ0, φ1, φ2, datum):
 
     assert φ1 != φ2, 'standard parrallels equal, use different'
 
-    a, f, e, e2, _ = datum.constants
+    def Q(φ):
+        return π/4 - φ/2
 
-    def q(φ):
-        return (π/4 - φ/2)
+    q = Q(φ)
+    q0 = Q(φ0)
+    q1 = Q(φ1)
+    q2 = Q(φ2)
 
-    def m(φ):
-        return (
-            (1+e*sin(φ)) / (1-e*sin(φ))
-        ) ** (e/2)
+    v1 = datum.max_radii_curvature(φ1)
+    v2 = datum.max_radii_curvature(φ2)
 
-    def max_curvature(φ):
-        return a / sqrt(1 - (e*sin(φ))**2)
+    r0 = datum.min_radii_curvature(φ0)
 
-    def r(φ):
-        return (
-            a * (1-e2)
-        ) / (
-            (1 - (e * sin(φ))**2) ** (3/2)
-        )
-    
-    Q = q(φ)
-    q0 = q(φ0)
-    q1 = q(φ1)
-    q2 = q(φ2)
-
-    v1 = max_curvature(φ1)
-    v2 = max_curvature(φ2)
-
-    m1 = m(φ1)
-    m2 = m(φ2)
+    m = datum.m(φ)
+    m1 = datum.m(φ1)
+    m2 = datum.m(φ2)
 
     n = (
-            ln(v1*cos(φ1)) - ln(v2*cos(φ2))
-        ) / (
-            ln(m1*tan(q1)) - ln(m2*tan(q2))
-        )
+        ln(v1*cos(φ1)) - ln(v2*cos(φ2))
+    ) / (
+        ln(m1*tan(q1)) - ln(m2*tan(q2))
+    )
 
-    F = (
-        v1 * cos(φ1)
-        ) / (
-            n*(m1*tan(q1))**n
-        )
+    c = v1 * cos(φ1) / (
+        n*(m1*tan(q1))**n
+    )
 
-    r0 = r(φ0)
-    M = m(φ)
-
-    return n, F, r0, M, Q
+    return n, c, r0, m, q
 
     

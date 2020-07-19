@@ -56,7 +56,7 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
     z = get_zone(dLng)
 
     # Step 1: Compute ellipsiodal constants
-    a, f, e, e2, n = datum.constants
+    a, _, f, e, e2, n = datum.constants
 
     # Step 2: Compute rectifying radius A
     A = rectifying_radius(a, n)
@@ -112,18 +112,20 @@ def geographic_to_vicgrid94(dLat, dLng):
     φ = radians(dLat)
     λ = radians(dLng)
 
-    φ1 = radians(φ1)
-    φ2 = radians(φ2)
     λ0 = radians(λ0)
     φ0 = radians(φ0)
 
-    # Step 1: n, r, ρ0, F
-    n, F, r0, m, q = vicgrid94_constants(φ, φ0, φ1, φ2, datum)
+    φ1 = radians(φ1)
+    φ2 = radians(φ2)
 
-    # Step 2: determine easting and northing
-    r = -n * (m * tan(q)) ** n
+    # Step 1: n, r, ρ0, F
+    n, c, r0, m, q = vicgrid94_constants(φ, φ0, φ1, φ2, datum)
+
+    # Step 2: determine polar coords
+    r = -c * (m * tan(q)) ** n
     θ = -n * (λ - λ0)
 
+    # Step 2: determine easting and northing wrt true origin
     X = r * sin(θ)
     Y = r * cos(θ) - r0
 
