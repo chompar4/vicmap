@@ -64,14 +64,9 @@ cm_mga_zone = {
 # --------------------
 # Lambert conformal conic projection
 
-datum_vicgrid94 = "AGD66"
-
 # standard parrallels 36°S & 38°S
 φ1 = -36
 φ2 = -38
-
-# Central meridian - 145°E
-cm_vicgrid94 = 145
 
 # The origin of VICGRID coordinates is 2,500,000 metres west and
 # 2,500,000 metres south of the intersection of the parallel of
@@ -80,9 +75,9 @@ cm_vicgrid94 = 145
 E0_vicgrid94 = 2500000
 N0_vicgrid94 = 2500000
  
-# reference longitude - origin
+# true origin longitude
 λ0 = 145
 
-# reference latitude - origin
+# true origin latitude
 φ0 = -37
 

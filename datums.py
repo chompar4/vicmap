@@ -46,8 +46,8 @@ class Datum:
     def max_radii_curvature(self, φ):
         "max radius of curvature at the latitude φ"
         top = self.a 
-        bottom = 1 - self.e2 * sin(φ)**2
-        return self.a / bottom ** 0.5
+        bottom = (1 - self.e2 * sin(φ)**2) ** 0.5
+        return self.a / bottom
 
     def min_radii_curvature(self, φ):
         "min radius of curvature at the latitude φ"

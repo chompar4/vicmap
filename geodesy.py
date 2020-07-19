@@ -99,14 +99,11 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
 
 def geographic_to_vicgrid94(dLat, dLng):
     
-    from constants import φ1, φ2, cm_vicgrid94, λ0, φ0, datum_vicgrid94
+    from constants import φ1, φ2, λ0, φ0
     from datums import GDA20
 
-    # datum 
+    # datum
     datum = GDA20
-
-    # pre-compute
-    qp = 1/4*π
 
     # work with radians
     φ = radians(dLat)
@@ -118,12 +115,13 @@ def geographic_to_vicgrid94(dLat, dLng):
     φ1 = radians(φ1)
     φ2 = radians(φ2)
 
-    # Step 1: n, r, ρ0, F
+    # Step 1: n, r, r0, F
     n, c, r0, m, q = vicgrid94_constants(φ, φ0, φ1, φ2, datum)
 
     # Step 2: determine polar coords
-    r = -c * (m * tan(q)) ** n
-    θ = -n * (λ - λ0)
+    coeff = -1 if φ < 0 else 1
+    r = coeff * c * (m * tan(q)) ** n
+    θ = coeff * n * (λ - λ0)
 
     # Step 2: determine easting and northing wrt true origin
     X = r * sin(θ)
