@@ -1,6 +1,4 @@
 from constants import (
-    semi_major_axis, 
-    inverse_flattening,
     E0, 
     N0,
     m0,
@@ -16,24 +14,21 @@ from utils import (
     pq_coefficients,
     krueger_coefficients,
     rectifying_radius,
-    ellipsoidal_constants,
     grid_convergence, 
     point_scale_factor
 )
 import numpy as np
 import math
 
-tan = math.tan
-cos = math.cos
-cosh = math.cosh
-sin = math.sin
-sinh = math.sinh
-atan = math.atan 
-atanh = math.atanh
-asinh = math.asinh
-sqrt = math.sqrt
+from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
+from datums import GDA20
 
-def geographic_to_mga(dLat, dLng):
+ln = math.log
+sec = lambda x: 1/cos(x)
+cot = lambda x: 1/tan(x)
+π = math.pi
+
+def geographic_to_mga(dLat, dLng, datum=GDA20):
     """
     Perform a transformation from geographic to MGA grid coordinates
     using the Krueger n-series equations, up to order 8.
@@ -51,22 +46,17 @@ def geographic_to_mga(dLat, dLng):
         γ: Grid Convergence
     """
 
-    # Define datum
-    datum = "GDA20"
-    a = semi_major_axis[datum]
-    _f = inverse_flattening[datum]
-
-    print('performing conversion using {} datum'.format(datum))
+    print('performing conversion using {} datum'.format(datum.name))
 
     assert -90 < dLat <= 90, 'latitude out of bounds'
     assert -180 < dLng < 180, 'longitude out of bounds'
 
-    rLat = math.radians(dLat)
-    rLng = math.radians(dLng)
+    rLat = radians(dLat)
+    rLng = radians(dLng)
     z = get_zone(dLng)
 
     # Step 1: Compute ellipsiodal constants
-    f, e, e2, n = ellipsoidal_constants(_f)
+    a, f, e, e2, n = datum.constants
 
     # Step 2: Compute rectifying radius A
     A = rectifying_radius(a, n)
@@ -108,7 +98,46 @@ def geographic_to_mga(dLat, dLng):
     return z, easting, northing, m, dγ
 
 def geographic_to_vicgrid94(dLat, dLng):
-    pass 
+    
+    from constants import φ1, φ2, cm_vicgrid94, λ0, φ0, datum_vicgrid94
+    from datums import AGD66
+
+    # datum 
+    a = AGD66.a
+
+    # work with radians
+    φ = radians(dLat)
+    λ = radians(dLng)
+
+    φ1 = radians(φ1)
+    φ2 = radians(φ2)
+    λ0 = radians(λ0)
+    φ0 = radians(φ0)
+
+    # pre-compute
+    qp = 1/4*π
+
+    # Step 1: n, ρ, ρ0, F
+    n = (
+        ln(cos(φ1)*sec(φ2))
+    ) / (
+        ln(
+            tan(qp + 1/2*φ2)*cot(qp + 1/2*φ1)
+        )
+    )
+
+    F = 1/n * cos(φ1) * tan(qp + 1/2*φ1) ** n
+
+    ρ = F * cot(qp + 1/2*φ) ** n
+    ρ0 = F * cot(qp + 1/2*φ0) ** n
+
+    # Step 2: determine easting and northing
+    x = ρ * sin(n * (λ - λ0))
+    y = ρ0  - ρ * cos(n * (λ - λ0))
+
+    return x*a, y*a
+
+
 
 def geographic_to_vicgrid(dLat, dLng):
-    pass 
+    pass

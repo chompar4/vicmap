@@ -1,4 +1,5 @@
 from constants import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0
+from datums import GDA20, WGS84
 
 import math
 import numpy as np
@@ -53,23 +54,6 @@ def rectifying_radius(a, n):
             + (25/ 16384) * n**8
         )
     )
-
-def ellipsoidal_constants(_f):
-    """
-    gives the required ellipsoidal constants
-    of an ellipse with:
-        _f : inverse flattening
-    returns: 
-        f: flattening
-        e: eecentricity
-        e2: eecentricity^2
-        n: 3rd flattening
-    """
-    f = 1/_f
-    e2 = f * (2-f)
-    e = sqrt(e2)
-    n = f / (2-f)
-    return f, e, e2, n   
 
 def transverse_mercator(_Nu, _ε, α): 
     """
@@ -262,6 +246,72 @@ def krueger_coefficients(n):
     }
 
 
+def _py_distance(point1, point2, ellipsoid=WGS84):
+    '''
+    From: geo-py package, which explodes on build currently
+    Calculating distance with using vincenty's formula
+    https://en.wikipedia.org/wiki/Vincenty's_formulae
+    '''
+    lon1, lat1 = (radians(coord) for coord in point1)
+    lon2, lat2 = (radians(coord) for coord in point2)
+
+    U1 = atan((1 - ellipsoid.f) * tan(lat1))
+    U2 = atan((1 - ellipsoid.f) * tan(lat2))
+    L = lon2 - lon1
+    Lambda = L
+
+    sinU1 = sin(U1)
+    cosU1 = cos(U1)
+    sinU2 = sin(U2)
+    cosU2 = cos(U2)
+
+    for _ in range(MAX_ITERATIONS):
+        sinLambda = sin(Lambda)
+        cosLambda = cos(Lambda)
+        sinSigma = sqrt(
+            (cosU2 * sinLambda) ** 2 +
+            (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) ** 2)
+        # coincident points
+        if sinSigma == 0:
+            return 0.0
+
+        cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda
+        sigma = atan2(sinSigma, cosSigma)
+        sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma
+        cosSqAlpha = 1 - sinAlpha ** 2
+        try:
+            cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha
+        except ZeroDivisionError:
+            cos2SigmaM = 0
+
+        C = (ellipsoid.f / 16) * cosSqAlpha * (
+            4 + ellipsoid.f * (4 - 3 * cosSqAlpha)
+        )
+        LambdaPrev = Lambda
+        Lambda = (
+            L + (1 - C) * ellipsoid.f * sinAlpha * (
+                sigma + C * sinSigma * (
+                    cos2SigmaM + C * cosSigma * (
+                        -1 + 2 * cos2SigmaM ** 2
+                    )
+                )
+            )
+        )
+
+        if abs(Lambda - LambdaPrev) < CONVERGENCE_THRESHOLD:
+            break
+    else:
+        # failure to converge
+        return None
+
+    uSq = cosSqAlpha * (ellipsoid.a ** 2 - ellipsoid.b ** 2) / (ellipsoid.b ** 2)
+    A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)))
+    B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)))
+    deltaSigma = B * sinSigma * (cos2SigmaM + B / 4 * (cosSigma *
+                 (-1 + 2 * cos2SigmaM ** 2) - B / 6 * cos2SigmaM *
+                 (-3 + 4 * sinSigma ** 2) * (-3 + 4 * cos2SigmaM ** 2)))
+    s = ellipsoid.b * A * (sigma - deltaSigma)
+    return s
 
 
     
