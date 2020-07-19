@@ -1,7 +1,3 @@
-# Choose the coord set
-coordinate_set = "GDA20" # GDA2020/MGA2020
-
-
 # Ellipsoid definition
 # --------------------
 
@@ -22,7 +18,7 @@ inverse_flattening = {
 }
 
 
-# Transverse Mercator Definition
+# MGA Definition
 # ------------------------------
 
 # False easting (m)
@@ -36,14 +32,6 @@ m0 = 0.9996
 
 # Zone width (degrees)
 zone_width = 6
-
-# in defined coords
-a = semi_major_axis[coordinate_set]
-_f = inverse_flattening[coordinate_set]
-
-
-# GDA / MGA Zones 
-# ---------------
 
 # Longitude of the central meridian of zone 1 (degrees)
 cm_zone1 = -177 # (-180, 180)

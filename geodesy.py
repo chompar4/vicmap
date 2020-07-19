@@ -1,7 +1,6 @@
 from constants import (
-    coordinate_set, 
-    a, 
-    _f, 
+    semi_major_axis, 
+    inverse_flattening,
     E0, 
     N0,
     m0,
@@ -34,9 +33,9 @@ atanh = math.atanh
 asinh = math.asinh
 sqrt = math.sqrt
 
-def geographic_to_utm(dLat, dLng):
+def geographic_to_mga(dLat, dLng):
     """
-    Perform a transformation from geographic to UTM grid coordinates
+    Perform a transformation from geographic to MGA grid coordinates
     using the Krueger n-series equations, up to order 8.
     Ellipsoidal constants are defined in the constants file. 
     In theory these calculations should be accutate 
@@ -52,7 +51,12 @@ def geographic_to_utm(dLat, dLng):
         γ: Grid Convergence
     """
 
-    print('performing conversion using {} datum'.format(coordinate_set))
+    # Define datum
+    datum = "GDA20"
+    a = semi_major_axis[datum]
+    _f = inverse_flattening[datum]
+
+    print('performing conversion using {} datum'.format(datum))
 
     assert -90 < dLat <= 90, 'latitude out of bounds'
     assert -180 < dLng < 180, 'longitude out of bounds'
