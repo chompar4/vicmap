@@ -102,3 +102,9 @@ def geographic_to_utm(dLat, dLng):
     dγ = math.degrees(γ)
 
     return z, easting, northing, m, dγ
+
+def geographic_to_vicgrid94(dLat, dLng):
+    pass 
+
+def geographic_to_vicgrid(dLat, dLng):
+    pass 
