@@ -4,15 +4,11 @@ from datums import GDA20, WGS84
 import math
 import numpy as np
 
-tan = math.tan
-cos = math.cos
-cosh = math.cosh
-sin = math.sin
-sinh = math.sinh
-atan = math.atan 
-atanh = math.atanh
-asinh = math.asinh
-sqrt = math.sqrt
+from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt
+ln = math.log
+sec = lambda x: 1/cos(x)
+cot = lambda x: 1/tan(x)
+π = math.pi
 
 def get_zone(dLng):
     """
@@ -245,7 +241,65 @@ def krueger_coefficients(n):
         16: α16, 
     }
 
+def vicgrid94_constants(φ, φ0, φ1, φ2, datum):
 
+    """
+    compute constants required for lambert conformal
+    conic projection to vicmap coords
+    accepts: 
+        φ0: origin latitude
+        φ1: standard parrallel 1
+        φ2: standard parrallel 2
+    """
 
+    assert φ1 != φ2, 'standard parrallels equal, use different'
+
+    a, f, e, e2, _ = datum.constants
+
+    def q(φ):
+        return (π/4 - φ/2)
+
+    def m(φ):
+        return (
+            (1+e*sin(φ)) / (1-e*sin(φ))
+        ) ** (e/2)
+
+    def max_curvature(φ):
+        return a / sqrt(1 - (e*sin(φ))**2)
+
+    def r(φ):
+        return (
+            a * (1-e2)
+        ) / (
+            (1 - (e * sin(φ))**2) ** (3/2)
+        )
+    
+    Q = q(φ)
+    q0 = q(φ0)
+    q1 = q(φ1)
+    q2 = q(φ2)
+
+    v1 = max_curvature(φ1)
+    v2 = max_curvature(φ2)
+
+    m1 = m(φ1)
+    m2 = m(φ2)
+
+    n = (
+            ln(v1*cos(φ1)) - ln(v2*cos(φ2))
+        ) / (
+            ln(m1*tan(q1)) - ln(m2*tan(q2))
+        )
+
+    F = (
+        v1 * cos(φ1)
+        ) / (
+            n*(m1*tan(q1))**n
+        )
+
+    r0 = r(φ0)
+    M = m(φ)
+
+    return n, F, r0, M, Q
 
     

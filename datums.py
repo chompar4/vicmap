@@ -1,5 +1,5 @@
 from math import sqrt
-from constants import semi_major_axis, semi_minor_axis, inverse_flattening
+from constants import semi_major_axis, inverse_flattening
 
 class Datum:
     def __init__(self, name):
@@ -11,9 +11,13 @@ class Datum:
         """
 
         self.a = semi_major_axis[name]
-        self.b = semi_minor_axis[name]
         self._f = inverse_flattening[name]
         self.name = name
+
+    @property
+    def b(self):
+        "b; semi minor acis length (meters)"
+        return self.a / (1 - self.f)
 
     @property
     def e2(self):
@@ -46,6 +50,10 @@ class Datum:
         Calculating distance with using vincenty's formula
         https://en.wikipedia.org/wiki/Vincenty's_formulae
         '''
+
+        CONVERGENCE_THRESHOLD = 1e-12
+        MAX_ITERATIONS = 15
+
         lon1, lat1 = (radians(coord) for coord in point1)
         lon2, lat2 = (radians(coord) for coord in point2)
 

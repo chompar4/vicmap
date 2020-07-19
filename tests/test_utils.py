@@ -1,7 +1,10 @@
-from utils import point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, rectifying_radius, krueger_coefficients
+from utils import vicgrid94_constants, point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, rectifying_radius, krueger_coefficients
 
 import pytest 
 import numpy as np
+
+from math import radians
+from datums import WGS84
 
 zones = [
     (108, 114, 49),
@@ -98,3 +101,13 @@ def test_point_scale_factor():
     rLat = -0.413121596
     m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
     assert round(m, 12) == 0.999759539516, 'm: {}'.format(m)
+
+def test_vicgrid94_constants():
+    φ0 = radians(-37)
+    φ1 = radians(-36)
+    φ2 = radians(-38)
+    n, F, ρ0, _, _ = vicgrid94_constants(10, φ0, φ1, φ2, WGS84)
+
+    assert round(n, 6) == round(-0.6018461056, 6)
+    assert round(F, 1) == -12849334.6
+    assert ρ0 == 8472630.5

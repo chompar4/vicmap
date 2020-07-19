@@ -10,15 +10,6 @@ semi_major_axis = {
     "ANG": 6378350.871924
 }
 
-# Semi minor axis (b) meters
-semi_minor_axis = {
-    "WGS84": None,
-    "GDA20": None,
-    "GDA94": None,
-    "AGD66": None,
-    "ANG": None,
-}
-
 # Inverse flattening (1/f)
 inverse_flattening = {
     "WGS84": 298.257223563,
@@ -36,10 +27,10 @@ inverse_flattening = {
 MGA_datum = "GDA20"
 
 # False easting (m)
-E0 = 500000
+E0_mga = 500000
 
 # False northing (m)
-N0 = 10000000
+N0_mga = 10000000
 
 # Central Scale factor (m0)
 m0 = 0.9996
@@ -85,12 +76,13 @@ cm_vicgrid94 = 145
 # The origin of VICGRID coordinates is 2,500,000 metres west and
 # 2,500,000 metres south of the intersection of the parallel of
 # latitude 37°S and the central meridian.
- 
-# reference longitude - 2,500km west of (37°S, 145°E)
-λ0 = 116.72
-# λ0 = 0
 
-# reference latitude - 2,500km south of (37°S, 145°E)
-φ0 = -59.5
-# φ0 = 0
+E0_vicgrid94 = 2500000
+N0_vicgrid94 = 2500000
+ 
+# reference longitude - origin
+λ0 = 145
+
+# reference latitude - origin
+φ0 = -37
 

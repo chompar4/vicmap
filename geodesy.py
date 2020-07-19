@@ -1,11 +1,14 @@
 from constants import (
-    E0, 
-    N0,
+    E0_mga, 
+    N0_mga,
+    E0_vicgrid94, 
+    N0_vicgrid94,
     m0,
     zone_width
 )
 import math
 from utils import (
+    vicgrid94_constants,
     get_cm,
     get_zone,
     conformal_latitude,
@@ -19,14 +22,11 @@ from utils import (
 )
 import numpy as np
 import math
+cot = lambda x: 1/tan(x)
+π = math.pi
 
 from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
 from datums import GDA20
-
-ln = math.log
-sec = lambda x: 1/cos(x)
-cot = lambda x: 1/tan(x)
-π = math.pi
 
 def geographic_to_mga(dLat, dLng, datum=GDA20):
     """
@@ -82,8 +82,8 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
     Y = A*ε
 
     # Step 9 - MGA2020 coordinates (E, N)
-    easting = m0 * X + E0
-    northing = m0 * Y + N0
+    easting = m0 * X + E0_mga
+    northing = m0 * Y + N0_mga
 
     # Step 10 - q & p
     q, p = pq_coefficients(α, _ε, _Nu)
@@ -100,10 +100,13 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
 def geographic_to_vicgrid94(dLat, dLng):
     
     from constants import φ1, φ2, cm_vicgrid94, λ0, φ0, datum_vicgrid94
-    from datums import AGD66
+    from datums import GDA20
 
     # datum 
-    a = AGD66.a
+    datum = GDA20
+
+    # pre-compute
+    qp = 1/4*π
 
     # work with radians
     φ = radians(dLat)
@@ -114,28 +117,17 @@ def geographic_to_vicgrid94(dLat, dLng):
     λ0 = radians(λ0)
     φ0 = radians(φ0)
 
-    # pre-compute
-    qp = 1/4*π
-
-    # Step 1: n, ρ, ρ0, F
-    n = (
-        ln(cos(φ1)*sec(φ2))
-    ) / (
-        ln(
-            tan(qp + 1/2*φ2)*cot(qp + 1/2*φ1)
-        )
-    )
-
-    F = 1/n * cos(φ1) * tan(qp + 1/2*φ1) ** n
-
-    ρ = F * cot(qp + 1/2*φ) ** n
-    ρ0 = F * cot(qp + 1/2*φ0) ** n
+    # Step 1: n, r, ρ0, F
+    n, F, r0, m, q = vicgrid94_constants(φ, φ0, φ1, φ2, datum)
 
     # Step 2: determine easting and northing
-    x = ρ * sin(n * (λ - λ0))
-    y = ρ0  - ρ * cos(n * (λ - λ0))
+    r = -n * (m * tan(q)) ** n
+    θ = -n * (λ - λ0)
 
-    return x*a, y*a
+    X = r * sin(θ)
+    Y = r * cos(θ) - r0
+
+    return X + E0_vicgrid94, Y + N0_vicgrid94
 
 
 
