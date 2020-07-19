@@ -34,12 +34,13 @@ atanh = math.atanh
 asinh = math.asinh
 sqrt = math.sqrt
 
-def geographic_to_grid(dLat, dLng):
+def geographic_to_utm(dLat, dLng):
     """
-    Perform a transformation from geographic to grid coordinates
-    using the Krueger n-series equations. Ellipsoidal constants
-    are defined in the constants file. In theory these 
-    calculations should be accutate to less than a micrometer. 
+    Perform a transformation from geographic to UTM grid coordinates
+    using the Krueger n-series equations, up to order 8.
+    Ellipsoidal constants are defined in the constants file. 
+    In theory these calculations should be accutate 
+    to the nearest micrometer.
     Accepts:
         dLat: latitude in decimal degrees (-90, 90]
         dLng: longitude in decimal degrees (-180, 180]
@@ -101,9 +102,3 @@ def geographic_to_grid(dLat, dLng):
     dγ = math.degrees(γ)
 
     return z, easting, northing, m, dγ
-
-if __name__ == "__main__":
-    z, E, N, m, γ = geographic_to_grid(-23.67012389, 133.8855133)
-    print(
-        " z: {}\n E: {}\n N: {}\n m: {}\n γ: {}".format(z, E, N, m, γ)
-    )
