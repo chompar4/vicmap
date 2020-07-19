@@ -34,9 +34,9 @@ atanh = math.atanh
 asinh = math.asinh
 sqrt = math.sqrt
 
-def geographic_to_grid(dLat, dLng):
+def geographic_to_utm(dLat, dLng):
     """
-    Perform a transformation from geographic to grid coordinates
+    Perform a transformation from geographic to UTM grid coordinates
     using the Krueger n-series equations, up to order 8.
     Ellipsoidal constants are defined in the constants file. 
     In theory these calculations should be accutate 
