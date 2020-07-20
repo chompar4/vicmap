@@ -1,5 +1,6 @@
 import pytest
 from mga import geo_to_mga, get_zone
+from geodesy.points import GeoPoint
 from projections import utm
 from utils import dms_to_dd
 import numpy as np
@@ -10,11 +11,12 @@ def test_geo_to_mga():
 
     lat = dms_to_dd(-23, 40, 12.446020)
     lng = dms_to_dd(133, 53, 7.84784)
-    z, E, N = geo_to_mga(lat, lng)
+    pt = GeoPoint(lat, lng, datum=GDA20)
+    mga_pt = geo_to_mga(pt)
 
-    assert z == 53
-    assert round(E, 2) == round(386352.397753, 2)
-    assert round(N, 2) == round(7381850.768886, 2)
+    assert mga_pt.zone == 53
+    assert round(mga_pt.E, 2) == round(386352.397753, 2)
+    assert round(mga_pt.N, 2) == round(7381850.768886, 2)
 
     cm = 135
     m0 = 0.9996
@@ -36,10 +38,13 @@ def test_geo_to_mga_94_20_invariance():
     lat = dms_to_dd(-23, 40, 12.446020)
     lng = dms_to_dd(133, 53, 7.84784)
 
-    z20, E20, N20 = geo_to_mga(lat, lng, datum=GDA20)
-    z94, E94, N94 = geo_to_mga(lat, lng, datum=GDA94)
+    pt1 = GeoPoint(lat, lng, datum=GDA20)
+    pt2 = GeoPoint(lat, lng, datum=GDA94)
 
-    assert (z20, E20, N20) == (z94, E94, N94)
+    mga_pt1 = geo_to_mga(pt1)
+    mga_pt2 = geo_to_mga(pt2)
+
+    assert mga_pt1.coords == mga_pt2.coords
 
 
 zones = [

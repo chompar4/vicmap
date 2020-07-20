@@ -2,6 +2,7 @@ from projections import utm
 import math
 from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0, E0, N0
 from geodesy.datums import GDA20, GDA94
+from geodesy.points import UTMPoint
 
 
 def get_zone(dLng):
@@ -18,7 +19,7 @@ def get_cm(dLng):
     return cm_mga_zone[get_zone(dLng)]
 
 
-def geo_to_mga(dLat, dLng, datum=GDA20):
+def geo_to_mga(point):
     """
     Perform a transformation from GDA20 or GDA94 geographic
     coordinates to MGA grid coordinates. UTM transformation
@@ -35,16 +36,17 @@ def geo_to_mga(dLat, dLng, datum=GDA20):
         γ: Grid Convergence
     """
 
-    # note: it will still work for other datums, but that is not geo_to_mga
-    assert datum in [GDA20, GDA94], "Please specify your coordinates in GDA20 or GDA94"
+    dLat, dLng = point.dLat, point.dLng
+    datum = point.datum
 
+    assert datum in [GDA20, GDA94], "Please specify your coordinates in GDA20 or GDA94"
     print("({}, {}) -> MGA using {} datum".format(dLat, dLng, datum.name))
 
     zone = get_zone(dLng)
     cm = get_cm(dLng)
 
     E, N, m, γ = utm(dLat, dLng, cm, m0, E0, N0, datum.ellipsoid)
-    return zone, E, N
+    return UTMPoint(zone, E, N, grid="MGA")
 
 
 def mga_to_geographic(E, N):
