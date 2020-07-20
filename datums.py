@@ -3,7 +3,7 @@ from ellipsoids import reference_ellipsoids
 ellipsoid_lookup = {
     "GDA20": "GRS80",
     "GDA94": "GRS80",
-    "AGS84": "ANS",
+    "AGD84": "ANS",
     "AGD66": "ANS",
 }
 
@@ -58,8 +58,8 @@ GDA94 = Datum(
     name="Geocentric Datum of Australia 1994"
 )
 
-AGS84 = Datum(
-    code="AGS84", 
+AGD84 = Datum(
+    code="AGD84", 
     name="Australian Geodetic Datum 1984"
 )
 
