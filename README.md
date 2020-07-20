@@ -8,22 +8,46 @@ poetry install
 
 ## Point Transformations
 
-### MGA20
-MGA20 is the conformal UTM projection from the GRS80 ellipsoid (with GDA20 coordinates) to the plane.
-
-### MGA94
-MGA94 is the projection from the GRS80 ellipsoid (with GDA94 coordinates) to the plane. It has been superceded by MGA20.
-
-Use the ```geo_to_mga``` function to perform a forward point transformation from the decimal coordinates ```(dLng, dLat)``` to the MGA20 grid coordinates (E, N). If the datum of the input coordinates is not ```GDA20```, provide the ```datum``` arg and the coordinates will be converted from this datum to ```GDA20``` before projection. 
+Points on 3D Geoid surfaces are represented by the ```GeoPoint``` class, while points in the 2d plane are represented by the ```PlanePoint``` class. Each point requires a set of coordinates, and a datum. 
 
 ```python
-z, E, N, m, γ = geo_to_mga(dLat, dLng, datum=GDA20)
+pt = GeoPoint(dLat, dLng, datum=GDA20)
 ```
 
-Use the ```mga_to_geo``` function to perform an inverse point transformation from the MGA20 grid coordinates (E, N) to the GDA20 coordinates ```(dLng, dLat)```. If the datum of the output coordinates required is not ```GDA20```, provide the ```datum``` arg and the coordinates will be converted to the required```datum``` after projection. 
+
+### MGA20
+```MGA20``` is the pair of conformal UTM projections betwee the ```GDA20``` datum and the ```MGA``` grid.
+
+Use ```geo_to_mga``` to perform a forward point projection from a ```GeoPoint``` in the GDA20 datum to a ```PlanePoint``` in the MGA grid.
 
 ```python
-dLat, dLng = mga_to_geo(E, N, datum=GDA20)
+gda20_pt = GeoPoint(dLat, dLng, datum=GDA20)
+mga_pt = geo_to_mga(gda20_pt)
+```
+
+Use ```mga_to_geo``` to perform a reverse point projection from a ```PlanePoint``` in the ```MGA``` grid to a ```GeoPoint``` in the required datum. By default, the output datum is ```GDA20```.
+
+```python
+mga_pt = PlanePoint(E, N, grid=MGA)
+geo_pt = mga_to_geo(mga_pt) # default datum = GDA20
+```
+
+### MGA94
+```MGA94``` is the pair of conformal UTM projections betwee the ```GDA94``` datum and the ```MGA``` grid. 
+> NOTE: ```GDA94``` has been superceded by ```GDA20```.
+
+Use ```geo_to_mga``` to perform a forward point projection from a ```GeoPoint``` in the ```GDA94``` datum to a ```PlanePoint``` in the MGA grid.
+
+```python
+gda20_pt = GeoPoint(dLat, dLng, datum=GDA20)
+mga_pt = geo_to_mga(gda20_pt)
+```
+
+Use ```mga_to_geo``` to perform a reverse point projection from a ```PlanePoint``` in the ```MGA``` grid to a ```GeoPoint``` in the required datum. You must specify ```GDA94```
+
+```python
+mga_pt = PlanePoint(E, N, grid=MGA)
+geo_pt = mga_to_geo(mga_pt, datum=GDA94)
 ```
 
 ### VICGRID20
