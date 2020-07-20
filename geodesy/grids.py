@@ -54,8 +54,7 @@ class MGAGrid(UTMGrid):
         """
         return math.floor((dLng - self.z0_edge) / self.zw)
 
-    def get_cm(self, dLng):
-        zn = self.get_zone(dLng)
+    def get_cm(self, zn):
         return self.cms[zn]
 
 

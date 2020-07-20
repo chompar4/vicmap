@@ -31,6 +31,7 @@ def test_mga_grid():
     assert MGA.m0 == 0.9996
     assert MGA.zw == 6
     assert MGA.cm1 == -177
+    assert MGA.get_zone(-177) == 1
 
     cm_mga_zone = {
         49: 111,
@@ -42,7 +43,8 @@ def test_mga_grid():
         55: 147,
         56: 153,
     }
-    for k, v in cm_mga_zone.items():
-        assert MGA.cms[k] == v
+    for zn, cm in cm_mga_zone.items():
+        assert MGA.get_cm(zn) == cm, "zn: {}, expected cm: {}".format(zn, cm)
+        assert MGA.get_zone(cm) == zn
 
     assert MGA.z0_edge == -177 - 1.5 * 6

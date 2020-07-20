@@ -5,6 +5,7 @@ from projections import utm
 from utils import dms_to_dd
 import numpy as np
 from geodesy.datums import GDA20, GDA94
+from geodesy.grids import MGA
 
 
 def test_geo_to_mga():
@@ -23,7 +24,7 @@ def test_geo_to_mga():
     E0 = 500000
     N0 = 10000000
     datum = GDA20
-    _, _, m, γ = utm(lat, lng, cm, m0, E0, N0, datum.ellipsoid)
+    _, _, m, γ = utm(lat, lng, ellipsoid=datum.ellipsoid, grid=MGA)
 
     assert round(m, 9) == 0.999759539
     assert round(γ, 9) == -0.447481418
