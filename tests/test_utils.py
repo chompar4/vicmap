@@ -1,7 +1,10 @@
-from utils import point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, ellipsoidal_constants, rectifying_radius, krueger_coefficients
+from utils import point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, rectifying_radius, krueger_coefficients
 
 import pytest 
 import numpy as np
+
+from math import radians
+from datums import WGS84
 
 zones = [
     (108, 114, 49),
@@ -21,15 +24,6 @@ def test_get_zone(west, east, zn):
             assert get_zone(lng) == zn + 1  # range of zones = [west, east) 
         else:
             assert get_zone(lng) == zn
-
-def test_ellipsoidal_constants():
-
-    inv_flat = 298.257222101
-    f, e ,e2, n = ellipsoidal_constants(inv_flat) 
-    assert round(f, 12) == 3.352810681E-03
-    assert round(e, 12)  == 0.081819191043
-    assert round(e2, 12) == 6.694380023E-03
-    assert round(n, 12) == 1.679220395E-03
 
 def test_rectifying_radius():
     a = 6378137

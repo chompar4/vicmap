@@ -1,17 +1,22 @@
-from constants import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0
+from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0
+from datums import GDA20, WGS84
 
 import math
 import numpy as np
 
-tan = math.tan
-cos = math.cos
-cosh = math.cosh
-sin = math.sin
-sinh = math.sinh
-atan = math.atan 
-atanh = math.atanh
-asinh = math.asinh
-sqrt = math.sqrt
+from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt
+ln = math.log
+sec = lambda x: 1/cos(x)
+cot = lambda x: 1/tan(x)
+π = math.pi
+
+def dms_to_dd(d, m, s):
+    assert -180 <= d <= 180 
+    assert 0 <= m < 60
+    assert 0 <= s < 3600
+    sign = -1 if d < 0 else 1
+    dd = abs(d) + m / 60 + s / 3600
+    return sign * dd
 
 def get_zone(dLng):
     """
@@ -23,7 +28,6 @@ def get_zone(dLng):
 
 def get_cm(lng):
     """
-    # TODO: update cm_mga_zone with values outside MGA zones
     gives the central meridian longitude of the zone
     containing 'lng'
     """
@@ -53,23 +57,6 @@ def rectifying_radius(a, n):
             + (25/ 16384) * n**8
         )
     )
-
-def ellipsoidal_constants(_f):
-    """
-    gives the required ellipsoidal constants
-    of an ellipse with:
-        _f : inverse flattening
-    returns: 
-        f: flattening
-        e: eecentricity
-        e2: eecentricity^2
-        n: 3rd flattening
-    """
-    f = 1/_f
-    e2 = f * (2-f)
-    e = sqrt(e2)
-    n = f / (2-f)
-    return f, e, e2, n   
 
 def transverse_mercator(_Nu, _ε, α): 
     """
@@ -185,7 +172,7 @@ def krueger_coefficients(n):
     """
     Compute the coefficients (α) required for Kruegers eq'n.
     See docs in reference for these. AFAIK know general form
-    of these has been presented. TODO: fit a formula for them
+    of these has been presented.
     """
 
     n2 = n ** 2
@@ -260,8 +247,5 @@ def krueger_coefficients(n):
         14: α14, 
         16: α16, 
     }
-
-
-
 
     
