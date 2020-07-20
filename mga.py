@@ -92,9 +92,8 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
 
     # Step 12 - Grid convergence γ
     γ = grid_convergence(q, p, _t, ω, dLat)
-    dγ = math.degrees(γ)
 
-    return z, easting, northing, m, dγ
+    return z, easting, northing, m, math.degrees(γ)
 
 def mga_to_geographic(E, N, datum=GDA20):
     """
