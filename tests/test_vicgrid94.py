@@ -1,20 +1,17 @@
 import pytest
-from geodesy import geographic_to_mga, geographic_to_vicgrid94
+from vicgrid94 import geographic_to_vicgrid94
 from utils import dms_to_dd
+from datums import GDA94, AGD66
+
 import math
 
-def test_geographic_to_mga():
+"""
+The points chosen here have been a part of the state geodetic network adjustment
+from AGD66 to GDA94 and are the official values as recorded in the Survey Marks
+Enquiry Service – SMES (21/11/00). We reproduce these values to the nearest meter.
+"""
 
-    z, E, N, m, γ = geographic_to_mga(-23.67012389, 133.8855133)
-
-    assert z == 53
-    assert round(E, 2) == round(386352.397753, 2)
-    assert round(N, 2) == round(7381850.768886, 2)
-    assert round(m, 9) == 0.999759539
-    assert round(γ, 9) == -0.447481414
-
-
-known_vals94 = [
+known_vals_gda94 = [
     (-37, 145, 2500000, 2500000), # true origin
     (dms_to_dd(-34, 29, 41.377), dms_to_dd(141, 59, 19.5899), 2223259.175, 2773628.391),
     (dms_to_dd(-38, 3, 53.8007), dms_to_dd(141, 24, 57.2580), 2185545.806, 2375895.467),
@@ -25,25 +22,25 @@ known_vals94 = [
 
 TOL = 1e0
 
-@pytest.mark.parametrize("lat,lng,E,N", known_vals94)
+@pytest.mark.parametrize("lat,lng,E,N", known_vals_gda94)
 def test_known_vals_94_easting(lat, lng, E, N):
 
-    e, n = geographic_to_vicgrid94(lat, lng)
+    e, n, m, y = geographic_to_vicgrid94(lat, lng, datum=GDA94)
     diff = abs(e-E)
     assert diff <= TOL
 
-@pytest.mark.parametrize("lat,lng,E,N", known_vals94)
+@pytest.mark.parametrize("lat,lng,E,N", known_vals_gda94)
 def test_known_vals_94_northing(lat, lng, E, N):
 
-    e, n = geographic_to_vicgrid94(lat, lng)
+    e, n, m, y = geographic_to_vicgrid94(lat, lng, datum=GDA94)
     diff = abs(n-N)
     assert diff <= TOL
 
-@pytest.mark.parametrize("lat,lng,E,N", known_vals94)
+@pytest.mark.parametrize("lat,lng,E,N", known_vals_gda94)
 def test_known_vals_94_total(lat, lng, E, N):
 
     """ cartesian local approximation """
 
-    e, n = geographic_to_vicgrid94(lat, lng)
+    e, n, m, y = geographic_to_vicgrid94(lat, lng, datum=GDA94)
     diff = math.sqrt((e-E)**2 + (n-N)**2)
     assert diff <= TOL

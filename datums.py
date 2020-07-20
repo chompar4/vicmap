@@ -1,5 +1,5 @@
 from math import sqrt, sin
-from constants import semi_major_axis, inverse_flattening
+from constants.ellipsoid import semi_major_axis, inverse_flattening
 
 class Datum:
     def __init__(self, name):
@@ -117,8 +117,7 @@ class Datum:
 
 
 WGS84 = Datum(name="WGS84")
-
 GDA20 = Datum(name="GDA20")
-
+GDA94 = Datum(name="GDA94")
 AGD66 = Datum(name="AGD66")
 

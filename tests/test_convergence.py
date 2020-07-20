@@ -1,5 +1,5 @@
 from convergence import convergence
-from constants import cm_mga_zone
+from constants.mga import cm_mga_zone
 import numpy as np
 import pytest
 
