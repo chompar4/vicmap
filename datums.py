@@ -1,20 +1,12 @@
 from ellipsoids import reference_ellipsoids
 
-ellipsoid_lookup = {
-    "GDA20": "GRS80",
-    "GDA94": "GRS80",
-    "AGD84": "ANS",
-    "AGD66": "ANS",
-}
-
 class Datum:
-    def __init__(self, code, name):
+    def __init__(self, code, name, ellipsoid_code):
         """
         creates a geodetic datum from a reference ellipsoid.
         Note: the plural of datum is datums, not data.
         """
-        el_code = ellipsoid_lookup[code]
-        self.ellipsoid = reference_ellipsoids[el_code]
+        self.ellipsoid = reference_ellipsoids[ellipsoid_code]
         self.code = code
         self.name = name
 
@@ -50,20 +42,24 @@ class Datum:
 # supported datums
 GDA20 = Datum(
     code="GDA20", 
-    name="Geocentric Datum of Australia 2020"
+    name="Geocentric Datum of Australia 2020", 
+    ellipsoid_code="GRS80",
 )
 
 GDA94 = Datum(
     code="GDA94", 
-    name="Geocentric Datum of Australia 1994"
+    name="Geocentric Datum of Australia 1994", 
+    ellipsoid_code="GRS80",
 )
 
 AGD84 = Datum(
     code="AGD84", 
-    name="Australian Geodetic Datum 1984"
+    name="Australian Geodetic Datum 1984", 
+    ellipsoid_code="ANS",
 )
 
 AGD66 = Datum(
     code="AGD66", 
-    name="Australian Geodetic Datum 1966"
+    name="Australian Geodetic Datum 1966", 
+    ellipsoid_code="ANS",
 )
