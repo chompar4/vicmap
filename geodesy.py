@@ -8,7 +8,6 @@ from constants import (
 )
 import math
 from utils import (
-    vicgrid94_constants,
     get_cm,
     get_zone,
     conformal_latitude,
@@ -98,7 +97,7 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
 
     return z, easting, northing, m, dγ
 
-def geographic_to_mga(E, N, datum=GDA20):
+def mga_to_geographic(E, N, datum=GDA20):
     """
     Inverse transformation from MGA coords to 
     geographic coords.

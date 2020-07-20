@@ -10,6 +10,14 @@ sec = lambda x: 1/cos(x)
 cot = lambda x: 1/tan(x)
 π = math.pi
 
+def dms_to_dd(d, m, s):
+    assert -180 <= d <= 180 
+    assert 0 <= m < 60
+    assert 0 <= s < 3600
+    sign = -1 if d < 0 else 1
+    dd = abs(d) + m / 60 + s / 3600
+    return sign * dd
+
 def get_zone(dLng):
     """
     gives the tranverse mercator zone containing 
@@ -20,7 +28,6 @@ def get_zone(dLng):
 
 def get_cm(lng):
     """
-    # TODO: update cm_mga_zone with values outside MGA zones
     gives the central meridian longitude of the zone
     containing 'lng'
     """
@@ -165,7 +172,7 @@ def krueger_coefficients(n):
     """
     Compute the coefficients (α) required for Kruegers eq'n.
     See docs in reference for these. AFAIK know general form
-    of these has been presented. TODO: fit a formula for them
+    of these has been presented.
     """
 
     n2 = n ** 2

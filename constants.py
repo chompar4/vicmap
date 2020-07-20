@@ -73,9 +73,9 @@ cm_mga_zone = {
 E0_vicgrid94 = 2500000
 N0_vicgrid94 = 2500000
  
-# true origin longitude
+# central meridian longitude
 λ0 = 145
 
-# true origin latitude
+# 37th parrallel latitude
 φ0 = -37
 

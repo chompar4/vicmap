@@ -43,24 +43,6 @@ class Datum:
     def constants(self):
         return (self.a, self.b, self.f, self.e, self.e2, self.n)
 
-    def max_radii_curvature(self, φ):
-        "max radius of curvature at the latitude φ"
-        top = self.a 
-        bottom = (1 - self.e2 * sin(φ)**2) ** 0.5
-        return self.a / bottom
-
-    def min_radii_curvature(self, φ):
-        "min radius of curvature at the latitude φ"
-        top = self.a * (1-self.e2)
-        bottom = (1 - self.e2 * sin(φ)**2) ** 1.5
-        return top / bottom
-
-    def m(self, φ):
-        "variable for polar coord calculation"
-        top = 1+self.e*sin(φ)
-        bottom = 1 - self.e*sin(φ)
-        return (top / bottom) ** (self.e/2)
-
     @property
     def distance(self, point1, point2):
         '''

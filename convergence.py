@@ -11,7 +11,6 @@ def convergence(lat, lng):
     """
     gives the angle between the meridian
     and the grid-line parallel to the u-axis
-    # TODO: get_cm only returns values inside MGA zones
     Works for both GDA20 and GDA94.
     accepts: 
         lat: latitude in decimal degrees 

@@ -1,4 +1,4 @@
-from utils import vicgrid94_constants, point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, rectifying_radius, krueger_coefficients
+from utils import point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, rectifying_radius, krueger_coefficients
 
 import pytest 
 import numpy as np
