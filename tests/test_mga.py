@@ -1,10 +1,13 @@
 import pytest
 from mga import geographic_to_mga
 from datums import GDA20
+from utils import dms_to_dd
 
 def test_geographic_to_mga():
 
-    z, E, N, m, γ = geographic_to_mga(-23.67012389, 133.8855133, datum=GDA20)
+    lat = dms_to_dd(-23, 40, 12.446020)
+    lng = dms_to_dd(133, 53, 7.84784)
+    z, E, N, m, γ = geographic_to_mga(lat, lng, datum=GDA20)
 
     assert z == 53
     assert round(E, 2) == round(386352.397753, 2)
