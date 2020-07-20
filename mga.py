@@ -1,35 +1,28 @@
+from projections import utm
 import math
-from utils import (
-    get_cm,
-    get_zone,
-    conformal_latitude,
-    gauss_schreiber,
-    transverse_mercator,
-    pq_coefficients,
-    krueger_coefficients,
-    rectifying_radius,
-    grid_convergence,
-    point_scale_factor,
-)
-from constants.mga import E0, N0, zone_width, m0
-import numpy as np
-import math
-
-cot = lambda x: 1 / tan(x)
-π = math.pi
-ln = math.log
-
-from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
+from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0, E0, N0
 from datums import GDA20
+
+
+def get_zone(dLng):
+    """
+    gives the MGA zone containing dLng
+    """
+    return math.floor((dLng - zone0_edge) / zone_width)
+
+
+def get_cm(dLng):
+    """
+    gives the central meridian longitude of the MGA zone containing dLng
+    """
+    return cm_mga_zone[get_zone(dLng)]
 
 
 def geo_to_mga(dLat, dLng, datum=GDA20):
     """
-    Perform a transformation from geographic to MGA grid coordinates
-    using the Krueger n-series equations, up to order 8.
-    Ellipsoidal constants are defined in the constants file. 
-    In theory these calculations should be accutate 
-    to the nearest micrometer.
+    Perform a transformation from GDA20 or GDA94 geographic
+    coordinates to MGA grid coordinates. UTM transformation
+    depends only on the ellipsoidal constants of the datum.
     Accepts:
         dLat: latitude in decimal degrees (-90, 90]
         dLng: longitude in decimal degrees (-180, 180]
@@ -42,58 +35,16 @@ def geo_to_mga(dLat, dLng, datum=GDA20):
         γ: Grid Convergence
     """
 
-    print("geo -> MGA using {} datum".format(datum.name))
+    print("({}, {}) -> MGA using {} datum".format(dLat, dLng, datum.name))
 
-    assert -90 < dLat <= 90, "latitude out of bounds"
-    assert -180 < dLng < 180, "longitude out of bounds"
+    zone = get_zone(dLng)
+    cm = get_cm(dLng)
 
-    rLat = radians(dLat)
-    rLng = radians(dLng)
-    z = get_zone(dLng)
-
-    # Step 1: Compute ellipsiodal constants
-    a, _, f, e, e2, n = datum.ellipsoidal_constants
-
-    # Step 2: Compute rectifying radius A
-    A = rectifying_radius(a, n)
-
-    # Step 3: krueger coefficients for r = 1, 2, ..., 8
-    α = krueger_coefficients(n)
-
-    # Step 4 - conformal latitude _φ
-    t, σ, _t, _φ = conformal_latitude(rLat, e)
-
-    # Step 5 - longitude difference
-    central_meridian = get_cm(dLng)
-    ω = rLng - math.radians(central_meridian)
-
-    # Step 6 - Gauss-Schreiber
-    _ε, _Nu = gauss_schreiber(_t, ω, a)
-
-    # Step 7 - TM ratios
-    ε, Nu = transverse_mercator(_Nu, _ε, α)
-
-    # Step 8 - TM coords
-    X = A * Nu
-    Y = A * ε
-
-    # Step 9 - MGA2020 coordinates (E, N)
-    easting = m0 * X + E0
-    northing = m0 * Y + N0
-
-    # Step 10 - q & p
-    q, p = pq_coefficients(α, _ε, _Nu)
-
-    # Step 11 - Point scale factor m
-    m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
-
-    # Step 12 - Grid convergence γ
-    γ = grid_convergence(q, p, _t, ω, dLat)
-
-    return z, easting, northing, m, math.degrees(γ)
+    E, N, m, γ = utm(dLat, dLng, cm, m0, E0, N0, datum)
+    return zone, E, N
 
 
-def mga_to_geographic(E, N, datum=GDA20):
+def mga_to_geographic(E, N):
     """
     Inverse transformation from MGA coords to 
     geographic coords.

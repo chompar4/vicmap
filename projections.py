@@ -6,10 +6,21 @@ ln = math.log
 
 from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
 
+from utils import (
+    conformal_latitude,
+    gauss_schreiber,
+    transverse_mercator,
+    pq_coefficients,
+    krueger_coefficients,
+    rectifying_radius,
+    grid_convergence,
+    point_scale_factor,
+)
+
 
 def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
     """
-    Perform a transformation from geographic grid coordinates
+    Perform a transformation from geographic to grid coordinates
     using a Lambert conformal conic projection.
     See: https://pubs.usgs.gov/pp/1395/report.pdf
     Accepts:
@@ -22,10 +33,10 @@ def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
         E0: false easting (m)
         N0: false northing (m)
     returns: 
-        X: Easting (m)
-        Y: Northing (m)
-        m: Point Scale Factor
-        γ: Grid Convergence
+        X: easting (m)
+        Y: northing (m)
+        m: point scale factor
+        γ: grid convergence
     """
 
     # Helper functions
@@ -52,7 +63,7 @@ def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
     for theta in [dLng, λ0]:
         assert -180 < theta <= 180
 
-    # work with radians
+    # Step 1: work with radians
     φ = radians(dLat)
     λ = radians(dLng)
 
@@ -82,12 +93,82 @@ def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
     r = rCoeff * a * F * (t ** n)
     θ = rCoeff * n * (λ - λ0)
 
-    # Step 2: determine easting and northing wrt true origin
+    # Step 3: determine easting and northing wrt true origin
     X = r * sin(θ)
     Y = r * cos(θ) - r0
 
-    # Step 3: point scale factor (m) and grid convergence (γ)
+    # Step 4: point scale factor (m) and grid convergence (γ)
     m = -(r * n) / v * cos(φ)
     γ = -θ
 
     return X + E0, Y + N0, m, γ
+
+
+def utm(dLat, dLng, cm, m0, E0, N0, datum):
+    """
+    Perform a UTM projection from geographic to grid coordinates
+    using the Krueger n-series equations, up to order 8.
+    See: https://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
+    In theory these calculations should be accurate 
+    to the nearest micrometer.
+    Accepts:
+        dLat: latitude in decimal degrees (-90, 90]
+        dLng: longitude in decimal degrees (-180, 180]
+        cm: central meridian of zone containing (dLat, dLng)
+        m0: central scale factor
+        E0: false easting (m)
+        N0: false northing (m)
+        datum: reference ellipsoid and coordinate reference system
+    returns: 
+        z: zone
+        E: UTM easting (m)
+        N: UTM northing (m)
+        m: point scale factor
+        γ: grid convergence
+    """
+
+    assert -90 < dLat <= 90, "latitude out of bounds"
+    assert -180 < dLng < 180, "longitude out of bounds"
+
+    rLat = radians(dLat)
+    rLng = radians(dLng)
+
+    # Step 1: Compute ellipsiodal constants
+    a, _, f, e, e2, n = datum.ellipsoidal_constants
+
+    # Step 2: Compute rectifying radius A
+    A = rectifying_radius(a, n)
+
+    # Step 3: krueger coefficients for r = 1, 2, ..., 8
+    α = krueger_coefficients(n)
+
+    # Step 4 - conformal latitude _φ
+    t, σ, _t, _φ = conformal_latitude(rLat, e)
+
+    # Step 5 - longitude difference
+    ω = rLng - math.radians(cm)
+
+    # Step 6 - Gauss-Schreiber
+    _ε, _Nu = gauss_schreiber(_t, ω, a)
+
+    # Step 7 - TM ratios
+    ε, Nu = transverse_mercator(_Nu, _ε, α)
+
+    # Step 8 - TM coords
+    X = A * Nu
+    Y = A * ε
+
+    # Step 9 - MGA2020 coordinates (E, N)
+    easting = m0 * X + E0
+    northing = m0 * Y + N0
+
+    # Step 10 - q & p
+    q, p = pq_coefficients(α, _ε, _Nu)
+
+    # Step 11 - Point scale factor m
+    m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω, m0)
+
+    # Step 12 - Grid convergence γ
+    γ = grid_convergence(q, p, _t, ω, dLat)
+
+    return easting, northing, m, math.degrees(γ)

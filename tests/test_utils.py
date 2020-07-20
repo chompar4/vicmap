@@ -2,7 +2,6 @@ from utils import (
     dms_to_dd,
     point_scale_factor,
     grid_convergence,
-    get_zone,
     pq_coefficients,
     transverse_mercator,
     gauss_schreiber,
@@ -15,26 +14,6 @@ import pytest
 import numpy as np
 
 from math import radians
-
-zones = [
-    (108, 114, 49),
-    (114, 120, 50),
-    (120, 126, 51),
-    (126, 132, 52),
-    (132, 138, 53),
-    (138, 144, 54),
-    (144, 150, 55),
-    (150, 156, 56),
-]
-
-
-@pytest.mark.parametrize("west,east,zn", zones)
-def test_get_zone(west, east, zn):
-    for lng in np.linspace(start=west, stop=east, num=10):
-        if lng == east:
-            assert get_zone(lng) == zn + 1  # range of zones = [west, east)
-        else:
-            assert get_zone(lng) == zn
 
 
 def test_rectifying_radius():
@@ -134,7 +113,8 @@ def test_point_scale_factor():
     _t = -0.435413597639
     ω = -0.019451463
     rLat = -0.413121596
-    m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
+    m0 = 0.9996
+    m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω, m0)
     assert round(m, 12) == 0.999759539516, "m: {}".format(m)
 
 
