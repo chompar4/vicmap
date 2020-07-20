@@ -13,13 +13,9 @@ def test_geographic_to_mga():
     assert round(m, 9) == 0.999759539
     assert round(γ, 9) == -0.447481414
 
-def test_geographic_to_vicgrid94_center():
-    # center of vic
-    e, n = geographic_to_vicgrid94(-37, 145)
-    assert e == 2500000
-    assert n == 2500000
 
 known_vals94 = [
+    (-37, 145, 2500000, 2500000), # true origin
     (dms_to_dd(-34, 29, 41.377), dms_to_dd(141, 59, 19.5899), 2223259.175, 2773628.391),
     (dms_to_dd(-38, 3, 53.8007), dms_to_dd(141, 24, 57.2580), 2185545.806, 2375895.467),
     (dms_to_dd(-37, 23, 39.6610), dms_to_dd(148, 46, 43.1871), 2834469.388, 2449602.655),
@@ -27,7 +23,7 @@ known_vals94 = [
     (dms_to_dd(-38, 7, 47.3418), dms_to_dd(145, 9, 47.6172), 2514311.897, 2374602.216), 
 ]
 
-TOL = 1e-3
+TOL = 1e0
 
 @pytest.mark.parametrize("lat,lng,E,N", known_vals94)
 def test_known_vals_94_easting(lat, lng, E, N):
