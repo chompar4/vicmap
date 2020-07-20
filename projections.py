@@ -18,7 +18,7 @@ from utils import (
 )
 
 
-def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
+def lambert_conformal_conic(dLat, dLng, ellipsoid, φ1, φ2, λ0, φ0, E0, N0):
     """
     Perform a transformation from geographic to grid coordinates
     using a Lambert conformal conic projection.
@@ -26,7 +26,7 @@ def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
     Accepts:
         dLat: latitude in decimal degrees (-90, 90]
         dLng: longitude in decimal degrees (-180, 180]
-        datum: reference ellipsoid and coordinate reference system
+        ellipsoid: reference ellipsoid
         φ1, φ2 : standard parralels 
         λ0: central meridian longitude of grid
         φ0: latitude of central parrelel
@@ -73,7 +73,7 @@ def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
     φ1 = radians(φ1)
     φ2 = radians(φ2)
 
-    a, _, f, e, e2, n = datum.ellipsoidal_constants
+    a, _, f, e, e2, n = ellipsoid.constants
 
     m1 = M(φ1)
     m2 = M(φ2)
@@ -104,7 +104,7 @@ def lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0):
     return X + E0, Y + N0, m, γ
 
 
-def utm(dLat, dLng, cm, m0, E0, N0, datum):
+def utm(dLat, dLng, cm, m0, E0, N0, ellipsoid):
     """
     Perform a UTM projection from geographic to grid coordinates
     using the Krueger n-series equations, up to order 8.
@@ -118,7 +118,7 @@ def utm(dLat, dLng, cm, m0, E0, N0, datum):
         m0: central scale factor
         E0: false easting (m)
         N0: false northing (m)
-        datum: reference ellipsoid and coordinate reference system
+        ellipsoid: reference ellipsoid
     returns: 
         z: zone
         E: UTM easting (m)
@@ -134,7 +134,7 @@ def utm(dLat, dLng, cm, m0, E0, N0, datum):
     rLng = radians(dLng)
 
     # Step 1: Compute ellipsiodal constants
-    a, _, f, e, e2, n = datum.ellipsoidal_constants
+    a, _, f, e, e2, n = ellipsoid.constants
 
     # Step 2: Compute rectifying radius A
     A = rectifying_radius(a, n)

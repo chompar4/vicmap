@@ -61,6 +61,11 @@ class ReferenceEllipsoid:
     def f(self):
         return 1 / self._f
 
+    @property
+    def constants(self):
+        """ set of ellipsoidal constants """
+        return (self.a, self.b, self.f, self.e, self.e2, self.n)
+
 
 # supported reference ellipsoids
 WGS84 = ReferenceEllipsoid(

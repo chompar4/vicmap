@@ -47,10 +47,6 @@ class Datum:
     def f(self):
         return self.ellipsoid.f
 
-    @property
-    def ellipsoidal_constants(self):
-        return (self.a, self.b, self.f, self.e, self.e2, self.n)
-
 
 # supported datums
 WGS84 = Datum(

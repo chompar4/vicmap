@@ -21,7 +21,7 @@ def test_geo_to_mga():
     E0 = 500000
     N0 = 10000000
     datum = GDA20
-    _, _, m, γ = utm(lat, lng, cm, m0, E0, N0, datum)
+    _, _, m, γ = utm(lat, lng, cm, m0, E0, N0, datum.ellipsoid)
 
     assert round(m, 9) == 0.999759539
     assert round(γ, 9) == -0.447481418

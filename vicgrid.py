@@ -35,7 +35,7 @@ different for ANS and GRS80.
 """
 
 
-def geographic_to_vicgrid94(dLat, dLng):
+def geographic_to_vicgrid94(dLat, dLng, datum=GDA94):
     """
     Perform a transformation from GDA94 datum to 
     VICGRID94 grid coordinates using a Lambert 
@@ -50,9 +50,13 @@ def geographic_to_vicgrid94(dLat, dLng):
 
     from constants.vicgrid94 import φ1, φ2, λ0, φ0, E0, N0
 
-    datum = GDA94
-    print("({}, {}) -> VICGRID94 using {} datum".format(dLat, dLng, datum.name))
-    E, N, m, γ = lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0)
+    if datum != GDA94:
+        raise NotImplementedError("Please specify your coordinates in GDA94")
+        # TODO: convert from datum coordinates to GDA94 coordinates
+    print("({}, {}) -> VICGRID94 from {} coordinates".format(dLat, dLng, datum.name))
+    E, N, m, γ = lambert_conformal_conic(
+        dLat, dLng, datum.ellipsoid, φ1, φ2, λ0, φ0, E0, N0
+    )
     return E, N
 
 
@@ -76,9 +80,13 @@ def geographic_to_vicgrid(dLat, dLng, datum=AGD66):
 
     from constants.vicgrid import φ1, φ2, λ0, φ0, E0, N0
 
-    datum = AGD66
-    print("({}, {}) -> VICGRID94 using {} datum".format(dLat, dLng, datum.name))
-    E, N, m, γ = lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0)
+    if datum != AGD66:
+        raise NotImplementedError("Please specify your coordinates in AGD66")
+        # TODO: convert from datum coordinates to AGD66 coordinates
+    print("({}, {}) -> VICGRID94 from {} coordinates".format(dLat, dLng, datum.name))
+    E, N, m, γ = lambert_conformal_conic(
+        dLat, dLng, datum.ellipsoid, φ1, φ2, λ0, φ0, E0, N0
+    )
     return E, N
 
 

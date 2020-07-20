@@ -1,7 +1,7 @@
 from projections import utm
 import math
 from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0, E0, N0
-from datums import GDA20
+from datums import GDA20, GDA94
 
 
 def get_zone(dLng):
@@ -35,12 +35,15 @@ def geo_to_mga(dLat, dLng, datum=GDA20):
         γ: Grid Convergence
     """
 
+    # note: it will still work for other datums, but that is not geo_to_mga
+    assert datum in [GDA20, GDA94], "Please specify your coordinates in GDA20 or GDA94"
+
     print("({}, {}) -> MGA using {} datum".format(dLat, dLng, datum.name))
 
     zone = get_zone(dLng)
     cm = get_cm(dLng)
 
-    E, N, m, γ = utm(dLat, dLng, cm, m0, E0, N0, datum)
+    E, N, m, γ = utm(dLat, dLng, cm, m0, E0, N0, datum.ellipsoid)
     return zone, E, N
 
 
