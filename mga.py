@@ -55,7 +55,7 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
     z = get_zone(dLng)
 
     # Step 1: Compute ellipsiodal constants
-    a, _, f, e, e2, n = datum.constants
+    a, _, f, e, e2, n = datum.ellipsoidal_constants
 
     # Step 2: Compute rectifying radius A
     A = rectifying_radius(a, n)
@@ -92,9 +92,8 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
 
     # Step 12 - Grid convergence γ
     γ = grid_convergence(q, p, _t, ω, dLat)
-    dγ = math.degrees(γ)
 
-    return z, easting, northing, m, dγ
+    return z, easting, northing, m, math.degrees(γ)
 
 def mga_to_geographic(E, N, datum=GDA20):
     """

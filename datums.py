@@ -1,123 +1,101 @@
-from math import sqrt, sin
-from constants.ellipsoid import semi_major_axis, inverse_flattening
+from ellipsoids import reference_ellipsoids
+
+"""
+See: https://www.icsm.gov.au/education/fundamentals-mapping/datums/datums-explained-more-detail
+"""
 
 class Datum:
-    def __init__(self, name):
+    def __init__(self, code, name, ellipsoid_code, reference_frame, epsg_code):
         """
-        creates a geodetic datum from paramaters
-            a: equatorial radius (semi-major axis)
-            b: polar radius (semi-minor axis)
-            _f: inverse flattening 1/f
+        creates a geodetic datum from a reference ellipsoid.
+            ellipsoid: reference ellipsoid
+            reference_frame: reference_frame of datum coordinate system
+        Note: the plural of datum is datums, not data.
         """
-
-        self.a = semi_major_axis[name]
-        self._f = inverse_flattening[name]
+        self.ellipsoid = reference_ellipsoids[ellipsoid_code]
+        self.reference_frame = reference_frame
+        self.epsg_code = epsg_code
+        self.code = code
         self.name = name
 
     @property
+    def url(self):
+        return "https://epsg.io/{}-datum".format(self.epsg_code)
+
+    @property
+    def a(self):
+        return self.ellipsoid.a
+
+    @property
     def b(self):
-        "b; semi minor acis length (meters)"
-        return self.a / (1 - self.f)
+        return self.ellipsoid.b
 
     @property
     def e2(self):
-        "e^2: eecentricity squared"
-        return self.f * (2-self.f)
+        return self.ellipsoid.e2
 
     @property
     def e(self):
-        "eecentricity"
-        return sqrt(self.e2)
+        return self.ellipsoid.e
 
     @property
     def n(self):
-        "n: 3rd flattening"
-        return self.f / (2 - self.f)
+        return self.ellipsoid.n
 
     @property
     def f(self):
-        "f: flattening"
-        return 1/self._f
-
+        return self.ellipsoid.f
+        
     @property
-    def constants(self):
+    def ellipsoidal_constants(self):
         return (self.a, self.b, self.f, self.e, self.e2, self.n)
 
-    @property
-    def distance(self, point1, point2):
-        '''
-        From: geo-py package, which explodes on build currently
-        Calculating distance with using vincenty's formula
-        https://en.wikipedia.org/wiki/Vincenty's_formulae
-        '''
 
-        CONVERGENCE_THRESHOLD = 1e-12
-        MAX_ITERATIONS = 15
+# supported datums
+WGS84 = Datum(
+    code="WGS84",
+    name="World Geodetic System",
+    ellipsoid_code="WGS84",
+    reference_frame="WGS84",
+    epsg_code=6326,
+)
 
-        lon1, lat1 = (radians(coord) for coord in point1)
-        lon2, lat2 = (radians(coord) for coord in point2)
+GDA20 = Datum(
+    code="GDA20", 
+    name="Geocentric Datum of Australia 2020", 
+    ellipsoid_code="GRS80",
+    reference_frame="ITRF2014",
+    epsg_code=1168,
+)
 
-        U1 = atan((1 - self.f) * tan(lat1))
-        U2 = atan((1 - self.f) * tan(lat2))
-        L = lon2 - lon1
-        Lambda = L
+GDA94 = Datum(
+    code="GDA94", 
+    name="Geocentric Datum of Australia 1994", 
+    ellipsoid_code="GRS80",
+    reference_frame="ITRF92",
+    epsg_code=6283,
+)
 
-        sinU1 = sin(U1)
-        cosU1 = cos(U1)
-        sinU2 = sin(U2)
-        cosU2 = cos(U2)
+AGD84 = Datum(
+    code="AGD84", 
+    name="Australian Geodetic Datum 1984", 
+    ellipsoid_code="ANS",
+    reference_frame= '', 
+    epsg_code= 6203,
+)
 
-        for _ in range(MAX_ITERATIONS):
-            sinLambda = sin(Lambda)
-            cosLambda = cos(Lambda)
-            sinSigma = sqrt(
-                (cosU2 * sinLambda) ** 2 +
-                (cosU1 * sinU2 - sinU1 * cosU2 * cosLambda) ** 2)
-            # coincident points
-            if sinSigma == 0:
-                return 0.0
+AGD66 = Datum(
+    code="AGD66", 
+    name="Australian Geodetic Datum 1966", 
+    ellipsoid_code="ANS",
+    reference_frame= '', 
+    epsg_code= 6202,
+)
 
-            cosSigma = sinU1 * sinU2 + cosU1 * cosU2 * cosLambda
-            sigma = atan2(sinSigma, cosSigma)
-            sinAlpha = cosU1 * cosU2 * sinLambda / sinSigma
-            cosSqAlpha = 1 - sinAlpha ** 2
-            try:
-                cos2SigmaM = cosSigma - 2 * sinU1 * sinU2 / cosSqAlpha
-            except ZeroDivisionError:
-                cos2SigmaM = 0
-
-            C = (self.f / 16) * cosSqAlpha * (
-                4 + self.f * (4 - 3 * cosSqAlpha)
-            )
-            LambdaPrev = Lambda
-            Lambda = (
-                L + (1 - C) * self.f * sinAlpha * (
-                    sigma + C * sinSigma * (
-                        cos2SigmaM + C * cosSigma * (
-                            -1 + 2 * cos2SigmaM ** 2
-                        )
-                    )
-                )
-            )
-
-            if abs(Lambda - LambdaPrev) < CONVERGENCE_THRESHOLD:
-                break
-        else:
-            # failure to converge
-            return None
-
-        uSq = cosSqAlpha * (self.a ** 2 - self.b ** 2) / (self.b ** 2)
-        A = 1 + uSq / 16384 * (4096 + uSq * (-768 + uSq * (320 - 175 * uSq)))
-        B = uSq / 1024 * (256 + uSq * (-128 + uSq * (74 - 47 * uSq)))
-        deltaSigma = B * sinSigma * (cos2SigmaM + B / 4 * (cosSigma *
-                    (-1 + 2 * cos2SigmaM ** 2) - B / 6 * cos2SigmaM *
-                    (-3 + 4 * sinSigma ** 2) * (-3 + 4 * cos2SigmaM ** 2)))
-        s = self.b * A * (sigma - deltaSigma)
-        return s
-
-
-WGS84 = Datum(name="WGS84")
-GDA20 = Datum(name="GDA20")
-GDA94 = Datum(name="GDA94")
-AGD66 = Datum(name="AGD66")
-
+ANG = Datum(
+    code="ANG", 
+    name="unknown", 
+    ellipsoid_code="CLARKE",
+    reference_frame= '', 
+    epsg_code= '',
+)
