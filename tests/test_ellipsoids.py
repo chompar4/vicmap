@@ -1,8 +1,9 @@
 from ellipsoids import WGS84, GRS80, ANS, CLARKE
 
+
 def test_wgs84():
 
-    ellipsoid = WGS84 
+    ellipsoid = WGS84
 
     assert ellipsoid.a == 6378137
     assert ellipsoid._f == 298.257223563
@@ -10,6 +11,7 @@ def test_wgs84():
     assert round(ellipsoid.e2, 9) == 0.006694380
     assert round(ellipsoid.e, 9) == 0.081819191
     assert ellipsoid.url == "https://epsg.io/7030-ellipsoid"
+
 
 def test_grs80():
 
@@ -22,6 +24,7 @@ def test_grs80():
     assert round(ellipsoid.e, 9) == 0.081819191
     assert ellipsoid.url == "https://epsg.io/7019-ellipsoid"
 
+
 def test_ans():
 
     ellipsoid = ANS
@@ -32,6 +35,7 @@ def test_ans():
     assert round(ellipsoid.e2, 9) == 0.006694542
     assert round(ellipsoid.e, 9) == 0.08182018
     assert ellipsoid.url == "https://epsg.io/7003-ellipsoid"
+
 
 def test_clarke():
 

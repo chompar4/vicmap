@@ -4,6 +4,7 @@ from ellipsoids import reference_ellipsoids
 See: https://www.icsm.gov.au/education/fundamentals-mapping/datums/datums-explained-more-detail
 """
 
+
 class Datum:
     def __init__(self, code, name, ellipsoid_code, reference_frame, epsg_code):
         """
@@ -45,7 +46,7 @@ class Datum:
     @property
     def f(self):
         return self.ellipsoid.f
-        
+
     @property
     def ellipsoidal_constants(self):
         return (self.a, self.b, self.f, self.e, self.e2, self.n)
@@ -61,41 +62,41 @@ WGS84 = Datum(
 )
 
 GDA20 = Datum(
-    code="GDA20", 
-    name="Geocentric Datum of Australia 2020", 
+    code="GDA20",
+    name="Geocentric Datum of Australia 2020",
     ellipsoid_code="GRS80",
     reference_frame="ITRF2014",
     epsg_code=1168,
 )
 
 GDA94 = Datum(
-    code="GDA94", 
-    name="Geocentric Datum of Australia 1994", 
+    code="GDA94",
+    name="Geocentric Datum of Australia 1994",
     ellipsoid_code="GRS80",
     reference_frame="ITRF92",
     epsg_code=6283,
 )
 
 AGD84 = Datum(
-    code="AGD84", 
-    name="Australian Geodetic Datum 1984", 
+    code="AGD84",
+    name="Australian Geodetic Datum 1984",
     ellipsoid_code="ANS",
-    reference_frame= '', 
-    epsg_code= 6203,
+    reference_frame="",
+    epsg_code=6203,
 )
 
 AGD66 = Datum(
-    code="AGD66", 
-    name="Australian Geodetic Datum 1966", 
+    code="AGD66",
+    name="Australian Geodetic Datum 1966",
     ellipsoid_code="ANS",
-    reference_frame= '', 
-    epsg_code= 6202,
+    reference_frame="",
+    epsg_code=6202,
 )
 
 ANG = Datum(
-    code="ANG", 
-    name="unknown", 
+    code="ANG",
+    name="unknown",
     ellipsoid_code="CLARKE",
-    reference_frame= '', 
-    epsg_code= '',
+    reference_frame="",
+    epsg_code="",
 )

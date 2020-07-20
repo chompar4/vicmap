@@ -441,7 +441,7 @@ python-versions = "*"
 version = "0.1.9"
 
 [metadata]
-content-hash = "0efc15ca82b119ddf371141974df9f2092f6a53facc14717f996d62576c97a9f"
+content-hash = "b7249f19ff8395a35287bce93d75668458cb441dbd1a7c275c4bee984d5cf9a6"
 python-versions = "3.8.2"
 
 [metadata.files]

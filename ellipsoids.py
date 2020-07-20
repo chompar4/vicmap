@@ -14,6 +14,7 @@ reciprocal_flattening = {
     "CLARKE": 294.26,
 }
 
+
 class ReferenceEllipsoid:
     """
     Commonly reffered to as a spheroid.
@@ -28,6 +29,7 @@ class ReferenceEllipsoid:
     Each registered ellipsoid has a url:
         url: https://epsg.io/{epsg_code}-ellipsoid
     """
+
     def __init__(self, code, name, epsg_code):
         self.a = semi_major_axis[code]
         self._f = reciprocal_flattening[code]
@@ -45,8 +47,8 @@ class ReferenceEllipsoid:
 
     @property
     def e2(self):
-        return self.f * (2-self.f)
-    
+        return self.f * (2 - self.f)
+
     @property
     def e(self):
         return sqrt(self.e2)
@@ -57,35 +59,23 @@ class ReferenceEllipsoid:
 
     @property
     def f(self):
-        return 1/self._f
+        return 1 / self._f
 
 
 # supported reference ellipsoids
 WGS84 = ReferenceEllipsoid(
-    code="WGS84",
-    name="World Geodetic System WGS84 Spheroid", 
-    epsg_code=7030,
+    code="WGS84", name="World Geodetic System WGS84 Spheroid", epsg_code=7030,
 )
 
 GRS80 = ReferenceEllipsoid(
-    code="GRS80", 
-    name="Geodetic Reference System 1980 Spheroid", 
-    epsg_code=7019,
+    code="GRS80", name="Geodetic Reference System 1980 Spheroid", epsg_code=7019,
 )
 
 ANS = ReferenceEllipsoid(
-    code="ANS", 
-    name="Australian National Spheroid",
-    epsg_code=7003,
+    code="ANS", name="Australian National Spheroid", epsg_code=7003,
 )
 
-CLARKE = ReferenceEllipsoid(
-    code= "CLARKE", 
-    name= "Clarke 1866 Spheroid", 
-    epsg_code=7008,
-)
+CLARKE = ReferenceEllipsoid(code="CLARKE", name="Clarke 1866 Spheroid", epsg_code=7008,)
 
-reference_ellipsoids = {
-    e.code: e
-    for e in [WGS84, GRS80, ANS, CLARKE]
-}
+reference_ellipsoids = {e.code: e for e in [WGS84, GRS80, ANS, CLARKE]}
+

@@ -1,6 +1,7 @@
 import numpy as np
 import math
-cot = lambda x: 1/tan(x)
+
+cot = lambda x: 1 / tan(x)
 π = math.pi
 ln = math.log
 
@@ -41,6 +42,7 @@ different for ANS and GRS80.
 
 """
 
+
 def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     """
     Perform a transformation from geographic to VICGRID94 grid coordinates
@@ -60,11 +62,12 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     """
 
     from constants.vicgrid94 import φ1, φ2, λ0, φ0, E0, N0
-    print('geo -> VICGRID94 using {} datum'.format(datum.name))
-    
+
+    print("geo -> VICGRID94 using {} datum".format(datum.name))
+
     # Helper functions
     def Q(φ):
-        return π/4 - φ/2
+        return π / 4 - φ / 2
 
     def T(φ):
         lhs = (1 - sin(φ)) / (1 + sin(φ))
@@ -73,12 +76,12 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
         return sqrt(inner)
 
     def V(φ):
-        bottom = (1 - e2 * sin(φ)**2)
+        bottom = 1 - e2 * sin(φ) ** 2
         return a / sqrt(bottom)
 
     def M(φ):
         top = cos(φ)
-        bottom = (1 - e**2 * sin(φ) **2)
+        bottom = 1 - e ** 2 * sin(φ) ** 2
         return top / sqrt(bottom)
 
     # work with radians
@@ -102,13 +105,13 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     t = T(φ)
     v = V(φ)
 
-    n = (ln(m1) - ln(m2))/(ln(t1)-ln(t2))
-    F = m1 / (n*(t1**n))
+    n = (ln(m1) - ln(m2)) / (ln(t1) - ln(t2))
+    F = m1 / (n * (t1 ** n))
 
     # Step 2: determine polar coords
     rCoeff = -1 if n < 0 else 1
-    r0 = rCoeff * a * F * (t0**n)
-    r = rCoeff * a * F * (t**n)
+    r0 = rCoeff * a * F * (t0 ** n)
+    r = rCoeff * a * F * (t ** n)
     θ = rCoeff * n * (λ - λ0)
 
     # Step 2: determine easting and northing wrt true origin
@@ -116,8 +119,8 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     Y = r * cos(θ) - r0
 
     # Step 3: point scale factor (m) and grid convergence (γ)
-    m = - (r*n) / v * cos(φ)
-    γ = - θ
+    m = -(r * n) / v * cos(φ)
+    γ = -θ
 
     return X + E0, Y + N0, m, γ
 
