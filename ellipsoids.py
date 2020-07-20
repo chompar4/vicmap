@@ -30,7 +30,7 @@ class ReferenceEllipsoid:
         self.a = semi_major_axis[code]
         self._f = reciprocal_flattening[code]
         self.code = code
-        self.name = name 
+        self.name = name
 
     @property
     def b(self):
@@ -46,7 +46,7 @@ class ReferenceEllipsoid:
 
     @property
     def n(self):
-        return (self.a - self.b) / (self.a + self.b)
+        return self.f / (2 - self.f)
 
     @property
     def f(self):
