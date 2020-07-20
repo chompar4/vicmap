@@ -4,7 +4,6 @@ import pytest
 import numpy as np
 
 from math import radians
-from datums import WGS84
 
 zones = [
     (108, 114, 49),

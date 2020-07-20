@@ -1,5 +1,5 @@
 from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0
-from datums import GDA20, WGS84
+from datums import GDA20
 
 import math
 import numpy as np

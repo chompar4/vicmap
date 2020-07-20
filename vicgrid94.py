@@ -91,7 +91,7 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     φ1 = radians(φ1)
     φ2 = radians(φ2)
 
-    a, _, f, e, e2, n = datum.constants
+    a, _, f, e, e2, n = datum.ellipsoidal_constants
 
     m1 = M(φ1)
     m2 = M(φ2)

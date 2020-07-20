@@ -55,7 +55,7 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
     z = get_zone(dLng)
 
     # Step 1: Compute ellipsiodal constants
-    a, _, f, e, e2, n = datum.constants
+    a, b, f, e, e2, n = datum.ellipsoidal_constants
 
     # Step 2: Compute rectifying radius A
     A = rectifying_radius(a, n)
