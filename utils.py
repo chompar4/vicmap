@@ -241,46 +241,4 @@ def krueger_coefficients(n):
         16: α16, 
     }
 
-def vicgrid94_constants(φ, φ0, φ1, φ2, datum):
-
-    """
-    compute constants required for lambert conformal
-    conic projection to vicmap coords
-    accepts: 
-        φ0: origin latitude
-        φ1: standard parrallel 1
-        φ2: standard parrallel 2
-    """
-
-    assert φ1 != φ2, 'standard parrallels equal, use different'
-
-    def Q(φ):
-        return π/4 - φ/2
-
-    q = Q(φ)
-    q0 = Q(φ0)
-    q1 = Q(φ1)
-    q2 = Q(φ2)
-
-    v1 = datum.max_radii_curvature(φ1)
-    v2 = datum.max_radii_curvature(φ2)
-
-    r0 = datum.min_radii_curvature(φ0)
-
-    m = datum.m(φ)
-    m1 = datum.m(φ1)
-    m2 = datum.m(φ2)
-
-    n = (
-        ln(v1*cos(φ1)) - ln(v2*cos(φ2))
-    ) / (
-        ln(m1*tan(q1)) - ln(m2*tan(q2))
-    )
-
-    c = v1 * cos(φ1) / (
-        n*(m1*tan(q1))**n
-    )
-
-    return n, c, r0, m, q
-
     

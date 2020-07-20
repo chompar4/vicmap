@@ -1,16 +1,30 @@
 # gda20
-Cartographic tools for working with the MGA (Map Grid of Australia) & GDA20 (Geographic Datum of Australia 2020).
+Cartographic tools for working with the MGA (Map Grid of Australia) & VICGRID94 coordinate systems.
 
+# MGA
 
-* function for calculating grid convergence within all MGA zones
-* transformations between grid / geodetic coordinates
-    * grid to geographic (lat, long)
-    * geographic (lat, long) to grid
+MGA is a UTM projection which uses the GDA20 datum and the following properties:
+```
+E0 = 500,000m false easting
+N0 = 10,000,000m false northing
+m0 = 0.9996 central scale factor 
+cm0 = -177° central meridian of zone 1
+```
 
 See the ICSM GDA2020 Technical Manual for reference
-## Reference: 
 ```
 https://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
+```
+
+# VICGRID94
+
+VICGRID94 is a lambert conformal conic projection centered on Victoria.
+
+<img src="assets/lambert-conic-illustration.png">
+
+See the VICGRID94 Map Projection Specifications doc for reference
+```
+https://www.yumpu.com/en/document/view/11956152/vicgrid94-map-projection-introduction-specifications
 ```
 
 

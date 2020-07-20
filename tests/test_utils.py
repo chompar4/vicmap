@@ -101,13 +101,3 @@ def test_point_scale_factor():
     rLat = -0.413121596
     m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
     assert round(m, 12) == 0.999759539516, 'm: {}'.format(m)
-
-def test_vicgrid94_constants():
-    φ0 = radians(-37)
-    φ1 = radians(-36)
-    φ2 = radians(-38)
-    n, c, r0, _, _ = vicgrid94_constants(10, φ0, φ1, φ2, WGS84)
-
-    assert round(n, 6) == round(-0.6018461056, 6)
-    assert round(c, 1) == -12849334.6
-    assert r0 == 8472630.5

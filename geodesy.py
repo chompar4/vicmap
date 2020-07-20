@@ -24,6 +24,7 @@ import numpy as np
 import math
 cot = lambda x: 1/tan(x)
 π = math.pi
+ln = math.log
 
 from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
 from datums import GDA20
@@ -97,13 +98,30 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
 
     return z, easting, northing, m, dγ
 
-def geographic_to_vicgrid94(dLat, dLng):
+def geographic_to_mga(E, N, datum=GDA20):
+    """
+    Inverse transformation from MGA coords to 
+    geographic coords.
+    """
+    pass
+
+def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     
     from constants import φ1, φ2, λ0, φ0
-    from datums import GDA20
 
-    # datum
-    datum = GDA20
+    def Q(φ):
+        return π/4 - φ/2
+
+    def T(φ):
+        lhs = (1 - sin(φ)) / (1 + sin(φ))
+        rhs = (1 + e * sin(φ)) / (1 - e * sin(φ))
+        inner = lhs * (rhs ** e)
+        return sqrt(inner)
+
+    def M(φ):
+        top = cos(φ)
+        bottom = (1 - e**2 * sin(φ) **2)
+        return top / sqrt(bottom)
 
     # work with radians
     φ = radians(dLat)
@@ -115,20 +133,30 @@ def geographic_to_vicgrid94(dLat, dLng):
     φ1 = radians(φ1)
     φ2 = radians(φ2)
 
-    # Step 1: n, r, r0, F
-    n, c, r0, m, q = vicgrid94_constants(φ, φ0, φ1, φ2, datum)
+    a, _, f, e, e2, n = datum.constants
+
+    m1 = M(φ1)
+    m2 = M(φ2)
+    q1 = Q(φ1)
+    t1 = T(φ1)
+    t2 = T(φ2)
+    t0 = T(φ0)
+    t = T(φ)
+
+    n = (ln(m1) - ln(m2))/(ln(t1)-ln(t2))
+    F = m1 / (n*(t1**n))
 
     # Step 2: determine polar coords
-    coeff = -1 if φ < 0 else 1
-    r = coeff * c * (m * tan(q)) ** n
-    θ = coeff * n * (λ - λ0)
+    rCoeff = -1 if n < 0 else 1
+    r0 = rCoeff * a * F * (t0**n)
+    r = rCoeff * a * F * (t**n)
+    θ = rCoeff * n * (λ - λ0)
 
     # Step 2: determine easting and northing wrt true origin
     X = r * sin(θ)
     Y = r * cos(θ) - r0
 
     return X + E0_vicgrid94, Y + N0_vicgrid94
-
 
 
 def geographic_to_vicgrid(dLat, dLng):

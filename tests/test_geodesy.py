@@ -17,17 +17,34 @@ def test_geographic_to_vicgrid94_center():
     assert e == 2500000
     assert n == 2500000
 
-known_vals94 = [
-    (-34.49482703, 141.988775, 2223259.175, 2773628.391),
-    (-38.06494464, 141.415905, 2185545.806, 2375895.467),
-    (-37.39435028, 148.7786631, 2834469.388, 2449602.655),
-    (-36.01615208, 145.163227, 2590104.617, 2608691.847),
-    (-39.06611111, 145.163227, 2514311.897, 2374602.216), 
+known_vals94_easting = [
+    (-34.49482703, 141.988775, 2223259.175),
+    (-38.06494464, 141.415905, 2185545.806),
+    (-37.39435028, 148.7786631, 2834469.388),
+    (-36.01615208, 145.163227, 2590104.617),
+    (-39.06611111, 145.163227, 2514311.897),
 ]
 
-@pytest.mark.parametrize("lat,lng,E,N", known_vals94)
-def test_known_vals_94(lat, lng, E, N):
+@pytest.mark.parametrize("lat,lng,E", known_vals94_easting)
+def test_known_vals_94_easting(lat, lng, E):
 
     e, n = geographic_to_vicgrid94(lat, lng)
     assert round(e, 2) == round(E, 2)
+    # diffE = abs(e-E)
+    # assert diffE < 1e-3
+
+known_vals94_northing = [
+    (-34.49482703, 141.988775, 2773628.391),
+    (-38.06494464, 141.415905, 2375895.467),
+    (-37.39435028, 148.7786631, 2449602.655),
+    (-36.01615208, 145.163227, 2608691.847),
+    (-39.06611111, 145.163227, 2374602.216), 
+]
+
+@pytest.mark.parametrize("lat,lng,N", known_vals94_northing)
+def test_known_vals_94_northing(lat, lng, N):
+
+    e, n = geographic_to_vicgrid94(lat, lng)
     assert round(n, 2) == round(N, 2)
+    # diffN = abs(n-N)
+    # assert diffN < 1e-3

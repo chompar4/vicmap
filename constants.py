@@ -22,9 +22,7 @@ inverse_flattening = {
 
 # MGA Definition
 # --------------
-# UTM projection
-
-MGA_datum = "GDA20"
+# UTM projection from GDA datum
 
 # False easting (m)
 E0_mga = 500000
