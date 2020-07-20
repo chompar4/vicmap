@@ -63,13 +63,13 @@ class ReferenceEllipsoid:
 # supported reference ellipsoids
 WGS84 = ReferenceEllipsoid(
     code="WGS84",
-    name="World Geodetic System 1984", 
+    name="World Geodetic System WGS84 Spheroid", 
     epsg_code=7030,
 )
 
 GRS80 = ReferenceEllipsoid(
     code="GRS80", 
-    name="Geodetic Reference System 1980", 
+    name="Geodetic Reference System 1980 Spheroid", 
     epsg_code=7019,
 )
 
