@@ -72,6 +72,10 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
         inner = lhs * (rhs ** e)
         return sqrt(inner)
 
+    def V(φ):
+        bottom = (1 - e2 * sin(φ)**2)
+        return a / sqrt(bottom)
+
     def M(φ):
         top = cos(φ)
         bottom = (1 - e**2 * sin(φ) **2)
@@ -96,6 +100,7 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     t2 = T(φ2)
     t0 = T(φ0)
     t = T(φ)
+    v = V(φ)
 
     n = (ln(m1) - ln(m2))/(ln(t1)-ln(t2))
     F = m1 / (n*(t1**n))
@@ -110,9 +115,9 @@ def geographic_to_vicgrid94(dLat, dLng, datum=GDA20):
     X = r * sin(θ)
     Y = r * cos(θ) - r0
 
-    # TODO: m and γ
-    m = None
-    γ = None
+    # Step 3: point scale factor (m) and grid convergence (γ)
+    m = - (r*n) / v * cos(φ)
+    γ = - θ
 
     return X + E0, Y + N0, m, γ
 
