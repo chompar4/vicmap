@@ -1,7 +1,7 @@
 from projections import utm
 import math
 from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0, E0, N0
-from datums import GDA20, GDA94
+from geodesy.datums import GDA20, GDA94
 
 
 def get_zone(dLng):

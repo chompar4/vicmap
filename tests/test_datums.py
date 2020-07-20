@@ -1,4 +1,4 @@
-from datums import GDA20, GDA94, AGD84, AGD66, ANG
+from geodesy.datums import GDA20, GDA94, AGD84, AGD66, ANG
 
 
 def test_gda20():

@@ -1,4 +1,4 @@
-from ellipsoids import reference_ellipsoids
+from geodesy.ellipsoids import reference_ellipsoids
 
 """
 See: https://www.icsm.gov.au/education/fundamentals-mapping/datums/datums-explained-more-detail

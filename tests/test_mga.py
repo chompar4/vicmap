@@ -3,7 +3,7 @@ from mga import geo_to_mga, get_zone
 from projections import utm
 from utils import dms_to_dd
 import numpy as np
-from datums import GDA20, GDA94
+from geodesy.datums import GDA20, GDA94
 
 
 def test_geo_to_mga():

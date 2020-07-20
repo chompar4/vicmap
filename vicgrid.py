@@ -1,4 +1,4 @@
-from datums import GDA94, AGD66
+from geodesy.datums import GDA94, AGD66
 from projections import lambert_conformal_conic
 
 """

@@ -1,7 +1,7 @@
 import pytest
 from vicgrid import geographic_to_vicgrid94
 from utils import dms_to_dd
-from datums import GDA94, AGD66
+from geodesy.datums import GDA94, AGD66
 
 import math
 
