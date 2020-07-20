@@ -1,5 +1,5 @@
 import pytest
-from vicgrid94 import geographic_to_vicgrid94
+from vicgrid import geographic_to_vicgrid94
 from utils import dms_to_dd
 from datums import GDA94, AGD66
 
@@ -36,7 +36,7 @@ TOL = 1e0
 @pytest.mark.parametrize("lat,lng,E,N", known_vals_gda94)
 def test_known_vals_94_easting(lat, lng, E, N):
 
-    e, n, m, y = geographic_to_vicgrid94(lat, lng, datum=GDA94)
+    e, n = geographic_to_vicgrid94(lat, lng)
     diff = abs(e - E)
     assert diff <= TOL
 
@@ -44,7 +44,7 @@ def test_known_vals_94_easting(lat, lng, E, N):
 @pytest.mark.parametrize("lat,lng,E,N", known_vals_gda94)
 def test_known_vals_94_northing(lat, lng, E, N):
 
-    e, n, m, y = geographic_to_vicgrid94(lat, lng, datum=GDA94)
+    e, n = geographic_to_vicgrid94(lat, lng)
     diff = abs(n - N)
     assert diff <= TOL
 
@@ -54,6 +54,6 @@ def test_known_vals_94_total(lat, lng, E, N):
 
     """ cartesian local approximation """
 
-    e, n, m, y = geographic_to_vicgrid94(lat, lng, datum=GDA94)
+    e, n = geographic_to_vicgrid94(lat, lng)
     diff = math.sqrt((e - E) ** 2 + (n - N) ** 2)
     assert diff <= TOL

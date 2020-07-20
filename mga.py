@@ -23,7 +23,7 @@ from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, d
 from datums import GDA20
 
 
-def geographic_to_mga(dLat, dLng, datum=GDA20):
+def geo_to_mga(dLat, dLng, datum=GDA20):
     """
     Perform a transformation from geographic to MGA grid coordinates
     using the Krueger n-series equations, up to order 8.

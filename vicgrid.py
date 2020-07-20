@@ -1,9 +1,17 @@
-from datums import AGD66
-from constants.vicgrid import N0 as N0_vicgrid
-from constants.vicgrid94 import N0 as N0_vicgrid94
-from vicgrid94 import geographic_to_vicgrid94
+from datums import GDA94, AGD66
+from projections import lambert_conformal_conic
 
 """
+
+The VICGRID94 Map Projection was specified and adopted
+by Land Victoria on the 7th of February 2000 at a Land 
+Information Group Technical Meeting in response to user need.
+VICGRID94 is a projection created to cater for the needs of 
+spatial data users with large regional area interests in and 
+beyond the state of Victoria1 and who also wish to use the
+Geocentric Datum of Australia 1994 (GDA94) as the underlying 
+datum (rather than the Australian Geodetic Datum 1966 (AGD66) 
+on which the original VICGRID was based).
 
 It should be noted that the VICGRID94 projection incorporates 
 a different origin specification to VICGRID in order to avoid 
@@ -27,10 +35,51 @@ different for ANS and GRS80.
 """
 
 
+def geographic_to_vicgrid94(dLat, dLng):
+    """
+    Perform a transformation from GDA94 datum to 
+    VICGRID94 grid coordinates using a Lambert 
+    conformal conic projection.
+    Accepts:
+        dLat: latitude in decimal degrees (-90, 90]
+        dLng: longitude in decimal degrees (-180, 180]
+    returns: 
+        E: VICGRID94 Easting
+        N: VICGRID94 Northing
+    """
+
+    from constants.vicgrid94 import φ1, φ2, λ0, φ0, E0, N0
+
+    datum = GDA94
+    print("({}, {}) -> VICGRID94 using {} datum".format(dLat, dLng, datum.name))
+    E, N, m, γ = lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0)
+    return E, N
+
+
+def geographic_to_vicgrid(dLat, dLng):
+    pass
+
+
 def geographic_to_vicgrid(dLat, dLng, datum=AGD66):
-    delta = N0_vicgrid - N0_vicgrid94
-    X, Y, m, γ = geographic_to_vicgrid94(dLat=dLat, dLng=dLng, datum=datum)
-    return X, Y + delta, m, γ
+
+    """
+    Perform a transformation from AGD66 datum to 
+    VICGRID grid coordinates using a Lambert 
+    conformal conic projection.
+    Accepts:
+        dLat: latitude in decimal degrees (-90, 90]
+        dLng: longitude in decimal degrees (-180, 180]
+    returns: 
+        E: VICGRID Easting
+        N: VICGRID Northing
+    """
+
+    from constants.vicgrid import φ1, φ2, λ0, φ0, E0, N0
+
+    datum = AGD66
+    print("({}, {}) -> VICGRID94 using {} datum".format(dLat, dLng, datum.name))
+    E, N, m, γ = lambert_conformal_conic(dLat, dLng, datum, φ1, φ2, λ0, φ0, E0, N0)
+    return E, N
 
 
 def vicgrid_to_geographic():
