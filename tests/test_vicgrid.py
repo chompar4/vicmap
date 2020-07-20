@@ -2,6 +2,7 @@ import pytest
 from vicgrid import geographic_to_vicgrid
 from utils import dms_to_dd
 from geodesy.datums import GDA94, AGD66
+from geodesy.points import GeoPoint
 
 import math
 
@@ -36,16 +37,18 @@ TOL = 1e0
 @pytest.mark.parametrize("lat,lng,E,N", known_vals_agd66)
 def test_known_vals_easting(lat, lng, E, N):
 
-    e, n = geographic_to_vicgrid(lat, lng)
-    diff = abs(e - E)
+    pt = GeoPoint(lat, lng, datum=AGD66)
+    vic_pt = geographic_to_vicgrid(pt)
+    diff = abs(vic_pt.E - E)
     assert diff <= TOL
 
 
 @pytest.mark.parametrize("lat,lng,E,N", known_vals_agd66)
 def test_known_vals_northing(lat, lng, E, N):
 
-    e, n = geographic_to_vicgrid(lat, lng)
-    diff = abs(n - N)
+    pt = GeoPoint(lat, lng, datum=AGD66)
+    vic_pt = geographic_to_vicgrid(pt)
+    diff = abs(vic_pt.N - N)
     assert diff <= TOL
 
 
@@ -54,6 +57,7 @@ def test_known_vals_total(lat, lng, E, N):
 
     """ cartesian local approximation """
 
-    e, n = geographic_to_vicgrid(lat, lng)
-    diff = math.sqrt((e - E) ** 2 + (n - N) ** 2)
+    pt = GeoPoint(lat, lng, datum=AGD66)
+    vic_pt = geographic_to_vicgrid(pt)
+    diff = math.sqrt((vic_pt.E - E) ** 2 + (vic_pt.N - N) ** 2)
     assert diff <= TOL
