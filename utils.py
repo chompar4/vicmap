@@ -1,4 +1,3 @@
-from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0
 from datums import GDA20
 
 import math
@@ -19,23 +18,6 @@ def dms_to_dd(d, m, s):
     sign = -1 if d < 0 else 1
     dd = abs(d) + m / 60 + s / 3600
     return sign * dd
-
-
-def get_zone(dLng):
-    """
-    gives the tranverse mercator zone containing 
-    longitude 'lng', using parameters defined in constants
-    zones have the range [west, east).
-    """
-    return math.floor((dLng - zone0_edge) / zone_width)
-
-
-def get_cm(lng):
-    """
-    gives the central meridian longitude of the zone
-    containing 'lng'
-    """
-    return cm_mga_zone[get_zone(lng)]
 
 
 def TM_n_component(α, r, _ε, _N):
@@ -161,7 +143,7 @@ def grid_convergence(q, p, _t, ω, dLat):
         return g
 
 
-def point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω):
+def point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω, m0):
     """
     gives the point scale factor
     """
