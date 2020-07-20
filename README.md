@@ -13,13 +13,13 @@ MGA20 is the conformal UTM projection from the GRS80 ellipsoid (with GDA20 coord
 
 Use the ```geo_to_mga``` function to perform a forward point transformation from the GDA20 coordinates ```(dLng, dLat)``` to the MGA20 grid coordinates (E, N) as follows:
 
-```
+```python
 z, E, N, m, γ = geo_to_mga(dLat, dLng, datum=GDA20)
 ```
 
 Use the ```mga_to_geo``` function to perform an inverse point transformation from the MGA20 grid coordinates (E, N) to the GDA20 coordinates ```(dLng, dLat)``` as follows:
 
-```
+```python
 dLat, dLng = mga_to_geo(E, N, datum=GDA20)
 ```
 
@@ -29,13 +29,13 @@ MGA94 is the projection from the GRS80 ellipsoid (with GDA94 coordinates) to the
 
 Use the ```geo_to_mga``` function to perform a point transformation from the GDA94 coordinates ```(dLng, dLat)``` to the MGA94 grid coordinates (E, N) as follows:
 
-```
+```python
 z, E, N, m, γ = geo_to_mga(dLat, dLng, datum=GDA94)
 ```
 
 Use the ```mga_to_geo``` function to perform an inverse point transformation from the MGA94 grid coordinates (E, N) to the GDA94 coordinates ```(dLng, dLat)``` as follows:
 
-```
+```python
 dLat, dLng = mga_to_geo(E, N, datum=GDA94)
 ```
 
@@ -48,7 +48,7 @@ VICGRID94 uses a lambert conformal conic projection to project the GDA94 datum t
 
 Use the ```geo_to_vicgrid94``` function to perform a point transformation from the GDA94 coordinates ```(dLng, dLat)``` to the VICGRID94 grid coordinates (E, N) as follows:
 
-```
+```python
 E, N, m, γ = geo_to_vicgrid94(dLat, dLng)
 ```
 
@@ -58,7 +58,7 @@ VICGRID is similar to VICGRID94, but projects the AGD66 datum to the plane. The 
 
 Use the ```geo_to_vicgrid``` function to perform a point transformation from the AGD66 coordinates ```(dLng, dLat)``` to the VICGRID grid coordinates (E, N) as follows:
 
-```
+```python
 E, N, m, γ = geo_to_vicgrid(dLat, dLng, datum=AGD66)
 ```
 
