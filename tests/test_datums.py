@@ -1,4 +1,4 @@
-from datums import GDA20, GDA94, AGD84, AGD66
+from datums import GDA20, GDA94, AGD84, AGD66, ANG
 
 def test_gda20():
 
@@ -40,3 +40,13 @@ def test_agd66():
     assert b == 6399617.224558453
     assert round(e2, 9) == 0.006694542
     assert round(e, 9) == 0.08182018
+
+def test_ang():
+
+    a, b, f, e, e2, n = ANG.ellipsoidal_constants
+
+    assert a == 6378350.871924
+    assert 1/f == 294.26
+    assert b == 6400100.687350324
+    assert round(e2, 9) == 0.006785162
+    assert round(e, 9) == 0.082372092

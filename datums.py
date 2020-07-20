@@ -63,3 +63,9 @@ AGD66 = Datum(
     name="Australian Geodetic Datum 1966", 
     ellipsoid_code="ANS",
 )
+
+ANG = Datum(
+    code="ANG", 
+    name="unknown", 
+    ellipsoid_code="CLARKE"
+)

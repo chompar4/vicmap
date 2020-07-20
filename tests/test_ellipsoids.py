@@ -1,4 +1,4 @@
-from ellipsoids import WGS84, GRS80, ANS, ANG
+from ellipsoids import WGS84, GRS80, ANS, CLARKE
 
 def test_wgs84():
 
@@ -30,9 +30,9 @@ def test_ans():
     assert round(datum.e2, 9) == 0.006694542
     assert round(datum.e, 9) == 0.08182018
 
-def test_ang():
+def test_clarke():
 
-    datum = ANG
+    datum = CLARKE
 
     assert datum.a == 6378350.871924
     assert datum._f == 294.26

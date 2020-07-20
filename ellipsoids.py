@@ -4,14 +4,14 @@ semi_major_axis = {
     "WGS84": 6378137,
     "GRS80": 6378137,
     "ANS": 6378160,
-    "ANG": 6378350.871924,
+    "CLARKE": 6378350.871924,
 }
 
 reciprocal_flattening = {
     "WGS84": 298.257223563,
     "GRS80": 298.257222101,
     "ANS": 298.25,
-    "ANG": 294.26,
+    "CLARKE": 294.26,
 }
 
 class ReferenceEllipsoid:
@@ -69,12 +69,12 @@ ANS = ReferenceEllipsoid(
     name="Australian National Spheroid",
 )
 
-ANG = ReferenceEllipsoid(
-    code= "ANG", 
-    name= ""
+CLARKE = ReferenceEllipsoid(
+    code= "CLARKE", 
+    name= "Clarke 1866 Spheroid"
 )
 
 reference_ellipsoids = {
     e.code: e
-    for e in [WGS84, GRS80, ANS, ANG]
+    for e in [WGS84, GRS80, ANS, CLARKE]
 }

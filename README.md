@@ -1,9 +1,9 @@
 # gda20
 Cartographic tools for working with MGA & VICGRID coordinate systems.
 
-## MGA
+## MGA20
 
-MGA (The Map Grid of Australia) is a UTM projection based on the GDA94/GDA20 datum with the following properties:
+MGA (The Map Grid of Australia 2020) is a UTM projection based on the GDA20 datum with the following properties:
 ```
 E0 = 500,000m false easting
 N0 = 10,000,000m false northing
@@ -16,6 +16,10 @@ See the ICSM GDA2020 Technical Manual for reference
 ```
 https://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
 ```
+
+## MGA94
+MGA (The Map Grid of Australia 1994) is a UTM projection based on the GDA94. It has been superceded by MGA20.
+
 
 ## VICGRID94
 
