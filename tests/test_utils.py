@@ -1,4 +1,4 @@
-from utils import point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, rectifying_radius, krueger_coefficients
+from utils import dms_to_dd, point_scale_factor, grid_convergence, get_zone, pq_coefficients, transverse_mercator, gauss_schreiber, conformal_latitude, rectifying_radius, krueger_coefficients
 
 import pytest 
 import numpy as np
@@ -100,3 +100,11 @@ def test_point_scale_factor():
     rLat = -0.413121596
     m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω)
     assert round(m, 12) == 0.999759539516, 'm: {}'.format(m)
+
+def test_dms_to_dd():
+
+    val = dms_to_dd(-23, 40, 12.446020)
+    assert abs(val - -23.67012389) < 1e-6
+
+    val = dms_to_dd(133, 53, 7.84784)
+    assert abs(val - 133.8855133) < 1e-6
