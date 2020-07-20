@@ -104,9 +104,9 @@ def lambert_conformal_conic(dLat, dLng, ellipsoid, φ1, φ2, λ0, φ0, E0, N0):
     return X + E0, Y + N0, m, γ
 
 
-def utm(dLat, dLng, cm, m0, E0, N0, ellipsoid):
+def utm(dLat, dLng, ellipsoid, grid):
     """
-    Perform a UTM projection from geographic to grid coordinates
+    Perform a UTM projection from ellipsoid to grid
     using the Krueger n-series equations, up to order 8.
     See: https://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
     In theory these calculations should be accurate 
@@ -132,6 +132,10 @@ def utm(dLat, dLng, cm, m0, E0, N0, ellipsoid):
 
     rLat = radians(dLat)
     rLng = radians(dLng)
+
+    m0 = grid.m0
+    zn = grid.get_zone(dLng)
+    cm = grid.get_cm(zn)
 
     # Step 1: Compute ellipsiodal constants
     a, _, f, e, e2, n = ellipsoid.constants
@@ -159,8 +163,8 @@ def utm(dLat, dLng, cm, m0, E0, N0, ellipsoid):
     Y = A * ε
 
     # Step 9 - MGA2020 coordinates (E, N)
-    easting = m0 * X + E0
-    northing = m0 * Y + N0
+    easting = grid.m0 * X + grid.E0
+    northing = grid.m0 * Y + grid.N0
 
     # Step 10 - q & p
     q, p = pq_coefficients(α, _ε, _Nu)

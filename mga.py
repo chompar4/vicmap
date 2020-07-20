@@ -1,22 +1,8 @@
 from projections import utm
 import math
-from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0, E0, N0
 from geodesy.datums import GDA20, GDA94
 from geodesy.points import UTMPoint
-
-
-def get_zone(dLng):
-    """
-    gives the MGA zone containing dLng
-    """
-    return math.floor((dLng - zone0_edge) / zone_width)
-
-
-def get_cm(dLng):
-    """
-    gives the central meridian longitude of the MGA zone containing dLng
-    """
-    return cm_mga_zone[get_zone(dLng)]
+from geodesy.grids import MGA
 
 
 def geo_to_mga(point):
@@ -42,11 +28,10 @@ def geo_to_mga(point):
     assert datum in [GDA20, GDA94], "Please specify your coordinates in GDA20 or GDA94"
     print("({}, {}) -> MGA using {} datum".format(dLat, dLng, datum.name))
 
-    zone = get_zone(dLng)
-    cm = get_cm(dLng)
+    zone = MGA.get_zone(dLng)
 
-    E, N, m, γ = utm(dLat, dLng, cm, m0, E0, N0, datum.ellipsoid)
-    return UTMPoint(zone, E, N, grid="MGA")
+    E, N, m, γ = utm(dLat, dLng, ellipsoid=datum.ellipsoid, grid=MGA)
+    return UTMPoint(zone, E, N, grid=MGA)
 
 
 def mga_to_geographic(E, N):

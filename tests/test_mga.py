@@ -1,5 +1,5 @@
 import pytest
-from mga import geo_to_mga, get_zone
+from mga import geo_to_mga
 from geodesy.points import GeoPoint
 from projections import utm
 from utils import dms_to_dd
@@ -45,24 +45,3 @@ def test_geo_to_mga_94_20_invariance():
     mga_pt2 = geo_to_mga(pt2)
 
     assert mga_pt1.coords == mga_pt2.coords
-
-
-zones = [
-    (108, 114, 49),
-    (114, 120, 50),
-    (120, 126, 51),
-    (126, 132, 52),
-    (132, 138, 53),
-    (138, 144, 54),
-    (144, 150, 55),
-    (150, 156, 56),
-]
-
-
-@pytest.mark.parametrize("west,east,zn", zones)
-def test_get_zone(west, east, zn):
-    for lng in np.linspace(start=west, stop=east, num=10):
-        if lng == east:
-            assert get_zone(lng) == zn + 1  # range of zones = [west, east)
-        else:
-            assert get_zone(lng) == zn
