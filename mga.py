@@ -8,23 +8,20 @@ from utils import (
     pq_coefficients,
     krueger_coefficients,
     rectifying_radius,
-    grid_convergence, 
-    point_scale_factor
+    grid_convergence,
+    point_scale_factor,
 )
-from constants.mga import (
-    E0, 
-    N0,
-    zone_width, 
-    m0
-)
+from constants.mga import E0, N0, zone_width, m0
 import numpy as np
 import math
-cot = lambda x: 1/tan(x)
+
+cot = lambda x: 1 / tan(x)
 π = math.pi
 ln = math.log
 
 from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
 from datums import GDA20
+
 
 def geographic_to_mga(dLat, dLng, datum=GDA20):
     """
@@ -45,10 +42,10 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
         γ: Grid Convergence
     """
 
-    print('geo -> MGA using {} datum'.format(datum.name))
+    print("geo -> MGA using {} datum".format(datum.name))
 
-    assert -90 < dLat <= 90, 'latitude out of bounds'
-    assert -180 < dLng < 180, 'longitude out of bounds'
+    assert -90 < dLat <= 90, "latitude out of bounds"
+    assert -180 < dLng < 180, "longitude out of bounds"
 
     rLat = radians(dLat)
     rLng = radians(dLng)
@@ -64,21 +61,21 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
     α = krueger_coefficients(n)
 
     # Step 4 - conformal latitude _φ
-    t, σ, _t, _φ = conformal_latitude(rLat, e) 
+    t, σ, _t, _φ = conformal_latitude(rLat, e)
 
     # Step 5 - longitude difference
     central_meridian = get_cm(dLng)
     ω = rLng - math.radians(central_meridian)
 
-    # Step 6 - Gauss-Schreiber 
+    # Step 6 - Gauss-Schreiber
     _ε, _Nu = gauss_schreiber(_t, ω, a)
 
-    # Step 7 - TM ratios 
+    # Step 7 - TM ratios
     ε, Nu = transverse_mercator(_Nu, _ε, α)
 
     # Step 8 - TM coords
-    X = A*Nu
-    Y = A*ε
+    X = A * Nu
+    Y = A * ε
 
     # Step 9 - MGA2020 coordinates (E, N)
     easting = m0 * X + E0
@@ -94,6 +91,7 @@ def geographic_to_mga(dLat, dLng, datum=GDA20):
     γ = grid_convergence(q, p, _t, ω, dLat)
 
     return z, easting, northing, m, math.degrees(γ)
+
 
 def mga_to_geographic(E, N, datum=GDA20):
     """

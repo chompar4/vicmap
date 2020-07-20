@@ -1,4 +1,4 @@
-# VICGRID Definition 
+# VICGRID Definition
 # --------------------
 # Lambert conformal conic projection
 
@@ -12,7 +12,7 @@
 
 E0 = 2500000
 N0 = 4500000
- 
+
 # central meridian longitude
 λ0 = 145
 
