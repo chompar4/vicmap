@@ -1,24 +1,11 @@
 from projections import utm
 import math
-from constants.mga import cm_mga_zone, cm_zone1, zone0_edge, zone_width, m0, E0, N0
-from datums import GDA20, GDA94
+from geodesy.datums import GDA20, GDA94
+from geodesy.points import UTMPoint, GeoPoint, PlanePoint
+from geodesy.grids import MGA
 
 
-def get_zone(dLng):
-    """
-    gives the MGA zone containing dLng
-    """
-    return math.floor((dLng - zone0_edge) / zone_width)
-
-
-def get_cm(dLng):
-    """
-    gives the central meridian longitude of the MGA zone containing dLng
-    """
-    return cm_mga_zone[get_zone(dLng)]
-
-
-def geo_to_mga(dLat, dLng, datum=GDA20):
+def geo_to_mga(point):
     """
     Perform a transformation from GDA20 or GDA94 geographic
     coordinates to MGA grid coordinates. UTM transformation
@@ -26,7 +13,7 @@ def geo_to_mga(dLat, dLng, datum=GDA20):
     Accepts:
         dLat: latitude in decimal degrees (-90, 90]
         dLng: longitude in decimal degrees (-180, 180]
-        datum: default GDA20
+        datum: required to be GDA20 or GDA94
     returns: 
         z: Zone
         E: UTM Easting
@@ -35,21 +22,32 @@ def geo_to_mga(dLat, dLng, datum=GDA20):
         γ: Grid Convergence
     """
 
-    # note: it will still work for other datums, but that is not geo_to_mga
-    assert datum in [GDA20, GDA94], "Please specify your coordinates in GDA20 or GDA94"
+    assert isinstance(point, GeoPoint), "Please provide a GeoPoint() instance"
 
+    dLat, dLng = point.dLat, point.dLng
+    datum = point.datum
+
+    assert datum in [GDA20, GDA94], "Please specify your coordinates in GDA20 or GDA94"
     print("({}, {}) -> MGA using {} datum".format(dLat, dLng, datum.name))
 
-    zone = get_zone(dLng)
-    cm = get_cm(dLng)
+    zone = MGA.get_zone(dLng)
 
-    E, N, m, γ = utm(dLat, dLng, cm, m0, E0, N0, datum.ellipsoid)
-    return zone, E, N
+    E, N, m, γ = utm(dLat, dLng, ellipsoid=datum.ellipsoid, grid=MGA)
+    return UTMPoint(zone, E, N, grid=MGA)
 
 
-def mga_to_geographic(E, N):
+def mga_to_geographic(point, datum=GDA20):
     """
     Inverse transformation from MGA coords to 
-    geographic coords.
+    geographic coords. Defaults to most recent GDA20 datum.
     """
-    pass
+
+    assert isinstance(point, PlanePoint), "Please provide a PlanePoint() instance"
+    grid = point.grid
+
+    assert grid in [GDA20, GDA94], "Please specify your coordinates in GDA20 or GDA94"
+    print("({}, {}) -> MGA using {} datum".format(dLat, dLng, datum.name))
+
+    raise NotImplementedError
+
+    return GeoPoint(dLat, dLng, datum)

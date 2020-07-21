@@ -1,4 +1,4 @@
-from ellipsoids import WGS84, GRS80, ANS, CLARKE
+from geodesy.ellipsoids import WGS84, GRS80, ANS, CLARKE
 
 
 def test_wgs84():
