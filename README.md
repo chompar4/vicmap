@@ -1,5 +1,5 @@
 # vicmap
-Cartographic tools for working with MGA & VICGRID coordinate systems.
+python library of cartographic tools for projections and geodetic computations in victoria
 
 ## Installation
 ```
