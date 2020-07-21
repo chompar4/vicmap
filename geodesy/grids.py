@@ -1,18 +1,13 @@
 import math
 
 
-class UTMGrid:
-    pass
-
-
-class MGAGrid(UTMGrid):
+class MGAGrid:
     def __init__(self, E0, N0, m0, zw, cm1):
-
         """
-        Representation of the MGA (Map Grid of Australia) projection.
+        Representation of the MGA (Map Grid of Australia) plane.
         A specific UTM grid in the plane defined for australia.
         Origin Datum
-            GDA94 / GDA20
+            GDA94 / GDA20 only
         accepts
             E0: false easting (m)
             N0: false northing (m)
@@ -23,7 +18,6 @@ class MGAGrid(UTMGrid):
             zones: all zones in the UTM grid
             z0_edge: longitude of western edge of the 0th zone
         """
-
         self.E0 = E0
         self.N0 = N0
         self.m0 = m0
@@ -58,5 +52,42 @@ class MGAGrid(UTMGrid):
         return self.cms[zn]
 
 
+class VICGRID:
+    def __init__(self, φ1, φ2, E0, N0, φ0, λ0):
+        """
+        Representation of the VICGRID plane.
+        Contains all constants required for projection.
+        Origin Datum 
+            AGD66 only
+        accepts 
+            φ1, φ2: standard parralels
+            E0: false easting (m)
+            N0: false northing (m)
+            φ0: origin parrallel latitude (degrees)
+            λ0: central meridian longitude (degrees)
+        """
+        self.E0 = E0
+        self.N0 = N0
+        self.φ1 = φ1
+        self.φ2 = φ2
+        self.λ0 = λ0
+        self.φ0 = φ0
+
+    @property
+    def constants(self):
+        return (self.φ1, self.φ2, self.λ0, self.φ0, self.E0, self.N0)
+
+
+class VICGRID94(VICGRID):
+    def __init__(self, φ1, φ2, E0, N0, φ0, λ0):
+        """
+        Representation of the VICGRID94 plane.
+        Identical to VICGRID with a different false northing.
+        """
+        super().__init__(φ1, φ2, E0, N0, φ0, λ0)
+
+
 MGA = MGAGrid(E0=500000, N0=10000000, m0=0.9996, zw=6, cm1=-177)
+VICGRID = VICGRID(φ1=-36, φ2=-38, E0=2500000, N0=4500000, φ0=-37, λ0=145)
+VICGRID94 = VICGRID94(φ1=-36, φ2=-38, E0=2500000, N0=2500000, φ0=-37, λ0=145)
 

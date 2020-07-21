@@ -1,5 +1,5 @@
 import pytest
-from geodesy.grids import MGA
+from geodesy.grids import MGA, VICGRID, VICGRID94
 import numpy as np
 
 zones = [
@@ -48,3 +48,31 @@ def test_mga_grid():
         assert MGA.get_zone(cm) == zn
 
     assert MGA.z0_edge == -177 - 1.5 * 6
+
+
+def test_vicgrid():
+
+    assert VICGRID.E0 == 2500000
+    assert VICGRID.N0 == 4500000
+
+    assert VICGRID.φ1 == -36
+    assert VICGRID.φ2 == -38
+
+    assert VICGRID.λ0 == 145
+    assert VICGRID.φ0 == -37
+
+    assert VICGRID.constants == (-36, -38, 145, -37, 2500000, 4500000)
+
+
+def test_vicgrid94():
+
+    assert VICGRID94.E0 == 2500000
+    assert VICGRID94.N0 == 2500000
+
+    assert VICGRID94.φ1 == -36
+    assert VICGRID94.φ2 == -38
+
+    assert VICGRID94.λ0 == 145
+    assert VICGRID94.φ0 == -37
+
+    assert VICGRID94.constants == (-36, -38, 145, -37, 2500000, 2500000)

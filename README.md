@@ -14,7 +14,6 @@ Points on 3D Geoid surfaces are represented by the ```GeoPoint``` class, while p
 pt = GeoPoint(dLat, dLng, datum=GDA20)
 ```
 
-
 ### MGA20
 ```MGA20``` is the pair of conformal UTM projections betwee the ```GDA20``` datum and the ```MGA``` grid.
 
@@ -91,9 +90,9 @@ agd_pt = vicgrid_to_geo(mga_pt)
 ```
 
 
-### Converting between coordinates
+### Converting between datums
 
-Each datum has a conversion method. 
+Each datum has a conversion method.
 > TODO
 
 ## Projections

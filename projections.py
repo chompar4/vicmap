@@ -18,7 +18,7 @@ from utils import (
 )
 
 
-def lambert_conformal_conic(dLat, dLng, ellipsoid, φ1, φ2, λ0, φ0, E0, N0):
+def lambert_conformal_conic(dLat, dLng, ellipsoid, grid):
     """
     Perform a transformation from geographic to grid coordinates
     using a Lambert conformal conic projection.
@@ -57,6 +57,8 @@ def lambert_conformal_conic(dLat, dLng, ellipsoid, φ1, φ2, λ0, φ0, E0, N0):
         top = cos(φ)
         bottom = 1 - e ** 2 * sin(φ) ** 2
         return top / sqrt(bottom)
+
+    φ1, φ2, λ0, φ0, E0, N0 = grid.constants
 
     for phi in [dLat, φ1, φ2, φ0]:
         assert -90 < phi <= 90, "{}".format(phi)
