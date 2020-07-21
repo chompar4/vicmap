@@ -16,8 +16,8 @@ def test_geo_to_mga():
     mga_pt = geo_to_mga(pt)
 
     assert mga_pt.zone == 53
-    assert round(mga_pt.E, 2) == round(386352.397753, 2)
-    assert round(mga_pt.N, 2) == round(7381850.768886, 2)
+    assert abs(mga_pt.E - 386352.397753) < 1e-6
+    assert abs(mga_pt.N - 7381850.768886) < 1e-6
 
     cm = 135
     m0 = 0.9996
@@ -26,8 +26,8 @@ def test_geo_to_mga():
     datum = GDA20
     _, _, m, γ = utm(lat, lng, ellipsoid=datum.ellipsoid, grid=MGA)
 
-    assert round(m, 9) == 0.999759539
-    assert round(γ, 9) == -0.447481418
+    assert abs(m - 0.999759539) < 1e-8
+    assert abs(γ + 0.447481418) < 1e-8
 
 
 def test_geo_to_mga_non_GDA_datum():

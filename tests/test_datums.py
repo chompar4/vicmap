@@ -8,8 +8,8 @@ def test_gda20():
     assert a == 6378137
     assert 1 / f == 298.257222101
     assert b == 6399593.625864023
-    assert round(e2, 9) == 0.006694380
-    assert round(e, 9) == 0.081819191
+    assert abs(e2 - 0.006694380) < 1e-8
+    assert abs(e - 0.081819191) < 1e-8
 
 
 def test_gda94():
@@ -19,8 +19,8 @@ def test_gda94():
     assert a == 6378137
     assert 1 / f == 298.257222101
     assert b == 6399593.625864023
-    assert round(e2, 9) == 0.006694380
-    assert round(e, 9) == 0.081819191
+    assert abs(e2 - 0.006694380) < 1e-8
+    assert abs(e - 0.081819191) < 1e-8
 
 
 def test_agd84():
@@ -30,8 +30,8 @@ def test_agd84():
     assert a == 6378160
     assert 1 / f == 298.25
     assert b == 6399617.224558453
-    assert round(e2, 9) == 0.006694542
-    assert round(e, 9) == 0.08182018
+    assert abs(e2 - 0.006694542) < 1e-8
+    assert abs(e - 0.08182018) < 1e-8
 
 
 def test_agd66():
@@ -41,8 +41,8 @@ def test_agd66():
     assert a == 6378160
     assert 1 / f == 298.25
     assert b == 6399617.224558453
-    assert round(e2, 9) == 0.006694542
-    assert round(e, 9) == 0.08182018
+    assert abs(e2 - 0.006694542) < 1e-8
+    assert abs(e - 0.08182018) < 1e-8
 
 
 def test_ang():
@@ -52,5 +52,5 @@ def test_ang():
     assert a == 6378350.871924
     assert 1 / f == 294.26
     assert b == 6400100.687350324
-    assert round(e2, 9) == 0.006785162
-    assert round(e, 9) == 0.082372092
+    assert abs(e2 - 0.006785162) < 1e-8
+    assert abs(e - 0.082372092) < 1e-8

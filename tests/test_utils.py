@@ -19,45 +19,29 @@ from math import radians
 def test_rectifying_radius():
     a = 6378137
     n = 1.679220395e-03
-    assert round(rectifying_radius(a, n), 12) == 6367449.14576869
+    assert abs(rectifying_radius(a, n) - 6367449.14576869) < 1e-8
 
 
 def test_krueger_coefficients():
     n = 1.679220395e-03
     α = krueger_coefficients(n)
-    assert round(α[2], 12) == round(8.377318247286e-04, 12), "a2: {}".format(
-        round(α[2], 12)
-    )
-    assert round(α[4], 15) == round(7.608527848150e-07, 15), "a4: {}".format(
-        round(α[4], 15)
-    )
-    assert round(α[6], 17) == round(1.197645520855e-09, 17), "a6: {}".format(
-        round(α[6], 17)
-    )
-    assert round(α[8], 20) == round(2.429170728037e-12, 20), "a8: {}".format(
-        round(α[8], 20)
-    )
-    assert round(α[10], 22) == round(5.711818510466e-15, 22), "a10: {}".format(
-        round(α[10], 22)
-    )
-    assert round(α[12], 24) == round(1.479997974926e-17, 24), "a12: {}".format(
-        round(α[12], 24)
-    )
-    assert round(α[14], 27) == round(4.107624250384e-20, 27), "a14: {}".format(
-        round(α[14], 27)
-    )
-    assert round(α[16], 30) == round(1.210785086483e-22, 30), "a16: {}".format(
-        round(α[16], 30)
-    )
+    assert abs(α[2] - 8.377318247286e-04) < 1e-12
+    assert abs(α[4] - 7.608527848150e-07) < 1e-14
+    assert abs(α[6] - 1.197645520855e-09) < 1e-16
+    assert abs(α[8] - 2.429170728037e-12) < 1e-19
+    assert abs(α[10] - 5.711818510466e-15) < 1e-22
+    assert abs(α[12] - 1.479997974926e-17) < 1e-24
+    assert abs(α[14] - 4.107624250384e-20) < 1e-27
+    assert abs(α[16] - 1.210785086483e-22) < 1e-30
 
 
 def test_conformal_latitude():
     t, σ, _t, _φ = conformal_latitude(-0.413121596, 0.081819191043)
 
-    assert round(t, 12) == -0.438347537637, "t: {}".format(round(t, 12))
-    assert round(σ, 12) == -0.002688564995, "σ: {}".format(round(σ, 12))
-    assert round(_t, 12) == -0.435413597268, "_t: {}".format(round(_t, 10))
-    assert round(_φ, 12) == -0.410657890504, "_φ: {}".format(round(_φ, 10))
+    assert abs(t + 0.438347537637) < 1e-8
+    assert abs(σ + 0.002688564995) < 1e-8
+    assert abs(_t + 0.435413597268) < 1e-8
+    assert abs(_φ + 0.410657890504) < 1e-8
 
 
 def test_gauss_schreiber():
@@ -66,8 +50,8 @@ def test_gauss_schreiber():
     a = 6378137.0
     _ε, _N = gauss_schreiber(_t, ω, a)
 
-    assert round(_ε, 12) == -0.410727143471, "_e : {}".format(_ε)
-    assert round(_N, 12) == -0.017835003097, "_N : {}".format(_N)
+    assert abs(_ε + 0.410727143471) < 1e-8
+    assert abs(_N + 0.017835003097) < 1e-8
 
 
 def test_transverse_mercator():
@@ -78,8 +62,8 @@ def test_transverse_mercator():
 
     E, Nu = transverse_mercator(_Nu, _ε, α)
 
-    assert round(Nu, 12) == -0.017855357573, "N: {}".format(round(N, 9))
-    assert round(E, 12) == -0.411341629424, "E: {}".format(round(E, 9))
+    assert abs(Nu + 0.017855357573) < 1e-8
+    assert abs(E + 0.411341629424) < 1e-8
 
 
 def test_pq_coefficients():
@@ -89,8 +73,8 @@ def test_pq_coefficients():
     α = krueger_coefficients(n)
 
     q, p = pq_coefficients(α, _ε, _N)
-    assert round(q, 12) == round(-4.398179750e-05, 12), "q: {}".format(round(q, 12))
-    assert round(p, 12) == 1.001141754741e00, "p: {}".format(round(p, 12))
+    assert abs(q + 4.398179750e-05) < 1e-8
+    assert abs(p - 1.001141754741e00) < 1e-8
 
 
 def test_grid_convergence():
@@ -100,7 +84,7 @@ def test_grid_convergence():
     ω = -0.019451463
     dLat = -23.67012389
     γ = grid_convergence(q, p, _t, ω, dLat)
-    assert round(γ, 12) == -0.007810024262, "γ: {}".format(γ)
+    assert abs(γ + 0.007810024262) < 1e-8
 
 
 def test_point_scale_factor():
@@ -115,13 +99,13 @@ def test_point_scale_factor():
     rLat = -0.413121596
     m0 = 0.9996
     m = point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω, m0)
-    assert round(m, 12) == 0.999759539516, "m: {}".format(m)
+    assert abs(m - 0.999759539516) < 1e-8
 
 
 def test_dms_to_dd():
 
     val = dms_to_dd(-23, 40, 12.446020)
-    assert abs(val - -23.67012389) < 1e-6
+    assert abs(val + 23.67012389) < 1e-6
 
     val = dms_to_dd(133, 53, 7.84784)
     assert abs(val - 133.8855133) < 1e-6
