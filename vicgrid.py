@@ -1,6 +1,6 @@
 from geodesy.datums import GDA94, AGD66
 from projections import lambert_conformal_conic
-from geodesy.points import VICPoint
+from geodesy.points import VICPoint, GeoPoint, PlanePoint
 
 """
 
@@ -36,7 +36,7 @@ different for ANS and GRS80.
 """
 
 
-def geographic_to_vicgrid94(point):
+def geo_to_vicgrid94(point):
     """
     Perform a transformation from GDA94 datum to 
     VICGRID94 grid coordinates using a Lambert 
@@ -51,10 +51,12 @@ def geographic_to_vicgrid94(point):
 
     from constants.vicgrid94 import φ1, φ2, λ0, φ0, E0, N0
 
+    assert isinstance(point, GeoPoint), "Please provide a GeoPoint() instance"
+
     dLat, dLng, datum = point.dLat, point.dLng, point.datum
 
-    if datum != GDA94:
-        raise NotImplementedError("Please specify your coordinates in GDA94")
+    assert datum == GDA94, "Please specify your coordinates in GDA94"
+
     print("({}, {}) -> VICGRID94 from {} coordinates".format(dLat, dLng, datum.name))
     E, N, m, γ = lambert_conformal_conic(
         dLat, dLng, datum.ellipsoid, φ1, φ2, λ0, φ0, E0, N0
@@ -63,11 +65,7 @@ def geographic_to_vicgrid94(point):
     return VICPoint(E, N, grid="VICGRID94")
 
 
-def geographic_to_vicgrid(point):
-    pass
-
-
-def geographic_to_vicgrid(point):
+def geo_to_vicgrid(point):
 
     """
     Perform a transformation from AGD66 datum to 
@@ -83,10 +81,12 @@ def geographic_to_vicgrid(point):
 
     from constants.vicgrid import φ1, φ2, λ0, φ0, E0, N0
 
+    assert isinstance(point, GeoPoint), "Please provide a GeoPoint() instance"
+
     dLat, dLng, datum = point.dLat, point.dLng, point.datum
 
-    if datum != AGD66:
-        raise NotImplementedError("Please specify your coordinates in AGD66")
+    assert datum == AGD66, "Please specify your coordinates in GDA94"
+
     print("({}, {}) -> VICGRID94 from {} coordinates".format(dLat, dLng, datum.name))
     E, N, m, γ = lambert_conformal_conic(
         dLat, dLng, datum.ellipsoid, φ1, φ2, λ0, φ0, E0, N0
@@ -94,5 +94,9 @@ def geographic_to_vicgrid(point):
     return VICPoint(E, N, grid="VICGRID")
 
 
-def vicgrid_to_geographic():
+def vicgrid_to_geo():
+    pass
+
+
+def vicgrid94_to_geo():
     pass
