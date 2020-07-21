@@ -42,12 +42,6 @@ def geo_to_vicgrid94(point):
     Perform a transformation from GDA94 datum to 
     VICGRID94 grid coordinates using a Lambert 
     conformal conic projection.
-    Accepts:
-        dLat: latitude in decimal degrees (-90, 90]
-        dLng: longitude in decimal degrees (-180, 180]
-    returns: 
-        E: VICGRID94 Easting
-        N: VICGRID94 Northing
     """
 
     assert isinstance(point, GeoPoint), "Please provide a GeoPoint() instance"
@@ -68,12 +62,6 @@ def geo_to_vicgrid(point):
     Perform a transformation from AGD66 datum to 
     VICGRID grid coordinates using a Lambert 
     conformal conic projection.
-    Accepts:
-        dLat: latitude in decimal degrees (-90, 90]
-        dLng: longitude in decimal degrees (-180, 180]
-    returns: 
-        E: VICGRID Easting
-        N: VICGRID Northing
     """
 
     assert isinstance(point, GeoPoint), "Please provide a GeoPoint() instance"

@@ -103,12 +103,8 @@ Each datum has a conversion method.
 Accepts:
     dLat: latitude in decimal degrees (-90, 90]
     dLng: longitude in decimal degrees (-180, 180]
-    datum: reference ellipsoid and coordinate reference system
-    φ1, φ2 : standard parralels 
-    λ0: central meridian longitude of grid
-    φ0: latitude of central parrelel
-    E0: false easting (m)
-    N0: false northing (m)
+    datum constants: (cm, a, b, 1/f, e, e2, n)
+    grid constants: (λ0, φ0, E0, N0 φ1, φ2)
 returns: 
     X: easting (m)
     Y: northing (m)
@@ -123,10 +119,8 @@ Accepts:
     dLat: latitude in decimal degrees (-90, 90]
     dLng: longitude in decimal degrees (-180, 180]
     cm: central meridian of zone containing (dLat, dLng)
-    m0: central scale factor
-    E0: false easting (m)
-    N0: false northing (m)
-    datum: reference ellipsoid and coordinate reference system
+    datum constants: (cm, a, b, 1/f, e, e2, n)
+    grid constants: (m0, E0, N0)
 returns: 
     z: zone
     E: UTM easting (m)

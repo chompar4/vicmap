@@ -20,7 +20,6 @@ class ReferenceEllipsoid:
     Commonly reffered to as a spheroid.
     creates a reference ellipsoid with paramaters
         a: semi-major axis length (m)
-        a: semi-minor axis length (m)
         f: flattening
         _f: reciprocal of flattening
         e: first eecentricity 

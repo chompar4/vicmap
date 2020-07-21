@@ -26,15 +26,11 @@ def lambert_conformal_conic(dLat, dLng, ellipsoid, grid):
     Accepts:
         dLat: latitude in decimal degrees (-90, 90]
         dLng: longitude in decimal degrees (-180, 180]
-        ellipsoid: reference ellipsoid
-        φ1, φ2 : standard parralels 
-        λ0: central meridian longitude of grid
-        φ0: latitude of central parrelel
-        E0: false easting (m)
-        N0: false northing (m)
+        ellipsoidal: reference ellipsoid containing ellipsoidal constants
+        grid: plane specification containing grid constants
     returns: 
-        X: easting (m)
-        Y: northing (m)
+        X: easting (m) relative to false origin
+        Y: northing (m) relative to false origin
         m: point scale factor
         γ: grid convergence
     """
@@ -116,15 +112,12 @@ def utm(dLat, dLng, ellipsoid, grid):
     Accepts:
         dLat: latitude in decimal degrees (-90, 90]
         dLng: longitude in decimal degrees (-180, 180]
-        cm: central meridian of zone containing (dLat, dLng)
-        m0: central scale factor
-        E0: false easting (m)
-        N0: false northing (m)
-        ellipsoid: reference ellipsoid
+        ellipsoidal: reference ellipsoid containing ellipsoidal constants
+        grid: plane specification containing grid constants
     returns: 
         z: zone
-        E: UTM easting (m)
-        N: UTM northing (m)
+        E: UTM easting (m) relative to false origin
+        N: UTM northing (m) relative to false origin
         m: point scale factor
         γ: grid convergence
     """
