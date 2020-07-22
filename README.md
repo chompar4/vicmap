@@ -1,5 +1,6 @@
 # vicmap
 python library of cartographic tools for projections and geodetic computations in victoria
+ > NOTE: This is mostly an academic excercise, go and use pyproj if you require precison.
 
 ## Installation
 ```
