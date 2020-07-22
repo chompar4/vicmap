@@ -6,89 +6,60 @@ python library of cartographic tools for projections and geodetic computations i
 poetry install
 ```
 
-## Point Transformations
+## Points
 
-Points on 3D Geoid surfaces are represented by the ```GeoPoint``` class, while points in the 2d plane are represented by the ```PlanePoint``` class. Each point requires a set of coordinates, and a datum. 
+Points on 3D Geoid surfaces are represented by ```GeoPoints```, while points in the 2d plane are represented by the ```PlanePoints```. Each point requires a set of coordinates, and a datum (or grid). Points have a default coordinate system, which you can transform between.
 
+```
+GeoPoint()   :    (dLat, dLng)  - decimal latitude and longitude in degrees (DEFAULT)
+                  (x, y, z)     - cartesian coordinates in meters
+
+PlanePoint() :    (E, N)        - easting and northing in meters (DEFAULT)
+```
+
+To define a point, specify the coordinates and the datum.
 ```python
 pt = GeoPoint(dLat, dLng, datum=GDA20)
 ```
 
-### MGA20
-```MGA20``` is the pair of conformal UTM projections betwee the ```GDA20``` datum and the ```MGA``` grid.
+## Projections
 
-Use ```geo_to_mga``` to perform a forward point projection from a ```GeoPoint``` in the GDA20 datum to a ```PlanePoint``` in the MGA grid.
+### MGA20
+Use ```geo_to_mga``` and ```mga_to_geo``` to perform forward or reverse projections between ```GeoPoints``` in the ```GDA20``` datum and ```PlanePoints``` in the ```MGA20```. Projection is a conformal UTM projection.
 
 ```python
 gda20_pt = GeoPoint(dLat, dLng, datum=GDA20)
 mga_pt = geo_to_mga(gda20_pt)
-```
-
-Use ```mga_to_geo``` to perform a reverse point projection from a ```PlanePoint``` in the ```MGA``` grid to a ```GeoPoint``` in the required datum. By default, the output datum is ```GDA20```.
-
-```python
-mga_pt = PlanePoint(E, N, grid=MGA)
-geo_pt = mga_to_geo(mga_pt) # default datum = GDA20
 ```
 
 ### MGA94
-```MGA94``` is the pair of conformal UTM projections betwee the ```GDA94``` datum and the ```MGA``` grid. 
 > NOTE: ```GDA94``` has been superceded by ```GDA20```.
 
-Use ```geo_to_mga``` to perform a forward point projection from a ```GeoPoint``` in the ```GDA94``` datum to a ```PlanePoint``` in the MGA grid.
+Use ```geo_to_mga``` and ```mga_to_geo``` to perform forward/reverse projections between ```GeoPoints``` in ```GDA94``` datum and ```PlanePoints``` on the ```MGA``` grid. Projection is a [Conformal UTM Projection](https://github.com/chompar4/vicmap/blob/master/docs/A%20GUIDE%20TO%20MAP%20PROJECTIONS%20V3.pdf).
 
 ```python
-gda20_pt = GeoPoint(dLat, dLng, datum=GDA20)
+gda20_pt = GeoPoint(dLat, dLng, datum=GDA94)
 mga_pt = geo_to_mga(gda20_pt)
 ```
 
-Use ```mga_to_geo``` to perform a reverse point projection from a ```PlanePoint``` in the ```MGA``` grid to a ```GeoPoint``` in the required datum. You must specify ```GDA94```
+### VICGRID94
 
-```python
-mga_pt = PlanePoint(E, N, grid=MGA)
-geo_pt = mga_to_geo(mga_pt, datum=GDA94)
-```
-
-### VICGRID20
-??
-
-### VICGRID94 
-
-```VICGRID94``` is the pair of lambert conformal conic projections between the ```GDA94``` datum and the ```VICGRID94``` plane. 
-
-Use ```geo_to_vicgrid94``` to perform a forward point projection from a ```GeoPoint``` in the ```GDA94``` datum to a ```PlanePoint``` in the ```VICGRID94``` plane.
+Use ```geo_to_vicgrid94``` and ```vicgrid94_to_geo``` to perform a forward / reverse projection from a ```GeoPoint``` in the ```GDA94``` datum to a ```PlanePoint``` in the ```VICGRID94``` plane. Projection used is [Lambert Conformal Conic](https://github.com/chompar4/vicmap/blob/master/docs/A%20GUIDE%20TO%20MAP%20PROJECTIONS%20V3.pdf).
 
 ```python 
 gda94_pt = GeoPoint(dLat, dLng, datum=GDA94)
 vic94_pt = geo_to_vicgrid94(gda94_pt)
 ```
 
-Use ```vicgrid94_to_geo``` to perform a reverse point projection from a ```PlanePoint``` in the ```VICGRID94``` plabne to a ```GeoPoint``` in the required ```GDA94``` datum.
-
-```python
-vic_pt = PlanePoint(E, N, grid=VICGRID94)
-geo_pt = vicgrid94_to_geo(mga_pt)
-```
-
 ### VICGRID
 
-```VICGRID``` is the pair of lambert conformal conic projections between the ```AGD66``` datum and the ```VICGRID``` plane. 
+Use ```geo_to_vicgrid94``` and ```vicgrid94_to_geo``` to perform a forward / reverse lambert conformal conic projection from a ```GeoPoint``` in the ```AGD66``` datum to a ```PlanePoint``` in the ```VICGRID94``` plane.
  > NOTE: ```VICGRID``` has been superceded by ```VICGRID94```.
-
-Use ```geo_to_vicgrid``` to perform a forward point projection from a ```GeoPoint``` in the ```AGD66``` datum to a ```PlanePoint``` in the ```VICGRID``` plane.
 
 ```python 
 agd_pt = GeoPoint(dLat, dLng, datum=AGD66)
 vic_pt = geo_to_vicgrid(gda94_pt)
 ```
-
-Use ```vicgrid_to_geo``` to perform a reverse point projection from a ```PlanePoint``` in the ```VICGRID``` plabne to a ```GeoPoint``` in the required ```AGD66``` datum.
-
-```python
-vic_pt = PlanePoint(E, N, grid=VICGRID)
-agd_pt = vicgrid_to_geo(mga_pt)
-```
-
 
 ### Converting between datums
 

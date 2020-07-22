@@ -3,6 +3,7 @@ from math import sqrt
 semi_major_axis = {
     "WGS84": 6378137,
     "GRS80": 6378137,
+    "GRS67": 6378160,
     "ANS": 6378160,
     "CLARKE": 6378350.871924,
 }
@@ -10,6 +11,7 @@ semi_major_axis = {
 reciprocal_flattening = {
     "WGS84": 298.257223563,
     "GRS80": 298.257222101,
+    "GRS67": 298.247167427,
     "ANS": 298.25,
     "CLARKE": 294.26,
 }
@@ -75,11 +77,15 @@ GRS80 = ReferenceEllipsoid(
     code="GRS80", name="Geodetic Reference System 1980 Spheroid", epsg_code=7019,
 )
 
+GRS67 = ReferenceEllipsoid(
+    code="GRS67", name="Geodetic Reference System 1967 Spheroid", epsg_code=7036
+)
+
 ANS = ReferenceEllipsoid(
     code="ANS", name="Australian National Spheroid", epsg_code=7003,
 )
 
 CLARKE = ReferenceEllipsoid(code="CLARKE", name="Clarke 1866 Spheroid", epsg_code=7008,)
 
-reference_ellipsoids = {e.code: e for e in [WGS84, GRS80, ANS, CLARKE]}
+reference_ellipsoids = {e.code: e for e in [WGS84, GRS80, GRS67, ANS, CLARKE]}
 

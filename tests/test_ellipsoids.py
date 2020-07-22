@@ -1,4 +1,4 @@
-from geodesy.ellipsoids import WGS84, GRS80, ANS, CLARKE
+from geodesy.ellipsoids import WGS84, GRS80, GRS67, ANS, CLARKE
 
 
 def test_wgs84():
@@ -23,6 +23,19 @@ def test_grs80():
     assert abs(ellipsoid.e2 - 0.006694380) < 1e-8
     assert abs(ellipsoid.e - 0.081819191) < 1e-8
     assert ellipsoid.url == "https://epsg.io/7019-ellipsoid"
+
+
+def test_grs80():
+
+    ellipsoid = GRS67
+
+    assert ellipsoid.a == 6378160
+    assert ellipsoid._f == 298.247167427
+    assert ellipsoid.b == 6399617.429031907
+    print(ellipsoid.e2, ellipsoid.e)
+    assert abs(ellipsoid.e2 - 0.006694605328567654) < 1e-8
+    assert abs(ellipsoid.e - 0.08182056788221195) < 1e-8
+    assert ellipsoid.url == "https://epsg.io/7036-ellipsoid"
 
 
 def test_ans():
