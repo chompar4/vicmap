@@ -120,4 +120,3 @@ GDA20 | Geocentric Datum of Australia 2020 | GRS80 | ITRF2014 | ```1168```
 GDA94 | Geocentric Datum of Australia 1994 | GRS80 | ITRF92 | ```6283```
 AGD84 | Australian Geodetic Datum 1984 | ANS | | ```6203```
 AGD66 | Australian Geodetic Datum 1966 | ANS | | ```6202```
-ANG | | CLARKE | 

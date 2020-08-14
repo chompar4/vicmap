@@ -1,4 +1,9 @@
 from utils import dms_to_dd
+import math
+from pyproj import CRS, Transformer
+from projections import lambert_conformal_conic
+from geodesy.datums import GDA94
+from geodesy.grids import VICGRID94
 
 
 class GeoPoint:
@@ -7,9 +12,19 @@ class GeoPoint:
         self.dLng = dLng
         self.datum = datum
 
+    def coords(self):
+        return (self.dLat, self.dLng)
+
     @property
     def crs(self):
-        return self.datum.reference_frame
+        return self.datum.crs
+
+    def transform_to(self, other):
+        if other == self.crs:
+            return self.dLat, self.dLng
+        other_crs = CRS.from_epsg(other.epsg_code)
+        transformer = Transformer.from_crs(self.crs, other_crs)
+        return transformer.transform(self.dLat, self.dLng)
 
 
 class PlanePoint:
@@ -18,13 +33,11 @@ class PlanePoint:
         self.v = v
         self.grid = grid
 
-    @property
-    def point_scale_factor(self):
-        raise NotImplementedError
-
-    @property
-    def grid_convergence(self):
-        raise NotImplementedError
+    def transform_to(self, other):
+        if other == self.crs:
+            return self.E, self.N
+        transformer = Transformer.from_crs(self.crs, other)
+        return transformer.transform(self.E, self.N)
 
     @property
     def E(self):
@@ -38,24 +51,30 @@ class PlanePoint:
 class VICPoint(PlanePoint):
     def __init__(self, E, N, grid):
         super().__init__(u=E, v=N, grid=grid)
+        self.crs = CRS.from_epsg(grid.epsg_code)
 
     def coords(self):
         return (self.E, self.N)
 
     @property
-    def grid_convergence(self, datum):
-        # TODO
-        pass
+    def grid_convergence(self):
+        """
+        Transform back to GDA94 and use conic projection utils
+        """
+        dest = self.grid.datum
+        (λ, φ) = self.transform_to(other=dest.crs)
+        E, N, m, γ = lambert_conformal_conic(λ, φ, dest.ellipsoid, self.grid)
+        return γ
 
     @property
     def magnetic_declination(self, datum):
         # TODO
-        pass
+        raise NotImplementedError
 
     @property
     def grid_magnetic_angle(self, datum):
         # TODO
-        pass
+        raise NotImplementedError
 
     def __eq__(self, other):
         return self.grid == other.grid and self.coords == other.coords

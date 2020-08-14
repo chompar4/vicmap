@@ -10,7 +10,6 @@ def test_wgs84():
     assert ellipsoid.b == 6399593.625758493
     assert abs(ellipsoid.e2 - 0.006694380) < 1e-8
     assert abs(ellipsoid.e - 0.081819191) < 1e-8
-    assert ellipsoid.url == "https://epsg.io/7030-ellipsoid"
 
 
 def test_grs80():
@@ -22,7 +21,6 @@ def test_grs80():
     assert ellipsoid.b == 6399593.625864023
     assert abs(ellipsoid.e2 - 0.006694380) < 1e-8
     assert abs(ellipsoid.e - 0.081819191) < 1e-8
-    assert ellipsoid.url == "https://epsg.io/7019-ellipsoid"
 
 
 def test_grs80():
@@ -35,7 +33,6 @@ def test_grs80():
     print(ellipsoid.e2, ellipsoid.e)
     assert abs(ellipsoid.e2 - 0.006694605328567654) < 1e-8
     assert abs(ellipsoid.e - 0.08182056788221195) < 1e-8
-    assert ellipsoid.url == "https://epsg.io/7036-ellipsoid"
 
 
 def test_ans():
@@ -47,7 +44,6 @@ def test_ans():
     assert ellipsoid.b == 6399617.224558453
     assert abs(ellipsoid.e2 - 0.006694542) < 1e-8
     assert abs(ellipsoid.e - 0.08182018) < 1e-8
-    assert ellipsoid.url == "https://epsg.io/7003-ellipsoid"
 
 
 def test_clarke():
@@ -59,4 +55,3 @@ def test_clarke():
     assert ellipsoid.b == 6400100.687350324
     assert abs(ellipsoid.e2 - 0.006785162) < 1e-8
     assert abs(ellipsoid.e - 0.082372092) < 1e-8
-    assert ellipsoid.url == "https://epsg.io/7008-ellipsoid"

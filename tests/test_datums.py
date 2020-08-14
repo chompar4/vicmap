@@ -1,4 +1,4 @@
-from geodesy.datums import GDA20, GDA94, AGD84, AGD66, ANG
+from geodesy.datums import GDA20, GDA94, AGD84, AGD66
 
 
 def test_gda20():
@@ -43,14 +43,3 @@ def test_agd66():
     assert b == 6399617.224558453
     assert abs(e2 - 0.006694542) < 1e-8
     assert abs(e - 0.08182018) < 1e-8
-
-
-def test_ang():
-
-    a, b, f, e, e2, n = ANG.ellipsoid.constants
-
-    assert a == 6378350.871924
-    assert 1 / f == 294.26
-    assert b == 6400100.687350324
-    assert abs(e2 - 0.006785162) < 1e-8
-    assert abs(e - 0.082372092) < 1e-8

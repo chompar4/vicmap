@@ -2,8 +2,8 @@ import pytest
 from vicgrid import geo_to_vicgrid
 from utils import dms_to_dd
 from geodesy.datums import GDA94, AGD66, GDA20
-from geodesy.points import GeoPoint, PlanePoint
-from geodesy.grids import MGA
+from geodesy.points import GeoPoint, PlanePoint, VICPoint
+from geodesy.grids import MGA, VICGRID94, VICGRID
 
 import math
 
@@ -89,3 +89,19 @@ def test_geo_to_mga_non_geopoint():
     pt = PlanePoint(lat, lng, grid=MGA)
     with pytest.raises(AssertionError) as e_info:
         geo_to_vicgrid(pt)
+
+
+def test_grid_convergence_central_meridian_vicpoint():
+    """
+    Convergence along central meridian of vicgrid should 
+    equal 0
+    """
+    for grid in [VICGRID94, VICGRID]:
+        for dLat in range(-89, 89, 30):
+            dLng = 145
+            pt = GeoPoint(dLat, dLng, datum=GDA94)
+
+            x, y = pt.transform_to(other=grid)
+            grid_pt = VICPoint(x, y, grid=grid)
+
+            assert grid_pt.grid_convergence == 0

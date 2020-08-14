@@ -1,4 +1,6 @@
 import math
+from geodesy.datums import GDA94, AGD66
+from pyproj import CRS
 
 
 class MGAGrid:
@@ -39,6 +41,10 @@ class MGAGrid:
         return cms
 
     @property
+    def crs(self):
+        return CRS.from_epsg(self.epsg_code)
+
+    @property
     def z0_edge(self):
         return self.cms[1] - 1.5 * self.zw
 
@@ -53,7 +59,11 @@ class MGAGrid:
 
 
 class VICGRID:
-    def __init__(self, φ1, φ2, E0, N0, φ0, λ0):
+
+    datum = AGD66
+    epsg_code = 3111
+
+    def __init__(self, φ1, φ2, E0, N0, φ0, λ0, r0):
         """
         Representation of the VICGRID plane.
         Contains all constants required for projection.
@@ -72,6 +82,11 @@ class VICGRID:
         self.φ2 = φ2
         self.λ0 = λ0
         self.φ0 = φ0
+        self.r0 = r0
+
+    @property
+    def crs(self):
+        return CRS.from_epsg(self.epsg_code)
 
     @property
     def constants(self):
@@ -79,15 +94,21 @@ class VICGRID:
 
 
 class VICGRID94(VICGRID):
-    def __init__(self, φ1, φ2, E0, N0, φ0, λ0):
+
+    datum = GDA94
+    epsg_code = 3112
+
+    def __init__(self, φ1, φ2, E0, N0, φ0, λ0, r0):
         """
         Representation of the VICGRID94 plane.
         Identical to VICGRID with a different false northing.
         """
-        super().__init__(φ1, φ2, E0, N0, φ0, λ0)
+        super().__init__(φ1, φ2, E0, N0, φ0, λ0, r0)
 
 
 MGA = MGAGrid(E0=500000, N0=10000000, m0=0.9996, zw=6, cm1=-177)
-VICGRID = VICGRID(φ1=-36, φ2=-38, E0=2500000, N0=4500000, φ0=-37, λ0=145)
-VICGRID94 = VICGRID94(φ1=-36, φ2=-38, E0=2500000, N0=2500000, φ0=-37, λ0=145)
+VICGRID = VICGRID(φ1=-36, φ2=-38, E0=2500000, N0=4500000, φ0=-37, λ0=145, r0=8472630.5)
+VICGRID94 = VICGRID94(
+    φ1=-36, φ2=-38, E0=2500000, N0=2500000, φ0=-37, λ0=145, r0=8472630.5
+)
 
