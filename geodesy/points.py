@@ -43,12 +43,17 @@ class VICPoint(PlanePoint):
         return (self.E, self.N)
 
     @property
-    def point_scale_factor(self):
+    def grid_convergence(self, datum):
         # TODO
         pass
 
     @property
-    def grid_convergence(self):
+    def magnetic_declination(self, datum):
+        # TODO
+        pass
+
+    @property
+    def grid_magnetic_angle(self, datum):
         # TODO
         pass
 
@@ -66,12 +71,17 @@ class UTMPoint(PlanePoint):
         return (self.zone, self.E, self.N)
 
     @property
-    def point_scale_factor(self):
+    def grid_convergence(self, datum):
         # TODO
         pass
 
     @property
-    def grid_convergence(self):
+    def magnetic_declination(self, datum):
+        # TODO
+        pass
+
+    @property
+    def grid_magnetic_angle(self, datum):
         # TODO
         pass
 
