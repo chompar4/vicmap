@@ -5,29 +5,31 @@ from projections import utm
 from utils import dms_to_dd
 import numpy as np
 from geodesy.datums import GDA20, GDA94, AGD66
-from geodesy.grids import MGA
+from geodesy.grids import MGA20, MGA94
 
 
 def test_geo_to_mga():
 
-    lat = dms_to_dd(-23, 40, 12.446020)
-    lng = dms_to_dd(133, 53, 7.84784)
-    pt = GeoPoint(lat, lng, datum=GDA20)
-    mga_pt = geo_to_mga(pt)
+    for grid in [MGA94, MGA20]:
 
-    assert mga_pt.zone == 53
-    assert abs(mga_pt.E - 386352.397753) < 1e-6
-    assert abs(mga_pt.N - 7381850.768886) < 1e-6
+        lat = dms_to_dd(-23, 40, 12.446020)
+        lng = dms_to_dd(133, 53, 7.84784)
+        pt = GeoPoint(lat, lng, datum=GDA20)
+        mga_pt = geo_to_mga(pt)
 
-    cm = 135
-    m0 = 0.9996
-    E0 = 500000
-    N0 = 10000000
-    datum = GDA20
-    _, _, m, γ = utm(lat, lng, ellipsoid=datum.ellipsoid, grid=MGA)
+        assert mga_pt.zone == 53
+        assert abs(mga_pt.E - 386352.397753) < 1e-6
+        assert abs(mga_pt.N - 7381850.768886) < 1e-6
 
-    assert abs(m - 0.999759539) < 1e-8
-    assert abs(γ + 0.447481418) < 1e-8
+        cm = 135
+        m0 = 0.9996
+        E0 = 500000
+        N0 = 10000000
+        datum = GDA20
+        _, _, m, γ = utm(lat, lng, ellipsoid=datum.ellipsoid, grid=grid)
+
+        assert abs(m - 0.999759539) < 1e-8
+        assert abs(γ + 0.447481418) < 1e-8
 
 
 def test_geo_to_mga_non_GDA_datum():
@@ -48,11 +50,12 @@ def test_geo_to_mga_non_GDA_datum():
 
 def test_geo_to_mga_non_geopoint():
 
-    lat = -23
-    lng = 145
-    pt = PlanePoint(lat, lng, grid=MGA)
-    with pytest.raises(AssertionError) as e_info:
-        geo_to_mga(pt)
+    for grid in [MGA94, MGA20]:
+        lat = -23
+        lng = 145
+        pt = PlanePoint(lat, lng, grid=grid)
+        with pytest.raises(AssertionError) as e_info:
+            geo_to_mga(pt)
 
 
 def test_geo_to_mga_94_20_invariance():

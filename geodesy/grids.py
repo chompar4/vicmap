@@ -1,10 +1,13 @@
 import math
-from geodesy.datums import GDA94, AGD66
+from geodesy.datums import GDA20, GDA94, AGD66
 from pyproj import CRS
 
 
 class MGAGrid:
-    def __init__(self, E0, N0, m0, zw, cm1):
+
+    base_code = 283  # epsg
+
+    def __init__(self):
         """
         Representation of the MGA (Map Grid of Australia) plane.
         A specific UTM grid in the plane defined for australia.
@@ -20,11 +23,19 @@ class MGAGrid:
             zones: all zones in the UTM grid
             z0_edge: longitude of western edge of the 0th zone
         """
-        self.E0 = E0
-        self.N0 = N0
-        self.m0 = m0
-        self.zw = zw
-        self.cm1 = cm1
+        self.E0 = 500000
+        self.N0 = 10000000
+        self.m0 = 0.9996
+        self.zw = 6
+        self.cm1 = -177
+
+    def crs(self, zone):
+        """
+        MGA has a different epsg code for each zone, 
+        following the pattern: `283{z}` 
+        where z is the zone of projection.
+        """
+        return int(f"{self.base_code}{zone}")
 
     @property
     def cms(self):
@@ -41,10 +52,6 @@ class MGAGrid:
         return cms
 
     @property
-    def crs(self):
-        return CRS.from_epsg(self.epsg_code)
-
-    @property
     def z0_edge(self):
         return self.cms[1] - 1.5 * self.zw
 
@@ -58,12 +65,22 @@ class MGAGrid:
         return self.cms[zn]
 
 
+class MGAGrid20(MGAGrid):
+    datum = GDA20
+    name = "Map Grid of Australia (2020)"
+
+
+class MGAGrid94(MGAGrid):
+    datum = GDA94
+    name = "Map Grid of Australia (1994)"
+
+
 class VICGRID:
 
     datum = AGD66
     epsg_code = 3110
 
-    def __init__(self, φ1, φ2, E0, N0, φ0, λ0, r0):
+    def __init__(self):
         """
         Representation of the VICGRID plane.
         Contains all constants required for projection.
@@ -76,13 +93,13 @@ class VICGRID:
             φ0: origin parrallel latitude (degrees)
             λ0: central meridian longitude (degrees)
         """
-        self.E0 = E0
-        self.N0 = N0
-        self.φ1 = φ1
-        self.φ2 = φ2
-        self.λ0 = λ0
-        self.φ0 = φ0
-        self.r0 = r0
+        self.E0 = 2500000
+        self.N0 = 4500000
+        self.φ1 = -36
+        self.φ2 = -38
+        self.λ0 = 145
+        self.φ0 = -37
+        self.r0 = 8472630.5
 
     @property
     def crs(self):
@@ -98,17 +115,31 @@ class VICGRID94(VICGRID):
     datum = GDA94
     epsg_code = 3111
 
-    def __init__(self, φ1, φ2, E0, N0, φ0, λ0, r0):
+    def __init__(self):
         """
         Representation of the VICGRID94 plane.
         Identical to VICGRID with a different false northing.
+        Contains all constants required for projection.
+        Origin Datum 
+            AGD66 only
+        accepts 
+            φ1, φ2: standard parralels
+            E0: false easting (m)
+            N0: false northing (m)
+            φ0: origin parrallel latitude (degrees)
+            λ0: central meridian longitude (degrees)
         """
-        super().__init__(φ1, φ2, E0, N0, φ0, λ0, r0)
+        self.E0 = 2500000
+        self.N0 = 2500000
+        self.φ1 = -36
+        self.φ2 = -38
+        self.λ0 = 145
+        self.φ0 = -37
+        self.r0 = 8472630.5
 
 
-MGA = MGAGrid(E0=500000, N0=10000000, m0=0.9996, zw=6, cm1=-177)
-VICGRID = VICGRID(φ1=-36, φ2=-38, E0=2500000, N0=4500000, φ0=-37, λ0=145, r0=8472630.5)
-VICGRID94 = VICGRID94(
-    φ1=-36, φ2=-38, E0=2500000, N0=2500000, φ0=-37, λ0=145, r0=8472630.5
-)
+MGA94 = MGAGrid94()
+MGA20 = MGAGrid20()
+VICGRID = VICGRID()
+VICGRID94 = VICGRID94()
 

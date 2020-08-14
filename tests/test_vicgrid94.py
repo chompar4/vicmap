@@ -3,7 +3,7 @@ from vicgrid import geo_to_vicgrid94
 from utils import dms_to_dd
 from geodesy.datums import GDA94, AGD66, GDA20
 from geodesy.points import GeoPoint, PlanePoint
-from geodesy.grids import MGA
+from geodesy.grids import MGA94, MGA20
 
 import math
 
@@ -84,8 +84,10 @@ def test_geo_to_vicgrid_non_GDA94_datum():
 
 def test_geo_to_mga_non_geopoint():
 
-    lat = -23
-    lng = 145
-    pt = PlanePoint(lat, lng, grid=MGA)
-    with pytest.raises(AssertionError) as e_info:
-        geo_to_vicgrid94(pt)
+    for grid in [MGA94, MGA20]:
+
+        lat = -23
+        lng = 145
+        pt = PlanePoint(lat, lng, grid=grid)
+        with pytest.raises(AssertionError) as e_info:
+            geo_to_vicgrid94(pt)
