@@ -54,7 +54,7 @@ GDA20 = Datum(
     code="GDA20",
     name="Geocentric Datum of Australia 2020",
     ellipsoid_code="GRS80",
-    epsg_code=8032,
+    epsg_code=7844,
 )
 
 GDA94 = Datum(
@@ -75,5 +75,5 @@ AGD66 = Datum(
     code="AGD66",
     name="Australian Geodetic Datum 1966",
     ellipsoid_code="ANS",
-    epsg_code=6202,
+    epsg_code=4202,
 )

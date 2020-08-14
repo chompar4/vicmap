@@ -96,13 +96,16 @@ def test_grid_convergence_central_meridian_vicpoint():
     Convergence along central meridian of vicgrid should 
     equal 0
     """
-    for dLat in range(-89, 0, 30):
-        dLng = 145
-        pt = GeoPoint(dLat, dLng, datum=GDA94)
+    sf = 100000
+    delta = 20
+    for n in range(23, 28):
+        E = 25
+        grid_pt = VICPoint(E * sf, n * sf, grid=VICGRID94)
+        assert grid_pt.grid_convergence == 0
 
-        x, y = pt.transform_to(other=VICGRID94)
+        grid_pt = VICPoint(E * sf, (n + delta) * sf, grid=VICGRID)
+        # import ipdb
 
-        grid_pt = VICPoint(x, y, grid=VICGRID94)
-
+        # ipdb.set_trace()
         assert grid_pt.grid_convergence == 0
 
