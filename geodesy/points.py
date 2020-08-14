@@ -58,12 +58,9 @@ class VICPoint(PlanePoint):
 
     @property
     def grid_convergence(self):
-        """
-        Transform back to GDA94 and use conic projection utils
-        """
         dest = self.grid.datum
         (λ, φ) = self.transform_to(other=dest.crs)
-        E, N, m, γ = lambert_conformal_conic(λ, φ, dest.ellipsoid, self.grid)
+        _, _, _, γ = lambert_conformal_conic(λ, φ, dest.ellipsoid, self.grid)
         return γ
 
     @property

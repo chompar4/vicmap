@@ -96,7 +96,7 @@ def test_grid_convergence_central_meridian_vicpoint():
     Convergence along central meridian of vicgrid should 
     equal 0
     """
-    for grid in [VICGRID94, VICGRID]:
+    for grid in [VICGRID94]:
         for dLat in range(-89, 89, 30):
             dLng = 145
             pt = GeoPoint(dLat, dLng, datum=GDA94)
