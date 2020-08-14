@@ -6,7 +6,7 @@ ln = math.log
 
 from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
 
-from utils import (
+from geodesy.utils import (
     conformal_latitude,
     gauss_schreiber,
     transverse_mercator,
@@ -170,4 +170,4 @@ def utm(dLat, dLng, ellipsoid, grid):
     # Step 12 - Grid convergence γ
     γ = grid_convergence(q, p, _t, ω, dLat)
 
-    return easting, northing, m, math.degrees(γ)
+    return zn, easting, northing, m, math.degrees(γ)

@@ -1,7 +1,7 @@
-from utils import dms_to_dd
+from geodesy.utils import dms_to_dd
 import math
 from pyproj import CRS, Transformer
-from projections import lambert_conformal_conic
+from geodesy.projections import lambert_conformal_conic
 from geodesy.datums import GDA94, WGS84
 from geodesy.grids import VICGRID94, MGAGrid
 
@@ -107,17 +107,17 @@ class MGAPoint(PlanePoint):
     @property
     def grid_convergence(self, datum):
         # TODO
-        pass
+        raise NotImplementedError
 
     @property
     def magnetic_declination(self, datum):
         # TODO
-        pass
+        raise NotImplementedError
 
     @property
     def grid_magnetic_angle(self, datum):
         # TODO
-        pass
+        raise NotImplementedError
 
     def __eq__(self, other):
         return self.grid == other.grid and self.coords == other.coords
