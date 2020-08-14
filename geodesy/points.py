@@ -12,6 +12,7 @@ class GeoPoint:
         self.dLng = dLng
         self.datum = datum
 
+    @property
     def coords(self):
         return (self.dLat, self.dLng)
 
@@ -20,9 +21,9 @@ class GeoPoint:
         return self.datum.crs
 
     def transform_to(self, other):
-        if other == self.crs:
-            return self.dLat, self.dLng
         other_crs = CRS.from_epsg(other.epsg_code)
+        if other_crs == self.crs:
+            return self.coords
         transformer = Transformer.from_crs(self.crs, other_crs)
         return transformer.transform(self.dLat, self.dLng)
 
@@ -34,9 +35,10 @@ class PlanePoint:
         self.grid = grid
 
     def transform_to(self, other):
-        if other == self.crs:
-            return self.E, self.N
-        transformer = Transformer.from_crs(self.crs, other)
+        other_crs = CRS.from_epsg(other.epsg_code)
+        if other_crs == self.crs:
+            return self.coords
+        transformer = Transformer.from_crs(self.crs, other_crs)
         return transformer.transform(self.E, self.N)
 
     @property
@@ -53,13 +55,14 @@ class VICPoint(PlanePoint):
         super().__init__(u=E, v=N, grid=grid)
         self.crs = CRS.from_epsg(grid.epsg_code)
 
+    @property
     def coords(self):
         return (self.E, self.N)
 
     @property
     def grid_convergence(self):
         dest = self.grid.datum
-        (λ, φ) = self.transform_to(other=dest.crs)
+        (λ, φ) = self.transform_to(other=dest)
         _, _, _, γ = lambert_conformal_conic(λ, φ, dest.ellipsoid, self.grid)
         return γ
 

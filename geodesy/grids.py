@@ -61,7 +61,7 @@ class MGAGrid:
 class VICGRID:
 
     datum = AGD66
-    epsg_code = 3111
+    epsg_code = 3112
 
     def __init__(self, φ1, φ2, E0, N0, φ0, λ0, r0):
         """
@@ -96,7 +96,7 @@ class VICGRID:
 class VICGRID94(VICGRID):
 
     datum = GDA94
-    epsg_code = 3112
+    epsg_code = 3111
 
     def __init__(self, φ1, φ2, E0, N0, φ0, λ0, r0):
         """
