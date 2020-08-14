@@ -104,8 +104,5 @@ def test_grid_convergence_central_meridian_vicpoint():
         assert grid_pt.grid_convergence == 0
 
         grid_pt = VICPoint(E * sf, (n + delta) * sf, grid=VICGRID)
-        # import ipdb
-
-        # ipdb.set_trace()
         assert grid_pt.grid_convergence == 0
 
