@@ -29,13 +29,16 @@ class MGAGrid:
         self.zw = 6
         self.cm1 = -177
 
-    def crs(self, zone):
+    def epsg_code(self, zone):
         """
         MGA has a different epsg code for each zone, 
         following the pattern: `283{z}` 
         where z is the zone of projection.
         """
         return int(f"{self.base_code}{zone}")
+
+    def crs(self, zone):
+        return CRS.from_epsg(self.epsg_code(zone))
 
     @property
     def cms(self):

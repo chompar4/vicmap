@@ -1,7 +1,7 @@
 from projections import utm
 import math
 from geodesy.datums import GDA20, GDA94
-from geodesy.points import UTMPoint, GeoPoint, PlanePoint
+from geodesy.points import MGAPoint, GeoPoint, PlanePoint
 from geodesy.grids import MGA20, MGA94
 
 
@@ -24,7 +24,7 @@ def geo_to_mga(point):
     zone = grid.get_zone(dLng)
 
     E, N, m, γ = utm(dLat, dLng, ellipsoid=datum.ellipsoid, grid=grid)
-    return UTMPoint(zone, E, N, grid=grid)
+    return MGAPoint(zone, E, N, grid=grid)
 
 
 def mga_to_geographic(point, datum=GDA20):

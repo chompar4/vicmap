@@ -2,11 +2,33 @@ from utils import dms_to_dd
 import math
 from pyproj import CRS, Transformer
 from projections import lambert_conformal_conic
-from geodesy.datums import GDA94
-from geodesy.grids import VICGRID94
+from geodesy.datums import GDA94, WGS84
+from geodesy.grids import VICGRID94, MGAGrid
 
 
-class GeoPoint:
+class Point:
+    def transform_to(self, other):
+        """
+        Transform between one point and another.
+        """
+        if isinstance(other, MGAGrid):
+            # dont always know what MGA zone I'm in, project to wgs first
+            to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
+            dLat, dLng = to_wgs.transform(*self.coords)
+
+            zone = other.get_zone(dLng)
+            other_crs = other.crs(zone)
+
+        else:
+            other_crs = other.crs
+
+        if other_crs == self.crs:
+            return self.coords
+        transformer = Transformer.from_crs(self.crs, other_crs)
+        return transformer.transform(*self.coords)
+
+
+class GeoPoint(Point):
     def __init__(self, dLat, dLng, datum):
         self.dLat = dLat
         self.dLng = dLng
@@ -20,26 +42,12 @@ class GeoPoint:
     def crs(self):
         return self.datum.crs
 
-    def transform_to(self, other):
-        other_crs = CRS.from_epsg(other.epsg_code)
-        if other_crs == self.crs:
-            return self.coords
-        transformer = Transformer.from_crs(self.crs, other_crs)
-        return transformer.transform(self.dLat, self.dLng)
 
-
-class PlanePoint:
+class PlanePoint(Point):
     def __init__(self, u, v, grid):
         self.u = u
         self.v = v
         self.grid = grid
-
-    def transform_to(self, other):
-        other_crs = CRS.from_epsg(other.epsg_code)
-        if other_crs == self.crs:
-            return self.coords
-        transformer = Transformer.from_crs(self.crs, other_crs)
-        return transformer.transform(self.E, self.N)
 
     @property
     def E(self):
@@ -49,15 +57,15 @@ class PlanePoint:
     def N(self):
         return self.v
 
+    @property
+    def coords(self):
+        return (self.E, self.N)
+
 
 class VICPoint(PlanePoint):
     def __init__(self, E, N, grid):
         super().__init__(u=E, v=N, grid=grid)
         self.crs = CRS.from_epsg(grid.epsg_code)
-
-    @property
-    def coords(self):
-        return (self.E, self.N)
 
     @property
     def grid_convergence(self):
@@ -80,14 +88,21 @@ class VICPoint(PlanePoint):
         return self.grid == other.grid and self.coords == other.coords
 
 
-class UTMPoint(PlanePoint):
+class MGAPoint(PlanePoint):
     def __init__(self, zone, E, N, grid):
         super().__init__(u=E, v=N, grid=grid)
         self.zone = zone
 
     @property
+    def crs(self):
+        """
+        MGA crs depends upon zone
+        """
+        return self.grid.crs(self.zone)
+
+    @property
     def coords(self):
-        return (self.zone, self.E, self.N)
+        return (self.E, self.N)
 
     @property
     def grid_convergence(self, datum):
