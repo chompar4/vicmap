@@ -23,6 +23,13 @@ def test_grid_convergence_central_meridian_vicpoint():
         assert grid_pt.grid_convergence == 0
 
 
+def test_grid_convergence_signs_vicpoint():
+    sf = 100000
+    west_pt = VICPoint(23 * sf, 26 * sf, grid=VICGRID94)
+    assert west_pt.grid_convergence < 0
+
+    east_pt = VICPoint(26 * sf, 26 * sf, grid=VICGRID94)
+    assert east_pt.grid_convergence > 0
 def test_transform_to_compatible_types():
 
     """

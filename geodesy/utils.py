@@ -128,6 +128,7 @@ def grid_convergence(q, p, _t, ω, dLat):
     """
     gives the angle between the meridian
     and the grid-line parallel to the u-axis
+    for an MGA projection.
     """
     g = atan(abs(q / p)) + atan(abs(_t * tan(ω)) / sqrt(1 + _t ** 2))
 

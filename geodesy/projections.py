@@ -97,7 +97,7 @@ def lambert_conformal_conic(dLat, dLng, ellipsoid, grid):
 
     # Step 4: point scale factor (m) and grid convergence (γ)
     m = -(r * n) / v * cos(φ)
-    γ = -θ
+    γ = θ
 
     return X + E0, Y + N0, m, γ
 
