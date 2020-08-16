@@ -3,6 +3,7 @@ from pyproj import CRS, Transformer
 from geodesy.projections import lambert_conformal_conic, utm
 from geodesy.datums import GDA94, WGS84
 from geodesy.grids import VICGRID94, MGAGrid
+from geomag import declination
 
 
 class Point:
@@ -47,6 +48,15 @@ class PlanePoint(Point):
         self.u = u
         self.v = v
         self.grid = grid
+        self.datum = grid.datum
+
+        self.λ = None
+        self.φ = None
+
+    def invert(self):
+        if not self.λ or self.φ:
+            self.λ, self.φ = self.transform_to(other=self.datum)
+        return (self.λ, self.φ)
 
     @property
     def E(self):
@@ -75,9 +85,8 @@ class VICPoint(PlanePoint):
         returns 
             γ: grid convergence degrees, East >0, West <0
         """
-        dest = self.grid.datum
-        (λ, φ) = self.transform_to(other=dest)
-        _, _, _, γ = lambert_conformal_conic(λ, φ, dest.ellipsoid, self.grid)
+        (λ, φ) = self.invert()
+        _, _, _, γ = lambert_conformal_conic(λ, φ, self.datum.ellipsoid, self.grid)
         return γ
 
     @property
@@ -119,16 +128,13 @@ class MGAPoint(PlanePoint):
         returns 
             γ: grid convergence degrees, East >0, West <0
         """
-
-        dest = self.grid.datum
-        (λ, φ) = self.transform_to(other=dest)
-        _, _, _, _, γ = utm(λ, φ, ellipsoid=dest.ellipsoid, grid=self.grid)
+        (λ, φ) = self.invert()
+        _, _, _, _, γ = utm(λ, φ, ellipsoid=self.datum.ellipsoid, grid=self.grid)
         return γ
 
     @property
-    def magnetic_declination(self, datum):
-        # TODO
-        raise NotImplementedError
+    def magnetic_declination(self):
+        return declination()
 
     @property
     def grid_magnetic_angle(self, datum):

@@ -23,9 +23,8 @@ def test_grid_convergence_central_meridian_vicgrid():
         assert grid_pt.grid_convergence == 0
 
 
-known_convergence_vic = [
-    (23, 26, 0),
-]
+# TODO:
+known_convergence_vic = []
 
 
 def test_grid_convergence_known_values_vicgrid():
@@ -48,6 +47,12 @@ def test_grid_convergence_signs_vicgrid():
 
     east_pt = VICPoint(26 * sf, 26 * sf, grid=VICGRID94)
     assert east_pt.grid_convergence > 0
+
+
+def test_declination_vicgrid():
+    sf = 100000
+    west_pt = VICPoint(23 * sf, 26 * sf, grid=VICGRID94)
+    assert west_pt.magnetic_declination
 
 
 def test_grid_convergence_central_meridian_mga():
@@ -84,6 +89,12 @@ def test_grid_convergence_zone_invariance_mga():
         pt54 = MGAPoint(zone=54, E=e, N=n, grid=MGA20)
         pt55 = MGAPoint(zone=55, E=e, N=n, grid=MGA20)
         assert abs(pt54.grid_convergence - pt55.grid_convergence) < 1e-3
+
+
+def test_declination_mga():
+    sf = 100000
+    west_pt = MGAPoint(54, 600000, 6200000, grid=MGA20)
+    assert west_pt.magnetic_declination
 
 
 def test_transform_to_compatible_types():
