@@ -82,7 +82,6 @@ class PlanePoint(Point):
         self.grid = grid
         self.datum = grid.datum
 
-<<<<<<< HEAD
         self.φ = None
         self.λ = None
 
@@ -105,15 +104,6 @@ class PlanePoint(Point):
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
         return declination(φ, λ, z, date)
-=======
-        self.λ = None
-        self.φ = None
-
-    def invert(self):
-        if not self.λ or self.φ:
-            self.λ, self.φ = self.transform_to(other=self.datum)
-        return (self.λ, self.φ)
->>>>>>> master
 
     @property
     def E(self):
@@ -132,7 +122,6 @@ class VICPoint(PlanePoint):
     def __init__(self, E, N, grid):
         super().__init__(u=E, v=N, grid=grid)
         self.crs = CRS.from_epsg(grid.epsg_code)
-<<<<<<< HEAD
 
     @property
     def grid_convergence(self):
@@ -146,31 +135,6 @@ class VICPoint(PlanePoint):
         (φ, λ) = self.invert()
         _, _, _, γ = lambert_conformal_conic(φ, λ, self.datum.ellipsoid, self.grid)
         return γ
-=======
-
-    @property
-    def grid_convergence(self):
-        """
-        The horizontal angle at a place between true north and grid north. 
-        Proportional to the longitude difference between the place and 
-        the central meridian.
-        returns 
-            γ: grid convergence degrees, East >0, West <0
-        """
-        (λ, φ) = self.invert()
-        _, _, _, γ = lambert_conformal_conic(λ, φ, self.datum.ellipsoid, self.grid)
-        return γ
-
-    @property
-    def magnetic_declination(self, datum):
-        # TODO
-        raise NotImplementedError
-
-    @property
-    def grid_magnetic_angle(self, datum):
-        # TODO
-        raise NotImplementedError
->>>>>>> master
 
     def __eq__(self, other):
         return self.grid == other.grid and self.coords == other.coords
@@ -201,24 +165,9 @@ class MGAPoint(PlanePoint):
         returns 
             γ: grid convergence degrees, East >0, West <0
         """
-<<<<<<< HEAD
         (φ, λ) = self.invert()
         _, _, _, _, γ = utm(φ, λ, ellipsoid=self.datum.ellipsoid, grid=self.grid)
         return γ
-=======
-        (λ, φ) = self.invert()
-        _, _, _, _, γ = utm(λ, φ, ellipsoid=self.datum.ellipsoid, grid=self.grid)
-        return γ
-
-    @property
-    def magnetic_declination(self):
-        return declination()
-
-    @property
-    def grid_magnetic_angle(self, datum):
-        # TODO
-        raise NotImplementedError
->>>>>>> master
 
     def __eq__(self, other):
         return self.grid == other.grid and self.coords == other.coords
