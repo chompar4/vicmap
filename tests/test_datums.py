@@ -1,4 +1,4 @@
-from geodesy.datums import GDA20, GDA94, AGD84, AGD66
+from vicmap.datums import GDA20, GDA94, AGD84, AGD66
 
 
 def test_gda20():

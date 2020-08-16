@@ -1,5 +1,5 @@
 import math
-from geodesy.datums import GDA20, GDA94, AGD66
+from vicmap.datums import GDA20, GDA94, AGD66
 from pyproj import CRS
 
 

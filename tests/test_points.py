@@ -1,8 +1,8 @@
 import pytest
-from geodesy.utils import dms_to_dd
-from geodesy.datums import GDA94, AGD66, GDA20
-from geodesy.points import GeoPoint, PlanePoint, VICPoint, MGAPoint
-from geodesy.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid
+from vicmap.utils import dms_to_dd
+from vicmap.datums import GDA94, AGD66, GDA20
+from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint
+from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid
 
 import math
 

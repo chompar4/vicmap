@@ -38,7 +38,7 @@ print(pt.declination, pt.grid_convergence, pt.grid_magnetic_angle)
 
 ## Projections
 
-Functions for performing forward transformations can be found in the ```geodesy.projections``` module. The following projections are relevant for victoria: 
+Functions for performing forward transformations can be found in the ```vicmap.projections``` module. The following projections are relevant for victoria: 
 
 #### Lambert Conformal Conic
 
