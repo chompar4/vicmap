@@ -7,6 +7,11 @@ python library of cartographic tools for projections and geodetic computations i
 poetry install
 ```
 
+install ```geomag``` from source at the following link.
+```
+https://github.com/chompar4/geomag_api
+```
+
 ## Points
 
 Points on 3D Geoid surfaces are represented by ```GeoPoints```, while points in the 2d plane are represented by the ```PlanePoints```. Each point requires a set of coordinates, and a datum (or grid). Points have a default coordinate system, which you can transform between.

@@ -99,7 +99,7 @@ def lambert_conformal_conic(dLat, dLng, ellipsoid, grid):
     m = -(r * n) / v * cos(φ)
     γ = θ
 
-    return X + E0, Y + N0, m, γ
+    return X + E0, Y + N0, m, math.degrees(γ)
 
 
 def utm(dLat, dLng, ellipsoid, grid):

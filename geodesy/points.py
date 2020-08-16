@@ -1,7 +1,6 @@
-from geodesy.utils import dms_to_dd
 import math
 from pyproj import CRS, Transformer
-from geodesy.projections import lambert_conformal_conic
+from geodesy.projections import lambert_conformal_conic, utm
 from geodesy.datums import GDA94, WGS84
 from geodesy.grids import VICGRID94, MGAGrid
 
@@ -112,7 +111,7 @@ class MGAPoint(PlanePoint):
         return (self.E, self.N)
 
     @property
-    def grid_convergence(self, datum):
+    def grid_convergence(self):
         """
         The horizontal angle at a place between true north and grid north. 
         Proportional to the longitude difference between the place and 
@@ -120,8 +119,11 @@ class MGAPoint(PlanePoint):
         returns 
             γ: grid convergence degrees, East >0, West <0
         """
-        # TODO
-        raise NotImplementedError
+
+        dest = self.grid.datum
+        (λ, φ) = self.transform_to(other=dest)
+        _, _, _, _, γ = utm(λ, φ, ellipsoid=dest.ellipsoid, grid=self.grid)
+        return γ
 
     @property
     def magnetic_declination(self, datum):
