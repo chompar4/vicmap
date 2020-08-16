@@ -1,10 +1,10 @@
 import pytest
-from geodesy.points import GeoPoint, PlanePoint
-from geodesy.projections import utm
-from geodesy.utils import dms_to_dd
+from vicmap.points import GeoPoint, PlanePoint
+from vicmap.projections import utm
+from vicmap.utils import dms_to_dd
 import numpy as np
-from geodesy.datums import GDA20, GDA94, AGD66
-from geodesy.grids import MGA20, MGA94
+from vicmap.datums import GDA20, GDA94, AGD66
+from vicmap.grids import MGA20, MGA94
 
 """
 UNIVERSAL TRANSVERSE MERCATOR TESTS

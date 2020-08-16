@@ -1,4 +1,4 @@
-from geodesy.datums import GDA20
+from vicmap.datums import GDA20
 
 import math
 import numpy as np

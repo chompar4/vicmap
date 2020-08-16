@@ -1,9 +1,9 @@
 import pytest
-from geodesy.utils import dms_to_dd
-from geodesy.datums import GDA94, AGD66, GDA20
-from geodesy.points import GeoPoint, PlanePoint
-from geodesy.grids import MGA94, MGA20, VICGRID94, VICGRID
-from geodesy.projections import lambert_conformal_conic as lcc
+from vicmap.utils import dms_to_dd
+from vicmap.datums import GDA94, AGD66, GDA20
+from vicmap.points import GeoPoint, PlanePoint
+from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID
+from vicmap.projections import lambert_conformal_conic as lcc
 
 import math
 

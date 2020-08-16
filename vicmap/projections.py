@@ -6,7 +6,7 @@ ln = math.log
 
 from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
 
-from geodesy.utils import (
+from vicmap.utils import (
     conformal_latitude,
     gauss_schreiber,
     transverse_mercator,

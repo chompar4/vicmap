@@ -1,5 +1,5 @@
 import pytest
-from geodesy.grids import MGA94, MGA20, VICGRID, VICGRID94
+from vicmap.grids import MGA94, MGA20, VICGRID, VICGRID94
 import numpy as np
 
 zones = [

@@ -1,4 +1,4 @@
-from geodesy.ellipsoids import reference_ellipsoids
+from vicmap.ellipsoids import reference_ellipsoids
 from pyproj import CRS
 
 """

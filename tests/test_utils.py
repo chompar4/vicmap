@@ -1,4 +1,4 @@
-from geodesy.utils import (
+from vicmap.utils import (
     dms_to_dd,
     point_scale_factor,
     grid_convergence,
