@@ -128,19 +128,20 @@ def grid_convergence(q, p, _t, ω, dLat):
     """
     gives the angle between the meridian
     and the grid-line parallel to the u-axis
+    for an MGA projection.
     """
     g = atan(abs(q / p)) + atan(abs(_t * tan(ω)) / sqrt(1 + _t ** 2))
 
-    # East or West of Central Meridian
+    # East/West of Central Meridian
     ew = 1 if ω > 0 else -1
-    # North or South of Equator
-    ns = 1 if dLat > 0 else -1
 
-    # Grid Convergence Multiplier
-    if ew == ns:
-        return -g
-    elif e1 != ns:
-        return g
+    # NOTE: this also depends if north of equator.
+    # Only care about vic so assume ns = -1
+    # ns = 1 if dLat > 0 else -1
+    ns = -1
+
+    coeff = -1 if ew == ns else 1
+    return coeff * g
 
 
 def point_scale_factor(rLat, A, a, q, p, t, _t, e2, ω, m0):
