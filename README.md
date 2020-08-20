@@ -1,5 +1,5 @@
 # Vicmap
-Vicmap is a library of python tools for working with geographic data in victoria. 
+Tools for working with common victorian map projections
 
 ## Installation
 ```
