@@ -6,9 +6,9 @@ Tools for working with common victorian map projections
 poetry install
 ```
 
-Install the latest release of ```geomag``` from source at the following link if you need to run geomagnetic calculations.
+Install the latest release of ```isogonic-api``` from source at the following link if you need to run geomagnetic calculations.
 ```
-https://github.com/chompar4/geomag_api
+https://github.com/chompar4/isogonic-api
 ```
 
 ## Specifying Points
