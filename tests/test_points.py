@@ -122,3 +122,29 @@ def test_magnetic_functions():
         assert f"{pt.grid_convergence}"
         assert pt.grid_magnetic_angle
 
+
+def test_repr__():
+
+    pts = [
+        (GeoPoint(dLat=-37, dLng=145, datum=GDA20), f"<GeoPt_(-37,145)_GDA20>"),
+        (GeoPoint(dLat=-37, dLng=145, datum=GDA94), f"<GeoPt_(-37,145)_GDA94>"),
+        (
+            VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
+            f"<VicPt_(2500000,4500000)_VICGRID>",
+        ),
+        (
+            VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
+            f"<VicPt_(2500000,2500000)_VICGRID94>",
+        ),
+        (
+            MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
+            f"<MGAPt_(500000,10000000)_MGA94>",
+        ),
+        (
+            MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
+            f"<MGAPt_(500000,10000000)_MGA20>",
+        ),
+    ]
+
+    for pt, rep in pts:
+        assert pt.__repr__() == rep
