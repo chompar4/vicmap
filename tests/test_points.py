@@ -77,7 +77,7 @@ def test_grid_convergence_zone_invariance_mga():
 def test_declination_mga():
     sf = 100000
     west_pt = MGAPoint(54, 600000, 6200000, grid=MGA20)
-    assert west_pt.magnetic_declination == 9.350878790917436
+    assert abs(west_pt.magnetic_declination - 9.350878790917436) < 1e3
 
 
 def test_transform_to_compatible_types():

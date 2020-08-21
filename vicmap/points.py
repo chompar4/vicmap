@@ -80,8 +80,8 @@ class GeoPoint(Point):
 
 class PlanePoint(Point):
     def __init__(self, u, v, grid):
-        self.u = u
-        self.v = v
+        self.u = u - grid.E0
+        self.v = v - grid.N0
         self.grid = grid
         self.datum = grid.datum
 
@@ -110,11 +110,11 @@ class PlanePoint(Point):
 
     @property
     def E(self):
-        return self.u
+        return self.u + self.grid.E0
 
     @property
     def N(self):
-        return self.v
+        return self.v + self.grid.N0
 
     @property
     def coords(self):
