@@ -6,9 +6,9 @@ Vicmap is a library of python tools for working with geographic data in victoria
 poetry install
 ```
 
-Install the latest release of ```geomag``` from source at the following link if you need to run geomagnetic calculations.
+Install the latest release of ```isogonic-api``` from source at the following link if you need to run geomagnetic calculations.
 ```
-https://github.com/chompar4/geomag_api
+https://github.com/chompar4/isogonic-api
 ```
 
 ## Specifying Points
