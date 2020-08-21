@@ -71,17 +71,20 @@ class MGAGrid:
 class MGAGrid20(MGAGrid):
     datum = GDA20
     name = "Map Grid of Australia (2020)"
+    code = "MGA20"
 
 
 class MGAGrid94(MGAGrid):
     datum = GDA94
     name = "Map Grid of Australia (1994)"
+    code = "MGA94"
 
 
 class VICGRID:
 
     datum = AGD66
     epsg_code = 3110
+    code = "VICGRID"
 
     def __init__(self):
         """
@@ -117,6 +120,7 @@ class VICGRID94(VICGRID):
 
     datum = GDA94
     epsg_code = 3111
+    code = "VICGRID94"
 
     def __init__(self):
         """

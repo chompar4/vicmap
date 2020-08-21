@@ -74,6 +74,9 @@ class GeoPoint(Point):
         """
         return 0
 
+    def __repr__(self):
+        return f"<GeoPt_({self.dLat},{self.dLng})_{self.datum.code}>"
+
 
 class PlanePoint(Point):
     def __init__(self, u, v, grid):
@@ -139,6 +142,9 @@ class VICPoint(PlanePoint):
     def __eq__(self, other):
         return self.grid == other.grid and self.coords == other.coords
 
+    def __repr__(self):
+        return f"<VicPt_({self.E},{self.N})_{self.grid.code}>"
+
 
 class MGAPoint(PlanePoint):
     def __init__(self, zone, E, N, grid):
@@ -171,3 +177,6 @@ class MGAPoint(PlanePoint):
 
     def __eq__(self, other):
         return self.grid == other.grid and self.coords == other.coords
+
+    def __repr__(self):
+        return f"<MGAPt_({self.E},{self.N})_{self.grid.code}>"
