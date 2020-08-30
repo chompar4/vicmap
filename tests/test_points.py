@@ -108,6 +108,32 @@ def test_transform_to_compatible_types():
             assert pt.transform_to(grid)
 
 
+def test_known_vals_mgrs():
+
+    pts = [
+        (
+            MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
+            (54, "WD", "04000", "50000"),
+        ),
+        (
+            MGRSPoint(54, 6.5 * 1e5, 6.15 * 1e6, grid=MGA20),
+            (54, "XG", "50000", "50000"),
+        ),
+        (
+            MGRSPoint(55, 4.567 * 1e5, 6.1556 * 1e6, grid=MGA20),
+            (55, "DB", "56700", "55600"),
+        ),
+        (
+            MGRSPoint(55, 6.78997 * 1e5, 5.8514 * 1e6, grid=MGA20),
+            (55, "FU", "78997", "51400"),
+        ),
+    ]
+
+    for pt, val in pts:
+
+        assert pt.display_coords == val
+
+
 def test_magnetic_functions():
 
     """
@@ -153,7 +179,7 @@ def test_repr__():
         ),
         (
             MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
-            f"<MGRSPt_(54, WD, 40000, 50000)_MGA20>",
+            f"<MGRSPt_(54, WD, 04000, 50000)_MGA20>",
         ),
     ]
 

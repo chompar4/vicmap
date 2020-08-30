@@ -208,53 +208,72 @@ class MGAPoint(PlanePoint):
         return f"<MGAPt_({self.E},{self.N})_{self.grid.code}>"
 
 
-sf = 100000
-
-cols = {
-    "Y": [7 * sf, 8 * sf],
-    "X": [6 * sf, 7 * sf],
-    "W": [5 * sf, 6 * sf],
-    "V": [4 * sf, 5 * sf],
-}
-
-rows = {
-    "H": [62 * sf, 63 * sf],
-    "G": [61 * sf, 62 * sf],
-    "F": [60 * sf, 61 * sf],
-    "E": [59 * sf, 60 * sf],
-    "D": [58 * sf, 59 * sf],
-    "C": [57 * sf, 58 * sf],
-}
-
-
 class MGRSPoint(MGAPoint):
-
-    SQM = 1e6
 
     """
     MGA point with a 100k square identifier (usi)
     """
 
+    # TODO: make me a nice function / expression. This is yuck
+    sf = 1e5
+    cols54 = {
+        "Y": [7 * sf, 8 * sf],
+        "X": [6 * sf, 7 * sf],
+        "W": [5 * sf, 6 * sf],
+        "V": [4 * sf, 5 * sf],
+    }
+
+    rows54 = {
+        "H": [62 * sf, 63 * sf],
+        "G": [61 * sf, 62 * sf],
+        "F": [60 * sf, 61 * sf],
+        "E": [59 * sf, 60 * sf],
+        "D": [58 * sf, 59 * sf],
+        "C": [57 * sf, 58 * sf],
+    }
+
+    cols55 = {
+        "B": [2 * sf, 3 * sf],
+        "C": [3 * sf, 4 * sf],
+        "D": [4 * sf, 5 * sf],
+        "E": [5 * sf, 6 * sf],
+        "F": [6 * sf, 7 * sf],
+        "G": [7 * sf, 8 * sf],
+    }
+
+    rows55 = {
+        "S": [56 * sf, 57 * sf],
+        "T": [57 * sf, 58 * sf],
+        "U": [58 * sf, 59 * sf],
+        "V": [59 * sf, 60 * sf],
+        "A": [60 * sf, 61 * sf],
+        "B": [61 * sf, 62 * sf],
+    }
+
     @property
     def usi(self):
-        if self.zone == 54:
-            X = next(code for code, (lb, ub) in cols.items() if lb <= self.E < ub)
-            Y = next(code for code, (lb, ub) in rows.items() if lb <= self.N < ub)
-        else:
-            pass
+        cols = self.cols54 if self.zone == 54 else self.cols55
+        rows = self.rows54 if self.zone == 54 else self.rows55
+        X = next(code for code, (lb, ub) in cols.items() if lb <= self.E < ub)
+        Y = next(code for code, (lb, ub) in rows.items() if lb <= self.N < ub)
         return f"{X}{Y}"
 
     @property
     def x(self):
-        return 10 * round(self.E % 1e5)
+        """ strip the first digit off the MGA easting """
+        val = round(self.E)
+        start, end = 1, min(1 + self.precision, 6)
+        return f"{val}"[start:end]
 
     @property
     def y(self):
-        return round(self.N % 1e5)
+        """ strip the first two digits off the MGA northing """
+        val = round(self.N)
+        start, end = 2, min(2 + self.precision, 7)
+        return f"{val}"[start:end]
 
     @property
     def display_coords(self):
-        # TODO: test
         return (self.zone, self.usi, self.x, self.y)
 
     @property
@@ -262,10 +281,9 @@ class MGRSPoint(MGAPoint):
         """
         Precision of the specified coordinates only, 
         not the accuracy of the coordinates.
+        5 fig = 1m, ..., 1 fig = 10k
         """
-        # TODO: 5 fig = 1m, ..., 1 fig = 10k
-        # TODO: test
-        return 5 / len(f"{round(self.E)}")
+        return 5
 
     def __repr__(self):
         return (
