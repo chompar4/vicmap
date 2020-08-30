@@ -16,17 +16,12 @@ class Point:
         coords = self.proj_coords[-2:]
 
         if isinstance(other, MGAGrid):
-            # dont always know what MGA zone I'm in, project to wgs first
+            # dont what MGA zone other is in, project to wgs first
             to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
             dLat, dLng = to_wgs.transform(*coords)
 
-            try:
-                zone = other.get_zone(dLng)
-                other_crs = other.crs(zone)
-            except:
-                import ipdb
-
-                ipdb.set_trace()
+            zone = other.get_zone(dLng)
+            other_crs = other.crs(zone)
 
         else:
             other_crs = other.crs
