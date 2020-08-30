@@ -12,6 +12,11 @@ class Point:
         """
         Transform between one point and another.
         """
+
+        assert isinstance(
+            other, self.__class__
+        ), "please provide a valid destination point"
+
         if isinstance(other, MGAGrid):
             # dont always know what MGA zone I'm in, project to wgs first
             to_wgs = Transformer.from_crs(self.crs, WGS84.crs)

@@ -235,3 +235,15 @@ def krueger_coefficients(n):
         16: α16,
     }
 
+
+def mga20_declination_from(zone, dLat, dLng):
+    pt = GeoPoint(dLat, dLng)
+    e, n = pt.transform_to(MGA20)
+    mga_pt = MGAPoint(zone, e, n, grid=MGA20)
+
+    return (
+        mga_pt.grid_convergence,
+        mga_pt.magnetic_declination,
+        mga_pt.grid_magnetic_angle,
+    )
+
