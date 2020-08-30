@@ -235,3 +235,26 @@ def krueger_coefficients(n):
         16: α16,
     }
 
+
+def mga20_declination_from(zone, dLat, dLng):
+    pt = GeoPoint(dLat, dLng)
+    e, n = pt.transform_to(MGA20)
+    mga_pt = MGAPoint(zone, e, n, grid=MGA20)
+
+    return (
+        mga_pt.grid_convergence,
+        mga_pt.magnetic_declination,
+        mga_pt.grid_magnetic_angle,
+    )
+
+
+def try_declination_import():
+    try:
+        from geomag import declination
+
+        return declination
+    except ImportError:
+        print(
+            "ImportError: please install https://github.com/chompar4/isogonic-api from source for geomagnetic calculations"
+        )
+

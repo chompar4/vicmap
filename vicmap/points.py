@@ -3,8 +3,8 @@ from pyproj import CRS, Transformer
 from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84
 from vicmap.grids import VICGRID94, MGAGrid
-from geomag import declination
 from datetime import date as datetime
+from vicmap.utils import try_declination_import
 
 
 class Point:
@@ -12,6 +12,7 @@ class Point:
         """
         Transform between one point and another.
         """
+
         if isinstance(other, MGAGrid):
             # dont always know what MGA zone I'm in, project to wgs first
             to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
@@ -22,11 +23,13 @@ class Point:
 
         else:
             other_crs = other.crs
+            zone = None
 
         if other_crs == self.crs:
             return self.coords
         transformer = Transformer.from_crs(self.crs, other_crs)
-        return transformer.transform(*self.coords)
+        new = transformer.transform(*self.coords)
+        return (zone, *new) if zone else new
 
     @property
     def grid_magnetic_angle(self):
@@ -59,6 +62,8 @@ class GeoPoint(Point):
         The horizontal angle at a place between true north and 
         magnetic north. Varies with location and time.
         """
+        declination = try_declination_import()
+
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
         return declination(self.dLat, self.dLng, z, date)
@@ -103,6 +108,8 @@ class PlanePoint(Point):
         The horizontal angle at a place between true north and 
         magnetic north. Varies with location and time.
         """
+        declination = try_declination_import()
+
         (φ, λ) = self.invert()
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
