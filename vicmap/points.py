@@ -205,10 +205,6 @@ class MGAPoint(PlanePoint):
 
 class MGRSPoint(MGAPoint):
 
-    """
-    MGA point with a 100k square identifier (usi)
-    """
-
     # TODO: make me a nice function / expression. This is yuck
     sf = 1e5
     cols54 = {
@@ -245,6 +241,22 @@ class MGRSPoint(MGAPoint):
         "B": [61 * sf, 62 * sf],
     }
 
+    def __init__(self, zone, E, N, grid, precision=5):
+        """
+        TODO: specify input with MGRS coords
+        MGA point with a 100k square alpha identifier (usi)
+        accepts:
+            precision:
+                0 fig = 100k
+                1 fig = 10k
+                2 fig = 1k
+                3 fig = 100m
+                4 fig = 10m 
+                5 fig = 1m
+        """
+        super().__init__(E=E, N=N, grid=grid, zone=zone)
+        self.precision = precision
+
     @property
     def usi(self):
         cols = self.cols54 if self.zone == 54 else self.cols55
@@ -270,15 +282,6 @@ class MGRSPoint(MGAPoint):
     @property
     def display_coords(self):
         return (self.zone, self.usi, self.x, self.y)
-
-    @property
-    def precision(self):
-        """
-        Precision of the specified coordinates only, 
-        not the accuracy of the coordinates.
-        5 fig = 1m, ..., 1 fig = 10k
-        """
-        return 5
 
     def __repr__(self):
         return (
