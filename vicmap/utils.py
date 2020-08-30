@@ -247,3 +247,14 @@ def mga20_declination_from(zone, dLat, dLng):
         mga_pt.grid_magnetic_angle,
     )
 
+
+def try_declination_import():
+    try:
+        from geomag import declination
+
+        return declination
+    except ImportError:
+        print(
+            "ImportError: please install https://github.com/chompar4/isogonic-api from source for geomagnetic calculations"
+        )
+

@@ -4,6 +4,7 @@ from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84
 from vicmap.grids import VICGRID94, MGAGrid
 from datetime import date as datetime
+from vicmap.utils import try_declination_import
 
 
 class Point:
@@ -61,7 +62,7 @@ class GeoPoint(Point):
         The horizontal angle at a place between true north and 
         magnetic north. Varies with location and time.
         """
-        from geomag import declination
+        declination = try_declination_import()
 
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
@@ -107,7 +108,7 @@ class PlanePoint(Point):
         The horizontal angle at a place between true north and 
         magnetic north. Varies with location and time.
         """
-        from geomag import declination
+        declination = try_declination_import()
 
         (φ, λ) = self.invert()
         z = 0  # TODO: compute height using AHD/DTM
