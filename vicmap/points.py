@@ -13,10 +13,6 @@ class Point:
         Transform between one point and another.
         """
 
-        assert isinstance(
-            other, self.__class__
-        ), "please provide a valid destination point"
-
         if isinstance(other, MGAGrid):
             # dont always know what MGA zone I'm in, project to wgs first
             to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
@@ -27,11 +23,13 @@ class Point:
 
         else:
             other_crs = other.crs
+            zone = None
 
         if other_crs == self.crs:
             return self.coords
         transformer = Transformer.from_crs(self.crs, other_crs)
-        return transformer.transform(*self.coords)
+        new = transformer.transform(*self.coords)
+        return (zone, *new) if zone else new
 
     @property
     def grid_magnetic_angle(self):
