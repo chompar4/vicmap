@@ -13,22 +13,29 @@ class Point:
         Transform between one point and another.
         """
 
+        coords = self.proj_coords[-2:]
+
         if isinstance(other, MGAGrid):
             # dont always know what MGA zone I'm in, project to wgs first
             to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
-            dLat, dLng = to_wgs.transform(*self.coords)
+            dLat, dLng = to_wgs.transform(*coords)
 
-            zone = other.get_zone(dLng)
-            other_crs = other.crs(zone)
+            try:
+                zone = other.get_zone(dLng)
+                other_crs = other.crs(zone)
+            except:
+                import ipdb
+
+                ipdb.set_trace()
 
         else:
             other_crs = other.crs
             zone = None
 
         if other_crs == self.crs:
-            return self.coords
+            return self.proj_coords
         transformer = Transformer.from_crs(self.crs, other_crs)
-        new = transformer.transform(*self.coords)
+        new = transformer.transform(*coords)
         return (zone, *new) if zone else new
 
     @property
@@ -49,7 +56,11 @@ class GeoPoint(Point):
         self.datum = datum
 
     @property
-    def coords(self):
+    def display_coords(self):
+        return self.proj_coords
+
+    @property
+    def proj_coords(self):
         return (self.dLat, self.dLng)
 
     @property
@@ -124,7 +135,11 @@ class PlanePoint(Point):
         return self.v + self.grid.N0
 
     @property
-    def coords(self):
+    def display_coords(self):
+        return self.proj_coords
+
+    @property
+    def proj_coords(self):
         return (self.E, self.N)
 
 
@@ -147,7 +162,7 @@ class VICPoint(PlanePoint):
         return γ
 
     def __eq__(self, other):
-        return self.grid == other.grid and self.coords == other.coords
+        return self.grid == other.grid and self.display_coords == other.display_coords
 
     def __repr__(self):
         return f"<VicPt_({self.E},{self.N})_{self.grid.code}>"
@@ -166,7 +181,11 @@ class MGAPoint(PlanePoint):
         return self.grid.crs(self.zone)
 
     @property
-    def coords(self):
+    def display_coords(self):
+        return (self.zone, self.E, self.N)
+
+    @property
+    def proj_coords(self):
         return (self.E, self.N)
 
     @property
@@ -183,7 +202,73 @@ class MGAPoint(PlanePoint):
         return γ
 
     def __eq__(self, other):
-        return self.grid == other.grid and self.coords == other.coords
+        return self.grid == other.grid and self.display_coords == other.display_coords
 
     def __repr__(self):
         return f"<MGAPt_({self.E},{self.N})_{self.grid.code}>"
+
+
+sf = 100000
+
+cols = {
+    "Y": [7 * sf, 8 * sf],
+    "X": [6 * sf, 7 * sf],
+    "W": [5 * sf, 6 * sf],
+    "V": [4 * sf, 5 * sf],
+}
+
+rows = {
+    "H": [62 * sf, 63 * sf],
+    "G": [61 * sf, 62 * sf],
+    "F": [60 * sf, 61 * sf],
+    "E": [59 * sf, 60 * sf],
+    "D": [58 * sf, 59 * sf],
+    "C": [57 * sf, 58 * sf],
+}
+
+
+class MGRSPoint(MGAPoint):
+
+    SQM = 1e6
+
+    """
+    MGA point with a 100k square identifier (usi)
+    """
+
+    @property
+    def usi(self):
+        if self.zone == 54:
+            X = next(code for code, (lb, ub) in cols.items() if lb <= self.E < ub)
+            Y = next(code for code, (lb, ub) in rows.items() if lb <= self.N < ub)
+        else:
+            pass
+        return f"{X}{Y}"
+
+    @property
+    def x(self):
+        return 10 * round(self.E % 1e5)
+
+    @property
+    def y(self):
+        return round(self.N % 1e5)
+
+    @property
+    def display_coords(self):
+        # TODO: test
+        return (self.zone, self.usi, self.x, self.y)
+
+    @property
+    def precision(self):
+        """
+        Precision of the specified coordinates only, 
+        not the accuracy of the coordinates.
+        """
+        # TODO: 5 fig = 1m, ..., 1 fig = 10k
+        # TODO: test
+        return 5 / len(f"{round(self.E)}")
+
+    def __repr__(self):
+        return (
+            f"<MGRSPt_({self.zone}, {self.usi}, {self.x}, {self.y})_{self.grid.code}>"
+        )
+

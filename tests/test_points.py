@@ -1,7 +1,7 @@
 import pytest
 from vicmap.utils import dms_to_dd
 from vicmap.datums import GDA94, AGD66, GDA20
-from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint
+from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
 from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid
 
 import math
@@ -80,6 +80,11 @@ def test_declination_mga():
     assert abs(west_pt.magnetic_declination - 9.350878790917436) < 1e3
 
 
+def test_declination_mgrs():
+    pt = MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20)
+    assert abs(pt.magnetic_declination - 9.813430953842529) < 1e-3
+
+
 def test_transform_to_compatible_types():
 
     """
@@ -93,6 +98,7 @@ def test_transform_to_compatible_types():
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
         MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
         MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
+        MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
     ]
 
     grids = [VICGRID, VICGRID94, MGA20, MGA94]
@@ -115,6 +121,7 @@ def test_magnetic_functions():
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
         MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
         MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
+        MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
     ]
 
     for pt in pts:
@@ -143,6 +150,10 @@ def test_repr__():
         (
             MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
             f"<MGAPt_(500000,10000000)_MGA20>",
+        ),
+        (
+            MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
+            f"<MGRSPt_(54, WD, 40000, 50000)_MGA20>",
         ),
     ]
 
