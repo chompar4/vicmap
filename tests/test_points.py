@@ -2,7 +2,7 @@ import pytest
 from vicmap.utils import dms_to_dd
 from vicmap.datums import GDA94, AGD66, GDA20
 from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
-from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRSGrid
+from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS
 
 import math
 
@@ -97,14 +97,20 @@ def test_transform_to_compatible_types():
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
         MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
         MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
-        MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
+        MGRSPoint.from_mga(zone=54, E=5.04 * 1e5, N=5.85 * 1e6),
     ]
 
-    grids = [VICGRID, VICGRID94, MGA20, MGA94]
+    grids = [VICGRID, VICGRID94, MGA20, MGA94, MGRS]
 
     for pt in pts:
         for grid in grids:
             assert pt.transform_to(grid)
+
+
+def test_transform_to_mgrs():
+
+    o = GeoPoint(dLat=-37, dLng=145, datum=GDA94)
+    assert o.transform_to(MGRS) == (55, "CV", "22038", "03258")
 
 
 def test_known_vals_mgrs():
@@ -136,16 +142,16 @@ def test_lower_left_mgrs():
 
     pts = [
         MGRSPoint.from_mga(54, cols[0], rows[0])
-        for k, cols in MGRSGrid.cols54.items()
-        for k, rows in MGRSGrid.rows54.items()
+        for k, cols in MGRS.cols54.items()
+        for k, rows in MGRS.rows54.items()
     ]
     for pt in pts:
         assert pt.x == "00000" and pt.y == "00000"
 
     pts = [
         MGRSPoint.from_mga(55, cols[0], rows[0])
-        for k, cols in MGRSGrid.cols55.items()
-        for k, rows in MGRSGrid.rows55.items()
+        for k, cols in MGRS.cols55.items()
+        for k, rows in MGRS.rows55.items()
     ]
     for pt in pts:
         assert pt.x == "00000" and pt.y == "00000"

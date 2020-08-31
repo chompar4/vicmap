@@ -2,7 +2,7 @@ import math
 from pyproj import CRS, Transformer
 from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84
-from vicmap.grids import VICGRID94, MGAGrid, MGRS, MGA20, MGA94
+from vicmap.grids import VICGRID94, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
 from vicmap.utils import try_declination_import
 
@@ -31,6 +31,12 @@ class Point:
             return self.proj_coords
         transformer = Transformer.from_crs(self.crs, other_crs)
         new = transformer.transform(*coords)
+
+        if isinstance(other, MGRSGrid):
+            E, N = new
+            pt = MGRSPoint.from_mga(zone=zone, E=E, N=N)
+            return pt.display_coords
+
         return (zone, *new) if zone else new
 
     @property
@@ -228,7 +234,11 @@ class MGRSPoint(MGAPoint):
 
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
         assert zone in [54, 55], f"invalid MGRS zone: {zone}"
-        assert isinstance(usi, str) and len(usi) == 2, f"invalid MGRS usi: {usi}"
+        col = usi[0] in self.grid.cols54 if zone == 54 else self.grid.cols55
+        row = usi[1] in self.grid.rows54 if zone == 54 else self.grid.rows55
+        assert (
+            isinstance(usi, str) and len(usi) == 2 and col and row
+        ), f"invalid MGRS usi: {usi}"
         assert 0 <= float(x) <= 10 ** precision, f"invalid MGRS x: {x}"
         assert 0 <= float(y) <= 10 ** precision, f"invalid MGRS y: {y}"
 
