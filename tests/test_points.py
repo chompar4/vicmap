@@ -2,7 +2,7 @@ import pytest
 from vicmap.utils import dms_to_dd
 from vicmap.datums import GDA94, AGD66, GDA20
 from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
-from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid
+from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRSGrid
 
 import math
 
@@ -130,9 +130,11 @@ def test_known_vals_mgrs():
 def test_lower_left_mgrs():
 
     pts = [
-        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000"),),
+        MGRSPoint.from_mga(54, cols[0], rows[0])
+        for k, cols in MGRSGrid.cols54.items()
+        for k, rows in MGRSGrid.rows54.items()
     ]
-    for pt, val in pts:
+    for pt in pts:
         assert pt.x == "00000" and pt.y == "00000"
 
 
