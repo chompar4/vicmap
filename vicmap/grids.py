@@ -80,6 +80,47 @@ class MGAGrid94(MGAGrid):
     code = "MGA94"
 
 
+class MGRSGrid(MGAGrid20):
+    name = "Military Grid Reference System (MGA20)"
+    code = "MGRS"
+
+    # TODO: make me a nice function / expression. This is yuck
+    sf = 1e5
+    cols54 = {
+        "Y": [7 * sf, 8 * sf],
+        "X": [6 * sf, 7 * sf],
+        "W": [5 * sf, 6 * sf],
+        "V": [4 * sf, 5 * sf],
+    }
+
+    rows54 = {
+        "H": [62 * sf, 63 * sf],
+        "G": [61 * sf, 62 * sf],
+        "F": [60 * sf, 61 * sf],
+        "E": [59 * sf, 60 * sf],
+        "D": [58 * sf, 59 * sf],
+        "C": [57 * sf, 58 * sf],
+    }
+
+    cols55 = {
+        "B": [2 * sf, 3 * sf],
+        "C": [3 * sf, 4 * sf],
+        "D": [4 * sf, 5 * sf],
+        "E": [5 * sf, 6 * sf],
+        "F": [6 * sf, 7 * sf],
+        "G": [7 * sf, 8 * sf],
+    }
+
+    rows55 = {
+        "S": [56 * sf, 57 * sf],
+        "T": [57 * sf, 58 * sf],
+        "U": [58 * sf, 59 * sf],
+        "V": [59 * sf, 60 * sf],
+        "A": [60 * sf, 61 * sf],
+        "B": [61 * sf, 62 * sf],
+    }
+
+
 class VICGRID:
 
     datum = AGD66
@@ -149,4 +190,5 @@ MGA94 = MGAGrid94()
 MGA20 = MGAGrid20()
 VICGRID = VICGRID()
 VICGRID94 = VICGRID94()
+MGRS = MGRSGrid()
 

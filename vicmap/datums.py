@@ -20,30 +20,6 @@ class Datum:
         self.code = code
         self.name = name
 
-    @property
-    def a(self):
-        return self.ellipsoid.a
-
-    @property
-    def b(self):
-        return self.ellipsoid.b
-
-    @property
-    def e2(self):
-        return self.ellipsoid.e2
-
-    @property
-    def e(self):
-        return self.ellipsoid.e
-
-    @property
-    def n(self):
-        return self.ellipsoid.n
-
-    @property
-    def f(self):
-        return self.ellipsoid.f
-
 
 # supported datums
 WGS84 = Datum(
