@@ -2,7 +2,7 @@ import math
 from pyproj import CRS, Transformer
 from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84
-from vicmap.grids import VICGRID94, MGAGrid, MGRS
+from vicmap.grids import VICGRID94, MGAGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
 from vicmap.utils import try_declination_import
 
@@ -168,6 +168,12 @@ class VICPoint(PlanePoint):
 
 class MGAPoint(PlanePoint):
     def __init__(self, zone, E, N, grid):
+
+        assert 200000 <= E <= 800000, f"invalid easting: {E}"
+        assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
+        assert zone in [54, 55], f"invalid zone: {zone}"
+        assert grid in [MGA20, MGA94, MGRS], f"invalid MGA grid: {grid.code}"
+
         super().__init__(u=E, v=N, grid=grid)
         self.zone = zone
 
@@ -220,6 +226,12 @@ class MGRSPoint(MGAPoint):
                 5 fig = 1m
         """
 
+        assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
+        assert zone in [54, 55], f"invalid MGRS zone: {zone}"
+        assert isinstance(usi, str) and len(usi) == 2, f"invalid MGRS usi: {usi}"
+        assert 0 <= float(x) <= 10 ** precision, f"invalid MGRS x: {x}"
+        assert 0 <= float(y) <= 10 ** precision, f"invalid MGRS y: {y}"
+
         def get_E(grid, zn, usi, x):
             code = usi[0]
             lb = grid.cols54[code][0] if zn == 54 else grid.cols55[code][0]
@@ -244,16 +256,22 @@ class MGRSPoint(MGAPoint):
         """
         Allow user to create from mga coords
         """
+
+        assert 200000 <= E <= 800000, f"invalid easting: {E}"
+        assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
+        assert zone in [54, 55], f"invalid zone: {zone}"
+        assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
+
         x = cls.get_x(E, precision)
         y = cls.get_y(N, precision)
-        usi = cls.get_usi(cls.grid, zone, E, N)
-        pt = cls(zone, usi, x, y)
+        usi = cls.get_usi(grid=cls.grid, zone=zone, E=E, N=N)
+        pt = cls(zone=zone, usi=usi, x=x, y=y)
         return pt
 
     @classmethod
-    def get_usi(cls, grid, zn, E, N):
-        cols = grid.cols54 if zn == 54 else grid.cols55
-        rows = grid.rows54 if zn == 54 else grid.rows55
+    def get_usi(cls, grid, zone, E, N):
+        cols = grid.cols54 if zone == 54 else grid.cols55
+        rows = grid.rows54 if zone == 54 else grid.rows55
         X = next(code for code, (lb, ub) in cols.items() if lb <= E < ub)
         Y = next(code for code, (lb, ub) in rows.items() if lb <= N < ub)
         return f"{X}{Y}"

@@ -52,7 +52,6 @@ def test_grid_convergence_central_meridian_mga():
 
 
 known_convergence_mga = [
-    (54, 386352.39800000, 7381850.76900000, -0.447481417),
     (54, 600000, 6200000, 0.613256375),
     (54, 700000, 6200000, 1.226072822),
     (54, 700000, 5700000, 1.444944199),
@@ -96,8 +95,8 @@ def test_transform_to_compatible_types():
         GeoPoint(dLat=-37, dLng=145, datum=GDA94),
         VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
-        MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
-        MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
+        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
+        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
         MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
     ]
 
@@ -128,6 +127,15 @@ def test_known_vals_mgrs():
         assert pt.display_coords == val
 
 
+def test_lower_left_mgrs():
+
+    pts = [
+        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000"),),
+    ]
+    for pt, val in pts:
+        assert pt.x == "00000" and pt.y == "00000"
+
+
 def test__eq__vic():
 
     p1 = VICPoint(E=10, N=10, grid=VICGRID)
@@ -138,16 +146,16 @@ def test__eq__vic():
 
 def test__eq__mga():
 
-    p1 = MGAPoint(zone="bleh", E=10, N=10, grid=MGA94)
-    p2 = MGAPoint(zone="bleh", E=10, N=10, grid=MGA94)
+    p1 = MGAPoint(zone=55, E=250000, N=5600000, grid=MGA94)
+    p2 = MGAPoint(zone=55, E=250000, N=5600000, grid=MGA94)
 
     assert p1 == p2
 
 
 def test__eq__mgrs():
 
-    p1 = MGRSPoint(zone="blah", usi="FU", x=30, y=20)
-    p2 = MGRSPoint(zone="blah", usi="FU", x=30, y=20)
+    p1 = MGRSPoint(zone=55, usi="FU", x=30, y=20)
+    p2 = MGRSPoint(zone=55, usi="FU", x=30, y=20)
 
     assert p1 == p2
 
@@ -170,8 +178,8 @@ def test_magnetic_functions():
         GeoPoint(dLat=-37, dLng=145, datum=GDA94),
         VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
-        MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
-        MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
+        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
+        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
         MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
     ]
 
@@ -195,12 +203,12 @@ def test_repr__():
             f"<VicPt_(2500000,2500000)_VICGRID94>",
         ),
         (
-            MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
-            f"<MGAPt_(500000,10000000)_MGA94>",
+            MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
+            f"<MGAPt_(800000,6300000)_MGA94>",
         ),
         (
-            MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
-            f"<MGAPt_(500000,10000000)_MGA20>",
+            MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
+            f"<MGAPt_(800000,6300000)_MGA20>",
         ),
         (
             MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
