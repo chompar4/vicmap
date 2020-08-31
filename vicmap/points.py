@@ -2,7 +2,7 @@ import math
 from pyproj import CRS, Transformer
 from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84
-from vicmap.grids import VICGRID94, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
+from vicmap.grids import VICGRID94, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
 from vicmap.utils import try_declination_import
 
@@ -52,6 +52,10 @@ class Point:
 
 class GeoPoint(Point):
     def __init__(self, dLat, dLng, datum=WGS84):
+
+        assert -90 < dLat < 90, f"invalid latitude: {dLat}"
+        assert -180 < dLng < 180, f"invalid longitude: {dLng}"
+
         self.dLat = dLat
         self.dLng = dLng
         self.datum = datum
@@ -152,6 +156,12 @@ class PlanePoint(Point):
 
 class VICPoint(PlanePoint):
     def __init__(self, E, N, grid):
+
+        assert grid in [VICGRID, VICGRID94], f"invalid grid: {grid.code}"
+        assert 2.1e6 <= E <= 3e6, f"easting out of bounds: {E}"
+        d = 2e6 if grid == VICGRID else 0
+        assert 2.2e6 + d <= N <= 2.9e6 + d, f"northing out of bounds: {N}"
+
         super().__init__(u=E, v=N, grid=grid)
         self.crs = CRS.from_epsg(grid.epsg_code)
 
@@ -308,4 +318,3 @@ class MGRSPoint(MGAPoint):
         return (
             f"<MGRSPt_({self.zone}, {self.usi}, {self.x}, {self.y})_{self.grid.code}>"
         )
-

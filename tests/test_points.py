@@ -95,8 +95,8 @@ def test_transform_to_compatible_types():
         GeoPoint(dLat=-37, dLng=145, datum=GDA94),
         VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
-        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
-        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
+        MGAPoint(zone=55, E=700000, N=6200000, grid=MGA94),
+        MGAPoint(zone=55, E=700000, N=6200000, grid=MGA20),
         MGRSPoint.from_mga(zone=54, E=5.04 * 1e5, N=5.85 * 1e6),
     ]
 
@@ -182,8 +182,8 @@ def test_mgrs_precision():
 
 def test__eq__vic():
 
-    p1 = VICPoint(E=10, N=10, grid=VICGRID)
-    p2 = VICPoint(E=10, N=10, grid=VICGRID)
+    p1 = VICPoint(E=2.2e6, N=4.2e6, grid=VICGRID)
+    p2 = VICPoint(E=2.2e6, N=4.2e6, grid=VICGRID)
 
     assert p1 == p2
 
