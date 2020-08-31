@@ -81,7 +81,7 @@ def test_declination_mga():
 
 
 def test_declination_mgrs():
-    pt = MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20)
+    pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
     assert abs(pt.magnetic_declination - 9.813430953842529) < 1e-3
 
 
@@ -98,7 +98,7 @@ def test_transform_to_compatible_types():
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
         MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
         MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
-        MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
+        MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
     ]
 
     grids = [VICGRID, VICGRID94, MGA20, MGA94]
@@ -111,20 +111,14 @@ def test_transform_to_compatible_types():
 def test_known_vals_mgrs():
 
     pts = [
+        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000"),),
+        (MGRSPoint.from_mga(54, 6.5 * 1e5, 6.15 * 1e6), (54, "XG", "50000", "50000"),),
         (
-            MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
-            (54, "WD", "04000", "50000"),
-        ),
-        (
-            MGRSPoint(54, 6.5 * 1e5, 6.15 * 1e6, grid=MGA20),
-            (54, "XG", "50000", "50000"),
-        ),
-        (
-            MGRSPoint(55, 4.567 * 1e5, 6.1556 * 1e6, grid=MGA20),
+            MGRSPoint.from_mga(55, 4.567 * 1e5, 6.1556 * 1e6),
             (55, "DB", "56700", "55600"),
         ),
         (
-            MGRSPoint(55, 6.78997 * 1e5, 5.8514 * 1e6, grid=MGA20),
+            MGRSPoint.from_mga(55, 6.78997 * 1e5, 5.8514 * 1e6),
             (55, "FU", "78997", "51400"),
         ),
     ]
@@ -132,6 +126,37 @@ def test_known_vals_mgrs():
     for pt, val in pts:
 
         assert pt.display_coords == val
+
+
+def test__eq__vic():
+
+    p1 = VICPoint(E=10, N=10, grid=VICGRID)
+    p2 = VICPoint(E=10, N=10, grid=VICGRID)
+
+    assert p1 == p2
+
+
+def test__eq__mga():
+
+    p1 = MGAPoint(zone="bleh", E=10, N=10, grid=MGA94)
+    p2 = MGAPoint(zone="bleh", E=10, N=10, grid=MGA94)
+
+    assert p1 == p2
+
+
+def test__eq__mgrs():
+
+    p1 = MGRSPoint(zone="blah", usi="FU", x=30, y=20)
+    p2 = MGRSPoint(zone="blah", usi="FU", x=30, y=20)
+
+    assert p1 == p2
+
+
+def test__eq__geo():
+    p1 = GeoPoint(40, 50)
+    p2 = GeoPoint(40, 50)
+
+    assert p1 == p2
 
 
 def test_magnetic_functions():
@@ -147,7 +172,7 @@ def test_magnetic_functions():
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
         MGAPoint(zone=55, E=MGA94.E0, N=MGA94.N0, grid=MGA94),
         MGAPoint(zone=55, E=MGA20.E0, N=MGA20.N0, grid=MGA20),
-        MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
+        MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
     ]
 
     for pt in pts:
@@ -178,8 +203,12 @@ def test_repr__():
             f"<MGAPt_(500000,10000000)_MGA20>",
         ),
         (
-            MGRSPoint(54, 5.04 * 1e5, 5.85 * 1e6, grid=MGA20),
-            f"<MGRSPt_(54, WD, 04000, 50000)_MGA20>",
+            MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
+            f"<MGRSPt_(54, WD, 04000, 50000)_MGRS>",
+        ),
+        (
+            MGRSPoint(54, "WD", 4000, 50000, precision=5),
+            f"<MGRSPt_(54, WD, 04000, 50000)_MGRS>",
         ),
     ]
 

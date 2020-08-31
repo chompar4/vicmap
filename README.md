@@ -12,12 +12,12 @@ poetry install
 
 Points on ellipsoidal geoid surfaces are represented by `GeoPoints`, while points in the 2d map plane are represented by the `PlanePoints`. Each point requires a set of coordinates, and a datum or grid.
 
-| Class         | Coordinates    | Description                                                                                     |
-| ------------- | -------------- | ----------------------------------------------------------------------------------------------- |
-| `GeoPoint()`  | (φ, λ)         | decimal geographic latitude and longitude on geoid                                              |
-| `MGAPoint()`  | (z, E, N)      | z: grid zone designator, easting and northing meters in a Map Grid of Australia plane           |
-| `VICPoint()`  | (E, N)         | easting and northing in meters in a VICGRID plane                                               |
-| `MGRSPoint()` | (z, a, E', N') | z: grid zone designator, a: the 100,000-meter square identifier, easting and northing in meters |
+| Class         | Coordinates    | Description                                                                                       |
+| ------------- | -------------- | ------------------------------------------------------------------------------------------------- |
+| `GeoPoint()`  | (φ, λ)         | decimal geographic latitude and longitude on geoid                                                |
+| `MGAPoint()`  | (z, E, N)      | z: grid zone designator, easting and northing meters in a Map Grid of Australia plane             |
+| `VICPoint()`  | (E, N)         | easting and northing in meters in a VICGRID plane                                                 |
+| `MGRSPoint()` | (z, usi, x, y) | z: grid zone designator, usi: the 100,000-meter square identifier, easting and northing in meters |
 
 To define a point, specify the coordinates and the datum/grid.
 

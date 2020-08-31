@@ -13,6 +13,7 @@ black = "^19.10b0"
 pyproj = "^2.6.1"
 geojson = "^2.5.0"
 geojsoncontour = "^0.4.0"
+pytest-cov = "^2.10.1"
 
 [tool.poetry.dev-dependencies]
 ipdb = "^0.13.2"

@@ -2,7 +2,7 @@ import math
 from pyproj import CRS, Transformer
 from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84
-from vicmap.grids import VICGRID94, MGAGrid
+from vicmap.grids import VICGRID94, MGAGrid, MGRS
 from datetime import date as datetime
 from vicmap.utils import try_declination_import
 
@@ -85,6 +85,9 @@ class GeoPoint(Point):
         """
         return 0
 
+    def __eq__(self, other):
+        return self.datum == other.datum and self.display_coords == other.display_coords
+
     def __repr__(self):
         return f"<GeoPt_({self.dLat},{self.dLng})_{self.datum.code}>"
 
@@ -137,6 +140,9 @@ class PlanePoint(Point):
     def proj_coords(self):
         return (self.E, self.N)
 
+    def __eq__(self, other):
+        return self.grid == other.grid and self.display_coords == other.display_coords
+
 
 class VICPoint(PlanePoint):
     def __init__(self, E, N, grid):
@@ -155,9 +161,6 @@ class VICPoint(PlanePoint):
         (φ, λ) = self.invert()
         _, _, _, γ = lambert_conformal_conic(φ, λ, self.datum.ellipsoid, self.grid)
         return γ
-
-    def __eq__(self, other):
-        return self.grid == other.grid and self.display_coords == other.display_coords
 
     def __repr__(self):
         return f"<VicPt_({self.E},{self.N})_{self.grid.code}>"
@@ -196,55 +199,17 @@ class MGAPoint(PlanePoint):
         _, _, _, _, γ = utm(φ, λ, ellipsoid=self.datum.ellipsoid, grid=self.grid)
         return γ
 
-    def __eq__(self, other):
-        return self.grid == other.grid and self.display_coords == other.display_coords
-
     def __repr__(self):
         return f"<MGAPt_({self.E},{self.N})_{self.grid.code}>"
 
 
 class MGRSPoint(MGAPoint):
 
-    # TODO: make me a nice function / expression. This is yuck
-    sf = 1e5
-    cols54 = {
-        "Y": [7 * sf, 8 * sf],
-        "X": [6 * sf, 7 * sf],
-        "W": [5 * sf, 6 * sf],
-        "V": [4 * sf, 5 * sf],
-    }
+    grid = MGRS
 
-    rows54 = {
-        "H": [62 * sf, 63 * sf],
-        "G": [61 * sf, 62 * sf],
-        "F": [60 * sf, 61 * sf],
-        "E": [59 * sf, 60 * sf],
-        "D": [58 * sf, 59 * sf],
-        "C": [57 * sf, 58 * sf],
-    }
-
-    cols55 = {
-        "B": [2 * sf, 3 * sf],
-        "C": [3 * sf, 4 * sf],
-        "D": [4 * sf, 5 * sf],
-        "E": [5 * sf, 6 * sf],
-        "F": [6 * sf, 7 * sf],
-        "G": [7 * sf, 8 * sf],
-    }
-
-    rows55 = {
-        "S": [56 * sf, 57 * sf],
-        "T": [57 * sf, 58 * sf],
-        "U": [58 * sf, 59 * sf],
-        "V": [59 * sf, 60 * sf],
-        "A": [60 * sf, 61 * sf],
-        "B": [61 * sf, 62 * sf],
-    }
-
-    def __init__(self, zone, E, N, grid, precision=5):
+    def __init__(self, zone, usi, x, y, precision=5):
         """
-        TODO: specify input with MGRS coords
-        MGA point with a 100k square alpha identifier (usi)
+        MGRS : MGA with a 100k square alpha identifier (usi)
         accepts:
             precision:
                 0 fig = 100k
@@ -254,29 +219,57 @@ class MGRSPoint(MGAPoint):
                 4 fig = 10m 
                 5 fig = 1m
         """
-        super().__init__(E=E, N=N, grid=grid, zone=zone)
-        self.precision = precision
 
-    @property
-    def usi(self):
-        cols = self.cols54 if self.zone == 54 else self.cols55
-        rows = self.rows54 if self.zone == 54 else self.rows55
-        X = next(code for code, (lb, ub) in cols.items() if lb <= self.E < ub)
-        Y = next(code for code, (lb, ub) in rows.items() if lb <= self.N < ub)
+        def get_E(grid, zn, usi, x):
+            code = usi[0]
+            lb = grid.cols54[code][0] if zn == 54 else grid.cols55[code][0]
+            return lb + float(x)
+
+        def get_N(grid, zn, usi, y):
+            code = usi[1]
+            lb = grid.rows54[code][0] if zn == 54 else grid.rows55[code][0]
+            return lb + float(y)
+
+        E = get_E(self.grid, zone, usi, x)
+        N = get_N(self.grid, zone, usi, y)
+
+        super().__init__(E=E, N=N, grid=self.grid, zone=zone)
+        self.x = self.__class__.get_x(E, precision)
+        self.y = self.__class__.get_y(N, precision)
+        self.precision = precision
+        self.usi = usi
+
+    @classmethod
+    def from_mga(cls, zone, E, N, precision=5):
+        """
+        Allow user to create from mga coords
+        """
+        x = cls.get_x(E, precision)
+        y = cls.get_y(N, precision)
+        usi = cls.get_usi(cls.grid, zone, E, N)
+        pt = cls(zone, usi, x, y)
+        return pt
+
+    @classmethod
+    def get_usi(cls, grid, zn, E, N):
+        cols = grid.cols54 if zn == 54 else grid.cols55
+        rows = grid.rows54 if zn == 54 else grid.rows55
+        X = next(code for code, (lb, ub) in cols.items() if lb <= E < ub)
+        Y = next(code for code, (lb, ub) in rows.items() if lb <= N < ub)
         return f"{X}{Y}"
 
-    @property
-    def x(self):
+    @classmethod
+    def get_x(cls, E, precision):
         """ strip the first digit off the MGA easting """
-        val = round(self.E)
-        start, end = 1, min(1 + self.precision, 6)
+        val = round(E)
+        start, end = 1, min(1 + precision, 6)
         return f"{val}"[start:end]
 
-    @property
-    def y(self):
+    @classmethod
+    def get_y(cls, N, precision):
         """ strip the first two digits off the MGA northing """
-        val = round(self.N)
-        start, end = 2, min(2 + self.precision, 7)
+        val = round(N)
+        start, end = 2, min(2 + precision, 7)
         return f"{val}"[start:end]
 
     @property

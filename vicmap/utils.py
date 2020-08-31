@@ -236,18 +236,6 @@ def krueger_coefficients(n):
     }
 
 
-def mga20_declination_from(zone, dLat, dLng):
-    pt = GeoPoint(dLat, dLng)
-    e, n = pt.transform_to(MGA20)
-    mga_pt = MGAPoint(zone, e, n, grid=MGA20)
-
-    return (
-        mga_pt.grid_convergence,
-        mga_pt.magnetic_declination,
-        mga_pt.grid_magnetic_angle,
-    )
-
-
 def try_declination_import():
     try:
         from geomag import declination
