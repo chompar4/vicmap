@@ -129,6 +129,11 @@ def test_known_vals_mgrs():
 
 def test_lower_left_mgrs():
 
+    """
+    Lower left corner of all mgrs grids should
+    return origin
+    """
+
     pts = [
         MGRSPoint.from_mga(54, cols[0], rows[0])
         for k, cols in MGRSGrid.cols54.items()
@@ -136,6 +141,37 @@ def test_lower_left_mgrs():
     ]
     for pt in pts:
         assert pt.x == "00000" and pt.y == "00000"
+
+    pts = [
+        MGRSPoint.from_mga(55, cols[0], rows[0])
+        for k, cols in MGRSGrid.cols55.items()
+        for k, rows in MGRSGrid.rows55.items()
+    ]
+    for pt in pts:
+        assert pt.x == "00000" and pt.y == "00000"
+
+
+def test_mgrs_precision():
+
+    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=5)
+    assert p1.x == "00000"
+    assert p1.x == "00000"
+
+    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=4)
+    assert p1.x == "0000"
+    assert p1.x == "0000"
+
+    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=3)
+    assert p1.x == "000"
+    assert p1.x == "000"
+
+    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=2)
+    assert p1.x == "00"
+    assert p1.x == "00"
+
+    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=1)
+    assert p1.x == "0"
+    assert p1.x == "0"
 
 
 def test__eq__vic():

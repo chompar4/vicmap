@@ -265,7 +265,7 @@ class MGRSPoint(MGAPoint):
         x = cls.get_x(E, precision)
         y = cls.get_y(N, precision)
         usi = cls.get_usi(grid=cls.grid, zone=zone, E=E, N=N)
-        pt = cls(zone=zone, usi=usi, x=x, y=y)
+        pt = cls(zone=zone, usi=usi, x=x, y=y, precision=precision)
         return pt
 
     @classmethod
