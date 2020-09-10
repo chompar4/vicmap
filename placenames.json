@@ -1,0 +1,27 @@
+{
+"type": "FeatureCollection",
+"name": "pts",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "Name": "Arbuckle" }, "geometry": { "type": "Point", "coordinates": [ 146.7834785, -37.4203968, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Moroka" }, "geometry": { "type": "Point", "coordinates": [ 146.9461872, -37.4945389, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Omeo" }, "geometry": { "type": "Point", "coordinates": [ 147.5957937, -37.095079, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Dinner Plain" }, "geometry": { "type": "Point", "coordinates": [ 147.2407979, -37.0205561, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Mt Bogong" }, "geometry": { "type": "Point", "coordinates": [ 147.3057699, -36.732281, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Feathertop" }, "geometry": { "type": "Point", "coordinates": [ 147.138943399999988, -36.8937424, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Swifts Ck" }, "geometry": { "type": "Point", "coordinates": [ 147.7122076, -37.2588455, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Suggan Buggan" }, "geometry": { "type": "Point", "coordinates": [ 148.348205, -36.9387192, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Buchan" }, "geometry": { "type": "Point", "coordinates": [ 148.1662542, -37.5107379, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Cann River" }, "geometry": { "type": "Point", "coordinates": [ 149.1495803, -37.5657494, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Bendoc" }, "geometry": { "type": "Point", "coordinates": [ 148.912262, -37.131165, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Snobs Ck" }, "geometry": { "type": "Point", "coordinates": [ 145.8879669, -37.3034018, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Baw Baw" }, "geometry": { "type": "Point", "coordinates": [ 146.3091819, -37.8374082, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Buller" }, "geometry": { "type": "Point", "coordinates": [ 146.4500133, -37.1457225, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Cobbler" }, "geometry": { "type": "Point", "coordinates": [ 146.5931433, -37.0434148, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Buffalo" }, "geometry": { "type": "Point", "coordinates": [ 146.781885499999987, -36.743292, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Halls Gap" }, "geometry": { "type": "Point", "coordinates": [ 142.3841621, -37.1725005, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Lorne" }, "geometry": { "type": "Point", "coordinates": [ 143.9623734, -38.5376459, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Apollo Bay" }, "geometry": { "type": "Point", "coordinates": [ 143.66436920000001, -38.7612976, 0.0 ] } },
+{ "type": "Feature", "properties": { "Name": "Bendigo" }, "geometry": { "type": "Point", "coordinates": [ 144.264639499999987, -36.7616334, 0.0 ] } }
+]
+}
