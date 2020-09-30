@@ -3,7 +3,11 @@ from vicmap.datums import GDA20, GDA94, AGD66
 from pyproj import CRS
 
 
-class MGAGrid:
+class Grid:
+    pass
+
+
+class MGAGrid(Grid):
 
     base_code = 283  # epsg
 
@@ -121,7 +125,7 @@ class MGRSGrid(MGAGrid20):
     }
 
 
-class VICGRID:
+class VICGRID(Grid):
 
     datum = AGD66
     epsg_code = 3110

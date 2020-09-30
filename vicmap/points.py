@@ -1,17 +1,25 @@
 import math
 from pyproj import CRS, Transformer
 from vicmap.projections import lambert_conformal_conic, utm
-from vicmap.datums import GDA94, WGS84
-from vicmap.grids import VICGRID94, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
+from vicmap.datums import GDA94, WGS84, Datum
+from vicmap.grids import VICGRID94, Grid, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
 from vicmap.utils import try_declination_import
 
 
 class Point:
+    def reproject(self, other_epsg):
+        # TODO
+        pass
+
     def transform_to(self, other):
         """
-        Transform between one point and another.
+        Transform between one point object and another.
         """
+
+        assert isinstance(other, Datum) or isinstance(
+            other, Grid
+        ), "please provide a valid destination datum or grid"
 
         coords = self.proj_coords[-2:]
 
