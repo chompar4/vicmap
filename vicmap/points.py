@@ -238,28 +238,27 @@ class MGRSPoint(MGAPoint):
                 1 fig = 10k
                 2 fig = 1k
                 3 fig = 100m
-                4 fig = 10m 
+                4 fig = 10m
                 5 fig = 1m
         """
 
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
         assert zone in [54, 55], f"invalid MGRS zone: {zone}"
-        col = usi[0] in self.grid.cols54 if zone == 54 else self.grid.cols55
-        row = usi[1] in self.grid.rows54 if zone == 54 else self.grid.rows55
-        assert (
-            isinstance(usi, str) and len(usi) == 2 and col and row
-        ), f"invalid MGRS usi: {usi}"
+        colName, rowName = usi[0].capitalize(), usi[1].capitalize()
+        assert isinstance(usi, str) and len(usi) == 2, f"invalid MGRS usi: {usi}"
+        col = colName in self.grid.cols54 if zone == 54 else colName in self.grid.cols55
+        row = rowName in self.grid.rows54 if zone == 54 else rowName in self.grid.rows55
+        assert col, f"usi column entry: {usi[0]} not found in zone: {zone}"
+        assert row, f"usi row entry: {usi[1]} not found in zone: {zone}"
         assert 0 <= float(x) <= 10 ** precision, f"invalid MGRS x: {x}"
         assert 0 <= float(y) <= 10 ** precision, f"invalid MGRS y: {y}"
 
         def get_E(grid, zn, usi, x):
-            code = usi[0]
-            lb = grid.cols54[code][0] if zn == 54 else grid.cols55[code][0]
+            lb = grid.cols54[colName][0] if zn == 54 else grid.cols55[colName][0]
             return lb + float(x)
 
         def get_N(grid, zn, usi, y):
-            code = usi[1]
-            lb = grid.rows54[code][0] if zn == 54 else grid.rows55[code][0]
+            lb = grid.rows54[rowName][0] if zn == 54 else grid.rows55[rowName][0]
             return lb + float(y)
 
         E = get_E(self.grid, zone, usi, x)
@@ -270,6 +269,19 @@ class MGRSPoint(MGAPoint):
         self.y = self.__class__.get_y(N, precision)
         self.precision = precision
         self.usi = usi
+
+    @classmethod
+    def from_6FIG(cls, zone, usi, GR6):
+        """
+        Allow creation from 6 fig grid reference with a usi
+        """
+        assert (
+            isinstance(GR6, str) and len(GR6) == 6
+        ), f"please specify GR {GR6} as a 6 digit string"
+        assert 0 <= float(GR6) <= 999999, f"invalid grid reference: {GR6}"
+
+        pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5)
+        return pt
 
     @classmethod
     def from_mga(cls, zone, E, N, precision=5):
