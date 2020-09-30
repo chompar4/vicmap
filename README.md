@@ -27,7 +27,7 @@ mga_pt = MGAPoint(zone=54, E=250,000, N=5,600,000, grid=MGA94)
 ```
 
 or use some of the provided utils to specify points from common reference systems. 
-(e.g a 6 figure GF with a zone usi)
+(e.g a 6 figure GR)
 
 ```python
 pt = MGRSPoint.from_6FIG(55, "fu", "275882")
