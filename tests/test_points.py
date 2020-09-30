@@ -84,6 +84,14 @@ def test_declination_mgrs():
     assert abs(pt.magnetic_declination - 9.813430953842529) < 1e-3
 
 
+def test_from_6FIG_mgrs():
+
+    pt = MGRSPoint.from_6FIG(55, "fu", "275882")
+    pt2 = MGAPoint(55, 627500, 5888200, grid=MGA20)
+
+    assert pt.E == pt2.E and pt.N == pt2.N
+
+
 def test_transform_to_compatible_types():
 
     """
