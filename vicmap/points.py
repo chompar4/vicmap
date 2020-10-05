@@ -5,17 +5,21 @@ from vicmap.datums import GDA94, WGS84, Datum
 from vicmap.grids import VICGRID94, Grid, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
 from vicmap.utils import try_declination_import
-from math import radians, sin, cos, tan, atan, acos, pi, atan2
+from math import radians, sin, cos, tan, atan, acos, pi, atan2, sqrt
 
 
 class Point:
     def reproject(self, other_epsg):
+        """
+        Give me coordinates of this point in coordinate system 
+        specified by an epsg code.
+        """
         # TODO
         pass
 
     def transform_to(self, other):
         """
-        Transform between one point object and another.
+        Give the coordinates of this point in another coordinate system.
         """
 
         assert isinstance(other, Datum) or isinstance(
@@ -120,13 +124,20 @@ class GeoPoint(Point):
         Reference (pg 49): 
         https://www.icsm.gov.au/sites/default/files/2020-08/GDA2020%20Technical%20Manual%20V1.4_0.pdf 
         """
-        assert (
-            isinstance(other, GeoPoint)
-            and other.datum.ellipsoid == self.datum.ellipsoid
-        )
 
-        φ1, φ2 = self.rLat, other.rLat
-        λ1, λ2 = self.rLng, other.rLng
+        assert isinstance(other, GeoPoint), f"please provide a GeoPoint"
+
+        φ1, λ1 = self.rLat, self.rLng
+        if other.datum.ellipsoid != self.datum.ellipsoid:
+            """ geodesics depend on base ellipsoid, transform if required """
+            φ2, λ2 = other.transform_to(self.datum)
+        else:
+            φ2, λ2 = other.rLat, other.rLng
+
+        """ exit early if same point """
+        if sqrt((φ1 - φ2) ** 2 + (λ1 - λ2) ** 2) < 1e-8:
+            return 0
+
         a, b, f, _, _, _ = self.datum.ellipsoid.constants
 
         U1 = atan((1 - f) * tan(φ1))

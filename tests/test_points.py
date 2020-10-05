@@ -1,6 +1,6 @@
 import pytest
 from vicmap.utils import dms_to_dd
-from vicmap.datums import GDA94, AGD66, GDA20
+from vicmap.datums import GDA94, AGD66, GDA20, __all_datums__
 from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
 from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS
 
@@ -81,7 +81,7 @@ def test_declination_mga():
 
 def test_declination_mgrs():
     pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
-    assert abs(pt.magnetic_declination - 9.813430953842529) < 1e-3
+    assert abs(pt.magnetic_declination - 9.816556197562203) < 1e-3
 
 
 def test_from_6FIG_mgrs():
@@ -299,4 +299,24 @@ def test_distance_to_geo_known_vals():
         p2 = GeoPoint(dLat=φ2, dLng=λ2, datum=GDA20)
 
         assert p1.distance_to(p2) - D < 1e0  # meters
+
+
+def test_distance_to_same_point():
+
+    p1 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=GDA20)
+    p2 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=GDA94)
+
+    assert p1.distance_to(p2) == 0
+
+
+def test_distance_to_transform_geo_datum():
+
+    geo_datums = __all_datums__
+
+    for d1 in geo_datums:
+        for d2 in geo_datums:
+            p1 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=d1)
+            p2 = GeoPoint(dLat=-37.65282114, dLng=143.9264955, datum=d2)
+
+            assert p1.distance_to(p2)
 
