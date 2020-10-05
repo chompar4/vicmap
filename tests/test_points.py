@@ -1,10 +1,12 @@
 import pytest
-from vicmap.utils import dms_to_dd
+from vicmap.utils import dms_to_dd, try_declination_import
 from vicmap.datums import GDA94, AGD66, GDA20, __all_datums__
 from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
 from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS, __all_grids__
 
 import math
+
+geomag = try_declination_import()
 
 
 def test_grid_convergence_central_meridian_vicgrid():
@@ -32,6 +34,7 @@ def test_grid_convergence_signs_vicgrid():
     assert east_pt.grid_convergence > 0
 
 
+@pytest.mark.skipif(geomag == None)
 def test_declination_vicgrid():
     sf = 100000
     west_pt = VICPoint(23 * sf, 26 * sf, grid=VICGRID94)
@@ -73,12 +76,14 @@ def test_grid_convergence_zone_invariance_mga():
         assert abs(pt54.grid_convergence - pt55.grid_convergence) < 1e-3
 
 
+@pytest.mark.skipif(geomag == None)
 def test_declination_mga():
     sf = 100000
     west_pt = MGAPoint(54, 600000, 6200000, grid=MGA20)
     assert abs(west_pt.magnetic_declination - 9.350878790917436) < 1e3
 
 
+@pytest.mark.skipif(geomag == None)
 def test_declination_mgrs():
     pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
     assert abs(pt.magnetic_declination - 9.816556197562203) < 1e-3
@@ -217,6 +222,7 @@ def test__eq__geo():
     assert p1 == p2
 
 
+@pytest.mark.skipif(geomag == None)
 def test_magnetic_functions():
 
     """
