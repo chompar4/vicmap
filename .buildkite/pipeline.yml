@@ -3,3 +3,4 @@ steps:
     commands:
       - poetry install
       - poetry run pytest
+    branches: "master"
