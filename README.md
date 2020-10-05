@@ -10,7 +10,7 @@ poetry install
 
 ## Specifying Points
 
-Points on ellipsoidal geoid surfaces are represented by `GeoPoints`, while points in the 2d map plane are represented by the `PlanePoints`. Each point requires a set of coordinates, and a datum or grid.
+Points on ellipsoidal surfaces are represented by `GeoPoint` instances and points in the 2d x-y plane are represented by the `PlanePoint` instances. Each type of point requires a set of coordinates, and a datum or grid respectively. `GeoPoint` and `PlanePoint` objects are defined on topologically distinct surfaces and so require a forward or inverse point projection to transform one to the other.
 
 | Class         | Coordinates    | Description                                                                                       |
 | ------------- | -------------- | ------------------------------------------------------------------------------------------------- |
