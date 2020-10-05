@@ -3,3 +3,6 @@ steps:
     commands:
       - poetry install
       - poetry run pytest
+    timeout_in_minutes: 5 
+    branches: 
+      - master
