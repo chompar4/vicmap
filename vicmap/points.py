@@ -116,9 +116,8 @@ class GeoPoint(Point):
         """
         Use Vincenty's inverse formula along an ellipsoidal geodesic 
         returns 
-            - s : ellipsoidal arc distance
-            - (a_12, a_21) : forward and reverse azimuths between points
-        Reference: 
+            - s : ellipsoidal arc distance (meters)
+        Reference (pg 49): 
         https://www.icsm.gov.au/sites/default/files/2020-08/GDA2020%20Technical%20Manual%20V1.4_0.pdf 
         """
         assert (
