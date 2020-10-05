@@ -100,6 +100,9 @@ class GeoPoint(Point):
         magnetic north. Varies with location and time.
         """
         declination = try_declination_import()
+        if declination == None:
+            print("error: geomag library not installed")
+            exit(1)
 
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
@@ -174,6 +177,9 @@ class PlanePoint(Point):
         magnetic north. Varies with location and time.
         """
         declination = try_declination_import()
+        if declination == None:
+            print("error: geomag library not installed")
+            exit(1)
 
         (φ, λ) = self.invert()
         z = 0  # TODO: compute height using AHD/DTM
