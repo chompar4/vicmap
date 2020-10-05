@@ -1,0 +1,5 @@
+steps:
+  - label: "pytest"
+    commands:
+      - poetry install --deploy --dev
+      - poetry run pytest
