@@ -37,7 +37,7 @@ class ReferenceEllipsoid:
 
     @property
     def b(self):
-        return self.a / (1 - self.f)
+        return self.a * (1 - self.f)
 
     @property
     def e2(self):
