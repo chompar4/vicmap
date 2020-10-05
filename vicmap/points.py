@@ -4,17 +4,22 @@ from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84, Datum
 from vicmap.grids import VICGRID94, Grid, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
-from vicmap.utils import try_declination_import
+from vicmap.utils import try_declination_import, ellipsoidal_distance
+from math import radians, sqrt
 
 
 class Point:
     def reproject(self, other_epsg):
+        """
+        Give me coordinates of this point in coordinate system 
+        specified by an epsg code.
+        """
         # TODO
         pass
 
     def transform_to(self, other):
         """
-        Transform between one point object and another.
+        Give the coordinates of this point in another coordinate system.
         """
 
         assert isinstance(other, Datum) or isinstance(
@@ -69,6 +74,14 @@ class GeoPoint(Point):
         self.datum = datum
 
     @property
+    def rLat(self):
+        return radians(self.dLat)
+
+    @property
+    def rLng(self):
+        return radians(self.dLng)
+
+    @property
     def display_coords(self):
         return self.proj_coords
 
@@ -102,6 +115,31 @@ class GeoPoint(Point):
             γ: grid convergence degrees, East >0, West <0
         """
         return 0
+
+    def distance_to(self, other):
+        """
+        Vincenty's inverse formula along an ellipsoidal geodesic 
+        accepts: 
+            - other : instance of GeoPoint
+        returns 
+            - s : ellipsoidal arc distance (meters)
+        """
+
+        assert isinstance(other, GeoPoint), f"please provide a GeoPoint"
+
+        φ1, λ1 = self.rLat, self.rLng
+        if other.datum.ellipsoid != self.datum.ellipsoid:
+            """ geodesics depend on base ellipsoid, transform if required """
+            φ2, λ2 = other.transform_to(self.datum)
+        else:
+            φ2, λ2 = other.rLat, other.rLng
+
+        """ exit early if same point """
+        if sqrt((φ1 - φ2) ** 2 + (λ1 - λ2) ** 2) < 1e-8:
+            return 0
+
+        a, b, f, _, _, _ = self.datum.ellipsoid.constants
+        return ellipsoidal_distance(φ1, λ1, φ2, λ2, a, b, f)
 
     def __eq__(self, other):
         return self.datum == other.datum and self.display_coords == other.display_coords

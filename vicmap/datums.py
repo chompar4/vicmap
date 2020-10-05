@@ -23,7 +23,7 @@ class Datum:
 
 # supported datums
 WGS84 = Datum(
-    code="WGS84", name="World Geodetic System", ellipsoid_code="WGS84", epsg_code=4326,
+    code="WGS84", name="World Geodetic System", ellipsoid_code="WGS84", epsg_code=4326
 )
 
 GDA20 = Datum(
@@ -53,3 +53,5 @@ AGD66 = Datum(
     ellipsoid_code="ANS",
     epsg_code=4202,
 )
+
+__all_datums__ = [GDA94, GDA20, WGS84, AGD84, AGD66]

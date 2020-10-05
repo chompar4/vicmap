@@ -1,8 +1,8 @@
 import pytest
 from vicmap.utils import dms_to_dd
-from vicmap.datums import GDA94, AGD66, GDA20
+from vicmap.datums import GDA94, AGD66, GDA20, __all_datums__
 from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
-from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS
+from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS, __all_grids__
 
 import math
 
@@ -81,7 +81,7 @@ def test_declination_mga():
 
 def test_declination_mgrs():
     pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
-    assert abs(pt.magnetic_declination - 9.813430953842529) < 1e-3
+    assert abs(pt.magnetic_declination - 9.816556197562203) < 1e-3
 
 
 def test_from_6FIG_mgrs():
@@ -108,11 +108,9 @@ def test_transform_to_compatible_types():
         MGRSPoint.from_mga(zone=54, E=5.04 * 1e5, N=5.85 * 1e6),
     ]
 
-    grids = [VICGRID, VICGRID94, MGA20, MGA94, MGRS]
-
     for pt in pts:
-        for grid in grids:
-            assert pt.transform_to(grid)
+        for other in __all_grids__ + __all_datums__:
+            assert pt.transform_to(other)
 
 
 def test_transform_to_mgrs():
@@ -124,8 +122,8 @@ def test_transform_to_mgrs():
 def test_known_vals_mgrs():
 
     pts = [
-        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000"),),
-        (MGRSPoint.from_mga(54, 6.5 * 1e5, 6.15 * 1e6), (54, "XG", "50000", "50000"),),
+        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000")),
+        (MGRSPoint.from_mga(54, 6.5 * 1e5, 6.15 * 1e6), (54, "XG", "50000", "50000")),
         (
             MGRSPoint.from_mga(55, 4.567 * 1e5, 6.1556 * 1e6),
             (55, "DB", "56700", "55600"),
@@ -274,3 +272,46 @@ def test_repr__():
 
     for pt, rep in pts:
         assert pt.__repr__() == rep
+
+
+def test_distance_to_geo_known_vals():
+
+    known = [
+        (-37.95103342, 144.4248679, -37.65282114, 143.9264955, 54972.274),
+        (-37.85103342, 144.3248679, -37.75282114, 143.8264955, 45224.112),
+        (-37.75103342, 144.2248679, -37.85282114, 143.7264955, 45321.404),
+        (-37.65103342, 144.1248679, -37.95282114, 143.6264955, 55212.127),
+        (-37.55103342, 144.0248679, -38.05282114, 143.5264955, 70910.283),
+        (-37.45103342, 143.9248679, -38.15282114, 143.4264955, 89407.481),
+        (-37.35103342, 143.8248679, -38.25282114, 143.3264955, 109291.662),
+        (-37.25103342, 143.7248679, -38.35282114, 143.2264955, 129927.587),
+        (-37.15103342, 143.6248679, -38.45282114, 143.1264955, 151007.381),
+        (-37.05103342, 143.5248679, -38.55282114, 143.0264955, 172368.273),
+        (-36.95103342, 143.4248679, -38.65282114, 142.9264955, 193917.394),
+        (-36.85103342, 143.3248679, -38.75282114, 142.8264955, 215598.311),
+        (-36.75103342, 143.2248679, -38.85282114, 142.7264955, 237374.916),
+    ]
+
+    for φ1, λ1, φ2, λ2, D in known:
+        p1 = GeoPoint(dLat=φ1, dLng=λ1, datum=GDA20)
+        p2 = GeoPoint(dLat=φ2, dLng=λ2, datum=GDA20)
+
+        assert p1.distance_to(p2) - D < 1e0  # meters
+
+
+def test_distance_to_same_point():
+
+    p1 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=GDA20)
+    p2 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=GDA94)
+
+    assert p1.distance_to(p2) == 0
+
+
+def test_distance_to_transform_geo_datum():
+    for d1 in __all_datums__:
+        for d2 in __all_datums__:
+            p1 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=d1)
+            p2 = GeoPoint(dLat=-37.65282114, dLng=143.9264955, datum=d2)
+
+            assert p1.distance_to(p2)
+
