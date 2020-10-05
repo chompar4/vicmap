@@ -2,7 +2,7 @@ import pytest
 from vicmap.utils import dms_to_dd
 from vicmap.datums import GDA94, AGD66, GDA20, __all_datums__
 from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
-from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS
+from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS, __all_grids__
 
 import math
 
@@ -108,11 +108,9 @@ def test_transform_to_compatible_types():
         MGRSPoint.from_mga(zone=54, E=5.04 * 1e5, N=5.85 * 1e6),
     ]
 
-    grids = [VICGRID, VICGRID94, MGA20, MGA94, MGRS]
-
     for pt in pts:
-        for grid in grids:
-            assert pt.transform_to(grid)
+        for other in __all_grids__ + __all_datums__:
+            assert pt.transform_to(other)
 
 
 def test_transform_to_mgrs():
@@ -310,11 +308,8 @@ def test_distance_to_same_point():
 
 
 def test_distance_to_transform_geo_datum():
-
-    geo_datums = __all_datums__
-
-    for d1 in geo_datums:
-        for d2 in geo_datums:
+    for d1 in __all_datums__:
+        for d2 in __all_datums__:
             p1 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=d1)
             p2 = GeoPoint(dLat=-37.65282114, dLng=143.9264955, datum=d2)
 
