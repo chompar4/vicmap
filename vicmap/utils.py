@@ -3,7 +3,7 @@ from vicmap.datums import GDA20
 import math
 import numpy as np
 
-from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt
+from math import atan2, tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt
 
 ln = math.log
 sec = lambda x: 1 / cos(x)
@@ -224,16 +224,7 @@ def krueger_coefficients(n):
     α14 = 1522256789 / 1383782400 * n7 - 16759934899 / 3113510400 * n8
     α16 = 1424729850961 / 743921418240 * n8
 
-    return {
-        2: α2,
-        4: α4,
-        6: α6,
-        8: α8,
-        10: α10,
-        12: α12,
-        14: α14,
-        16: α16,
-    }
+    return {2: α2, 4: α4, 6: α6, 8: α8, 10: α10, 12: α12, 14: α14, 16: α16}
 
 
 def try_declination_import():
@@ -246,3 +237,57 @@ def try_declination_import():
             "ImportError: please install https://github.com/chompar4/isogonic-api from source for geomagnetic calculations"
         )
 
+
+def ellipsoidal_distance(φ1, λ1, φ2, λ2, a, b, f):
+    """
+    Use Vincenty's inverse formula along an ellipsoidal geodesic 
+    (assumes radians are specified as input)
+    accepts: 
+        - φ1 : decimal latitude in radians
+        - λ1 : decimal longitude in radians
+        - φ2 : decimal latitude in radians
+        - λ1 : decimal longitude in radians
+        - a, b, f : ellipsoidal constants
+    returns 
+        - s : ellipsoidal arc distance (meters)
+    Reference (pg 49): 
+    https://www.icsm.gov.au/sites/default/files/2020-08/GDA2020%20Technical%20Manual%20V1.4_0.pdf 
+    """
+
+    U1 = atan((1 - f) * tan(φ1))
+    U2 = atan((1 - f) * tan(φ2))
+
+    λ = λ2 - λ1
+
+    tol = 1e-11
+    λ_old = λ
+    for iter in range(1, 16):
+
+        t = (cos(U2) * sin(λ_old)) ** 2
+        t += (cos(U1) * sin(U2) - sin(U1) * cos(U2) * cos(λ_old)) ** 2
+
+        sin_σ = t ** 0.5
+        cos_σ = sin(U1) * sin(U2) + cos(U1) * cos(U2) * cos(λ_old)
+        σ = atan2(sin_σ, cos_σ)
+
+        sin_α = cos(U1) * cos(U2) * sin(λ_old) / sin_σ
+        cos_sq_α = 1 - sin_α ** 2
+        cos_2σ_m = cos_σ - 2 * sin(U1) * sin(U2) / cos_sq_α
+        C = f * cos_sq_α * (4 + f * (4 - 3 * cos_sq_α)) / 16
+
+        t = σ + C * sin_σ * (cos_2σ_m + C * cos_σ * (-1 + 2 * cos_2σ_m ** 2))
+        λ_new = λ + (1 - C) * f * sin_α * t
+        if abs(λ_new - λ_old) <= tol:
+            break
+        else:
+            λ_old = λ_new
+
+    u2 = cos_sq_α * ((a ** 2 - b ** 2) / b ** 2)
+    A = 1 + (u2 / 16384) * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)))
+    B = (u2 / 1024) * (256 + u2 * (-128 + u2 * (74 - 47 * u2)))
+    t = cos_2σ_m + 0.25 * B * (cos_σ * (-1 + 2 * cos_2σ_m ** 2))
+    t -= (B / 6) * cos_2σ_m * (-3 + 4 * sin_σ ** 2) * (-3 + 4 * cos_2σ_m ** 2)
+    delta_σ = B * sin_σ * t
+    s = b * A * (σ - delta_σ)
+
+    return s
