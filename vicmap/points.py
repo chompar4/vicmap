@@ -5,6 +5,7 @@ from vicmap.datums import GDA94, WGS84, Datum
 from vicmap.grids import VICGRID94, Grid, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
 from vicmap.utils import try_declination_import
+from math import radians, sin, cos, tan, atan, acos, pi, atan2
 
 
 class Point:
@@ -69,6 +70,14 @@ class GeoPoint(Point):
         self.datum = datum
 
     @property
+    def rLat(self):
+        return radians(self.dLat)
+
+    @property
+    def rLng(self):
+        return radians(self.dLng)
+
+    @property
     def display_coords(self):
         return self.proj_coords
 
@@ -102,6 +111,62 @@ class GeoPoint(Point):
             γ: grid convergence degrees, East >0, West <0
         """
         return 0
+
+    def distance_to(self, other):
+        """
+        Use Vincenty's inverse formula along an ellipsoidal geodesic 
+        returns 
+            - s : ellipsoidal arc distance
+            - (a_12, a_21) : forward and reverse azimuths between points
+        Reference: 
+        https://www.icsm.gov.au/sites/default/files/2020-08/GDA2020%20Technical%20Manual%20V1.4_0.pdf 
+        """
+        assert (
+            isinstance(other, GeoPoint)
+            and other.datum.ellipsoid == self.datum.ellipsoid
+        )
+
+        φ1, φ2 = self.rLat, other.rLat
+        λ1, λ2 = self.rLng, other.rLng
+        a, b, f, _, _, _ = self.datum.ellipsoid.constants
+
+        U1 = atan((1 - f) * tan(φ1))
+        U2 = atan((1 - f) * tan(φ2))
+
+        λ = λ2 - λ1
+
+        tol = 1e-11
+        λ_old = λ
+        for iter in range(1, 16):
+
+            t = (cos(U2) * sin(λ_old)) ** 2
+            t += (cos(U1) * sin(U2) - sin(U1) * cos(U2) * cos(λ_old)) ** 2
+
+            sin_σ = t ** 0.5
+            cos_σ = sin(U1) * sin(U2) + cos(U1) * cos(U2) * cos(λ_old)
+            σ = atan2(sin_σ, cos_σ)
+
+            sin_α = cos(U1) * cos(U2) * sin(λ_old) / sin_σ
+            cos_sq_α = 1 - sin_α ** 2
+            cos_2σ_m = cos_σ - 2 * sin(U1) * sin(U2) / cos_sq_α
+            C = f * cos_sq_α * (4 + f * (4 - 3 * cos_sq_α)) / 16
+
+            t = σ + C * sin_σ * (cos_2σ_m + C * cos_σ * (-1 + 2 * cos_2σ_m ** 2))
+            λ_new = λ + (1 - C) * f * sin_α * t
+            if abs(λ_new - λ_old) <= tol:
+                break
+            else:
+                λ_old = λ_new
+
+        u2 = cos_sq_α * ((a ** 2 - b ** 2) / b ** 2)
+        A = 1 + (u2 / 16384) * (4096 + u2 * (-768 + u2 * (320 - 175 * u2)))
+        B = (u2 / 1024) * (256 + u2 * (-128 + u2 * (74 - 47 * u2)))
+        t = cos_2σ_m + 0.25 * B * (cos_σ * (-1 + 2 * cos_2σ_m ** 2))
+        t -= (B / 6) * cos_2σ_m * (-3 + 4 * sin_σ ** 2) * (-3 + 4 * cos_2σ_m ** 2)
+        delta_σ = B * sin_σ * t
+        s = b * A * (σ - delta_σ)
+
+        return s
 
     def __eq__(self, other):
         return self.datum == other.datum and self.display_coords == other.display_coords

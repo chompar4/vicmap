@@ -124,8 +124,8 @@ def test_transform_to_mgrs():
 def test_known_vals_mgrs():
 
     pts = [
-        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000"),),
-        (MGRSPoint.from_mga(54, 6.5 * 1e5, 6.15 * 1e6), (54, "XG", "50000", "50000"),),
+        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000")),
+        (MGRSPoint.from_mga(54, 6.5 * 1e5, 6.15 * 1e6), (54, "XG", "50000", "50000")),
         (
             MGRSPoint.from_mga(55, 4.567 * 1e5, 6.1556 * 1e6),
             (55, "DB", "56700", "55600"),
@@ -274,3 +274,11 @@ def test_repr__():
 
     for pt, rep in pts:
         assert pt.__repr__() == rep
+
+
+def test_distance_to():
+
+    p1 = GeoPoint(dLat=-37.9510334167, dLng=144.4248678889, datum=GDA20)
+    p2 = GeoPoint(dLat=-37.6528211389, dLng=143.9264955278, datum=GDA20)
+
+    assert p1.distance_to(p2) == 54972.271
