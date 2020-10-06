@@ -35,6 +35,15 @@ pt = MGRSPoint.from_6FIG(55, "fu", "275882")
 pt.transform_to(WGS84)
 ```
 
+## Geodesic Distance
+Use the ```distance_to``` method on ```GeoPoint``` instances to compute geodesic distance across the surface of the reference ellipsoid. This method handles different datums by projecting to a common ellipsoid.
+```python
+p1 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=GDA20)
+p2 = GeoPoint(dLat=-37.65282114, dLng=143.9264955, datum=GDA94)
+p1.distance_to(p2) 
+>>> 54972.274
+```
+
 ## Declination / Grid Magnetic Angles
 
 Every instance of a point class can evaluate the grid convergence, magnetic declination and grid magnetic angle of it's position.
