@@ -8,8 +8,6 @@ authors = ["Sam <chompar4@gmail.com>"]
 python = "3.8.2"
 numpy = "^1.19.0"
 pyproj = "^2.6.1"
-geojson = "^2.5.0"
-geojsoncontour = "^0.4.0"
 
 [tool.poetry.dev-dependencies]
 ipdb = "^0.13.2"
