@@ -20,6 +20,8 @@ class Point:
     def transform_to(self, other):
         """
         Give the coordinates of this point in another coordinate system.
+        TODO: do I want to specify espg code instead?
+        TODO: do I want to return an instance of object?
         """
 
         assert isinstance(other, Datum) or isinstance(
@@ -128,10 +130,11 @@ class GeoPoint(Point):
             - s : ellipsoidal arc distance (meters)
         """
 
-        assert isinstance(other, GeoPoint), f"please provide a GeoPoint"
-
         φ1, λ1 = self.rLat, self.rLng
-        if other.datum.ellipsoid != self.datum.ellipsoid:
+        if (
+            not isinstance(other, GeoPoint)
+            or other.datum.ellipsoid != self.datum.ellipsoid
+        ):
             """ geodesics depend on base ellipsoid, transform if required """
             φ2, λ2 = other.transform_to(self.datum)
         else:
@@ -185,6 +188,25 @@ class PlanePoint(Point):
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
         return declination(φ, λ, z, date)
+
+    def distance_to(self, other):
+        """
+        Euclidian distance in the plane
+        accepts: 
+            - other : instance of Point
+        returns 
+            - s : euclidian distance (meters)
+        """
+
+        x1, y1 = self.E, self.N
+        if isinstance(other, PlanePoint):
+            x2, y2 = other.E, other.N
+        else: 
+            new = other.transform_to(self.grid)
+            x2, y2 = new[-2:]
+
+        s = sqrt((x1 - x2)**2 + (y1-y2)**2)
+        return s
 
     @property
     def E(self):
@@ -334,6 +356,27 @@ class MGRSPoint(MGAPoint):
 
         pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5)
         return pt
+
+    def distance_to(self, other):
+        """
+        Euclidian distance in the plane
+        accepts: 
+            - other : instance of Point
+        returns 
+            - s : euclidian distance (meters)
+        """
+
+        x1, y1 = self.E, self.N
+        if isinstance(other, PlanePoint):
+            x2, y2 = other.E, other.N
+        else: 
+            zone, usi, e, n = other.transform_to(self.grid)
+            GR6 = e[0:3] + n[0:3]
+            pt = MGRSPoint.from_6FIG(zone, usi, GR6)
+            x2, y2 = pt.E, pt.N
+
+        s = sqrt((x1 - x2)**2 + (y1-y2)**2)
+        return s
 
     @classmethod
     def from_mga(cls, zone, E, N, precision=5):
