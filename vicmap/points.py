@@ -9,14 +9,6 @@ from math import radians, sqrt
 
 
 class Point:
-    def reproject(self, other_epsg):
-        """
-        Give me coordinates of this point in coordinate system 
-        specified by an epsg code.
-        """
-        # TODO
-        pass
-
     def transform_to(self, other):
         """
         Give the coordinates of this point in another coordinate system.

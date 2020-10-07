@@ -11,7 +11,6 @@ from vicmap.utils import (
 )
 
 import pytest
-import numpy as np
 
 from math import radians
 

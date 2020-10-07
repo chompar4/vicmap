@@ -2,7 +2,6 @@ import pytest
 from vicmap.points import GeoPoint, PlanePoint
 from vicmap.projections import utm
 from vicmap.utils import dms_to_dd
-import numpy as np
 from vicmap.datums import GDA20, GDA94, AGD66
 from vicmap.grids import MGA20, MGA94
 
