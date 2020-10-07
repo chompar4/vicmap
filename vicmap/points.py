@@ -20,6 +20,8 @@ class Point:
     def transform_to(self, other):
         """
         Give the coordinates of this point in another coordinate system.
+        TODO: do I want to specify espg code instead?
+        TODO: do I want to return an instance of object?
         """
 
         assert isinstance(other, Datum) or isinstance(
