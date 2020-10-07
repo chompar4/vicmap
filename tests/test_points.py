@@ -345,3 +345,21 @@ def test_distance_to_euclidian_uv1km():
         p2 = MGAPoint(zone=55, E=i + delta, N=6201000, grid=MGA94)
 
         assert p1.distance_to(p2) - 1414.21356 < 1e-4
+
+
+def test_distance_to_all_types():
+
+    pts = [
+        GeoPoint(dLat=-37, dLng=145, datum=GDA20),
+        GeoPoint(dLat=-37, dLng=145, datum=GDA94),
+        VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
+        VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
+        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
+        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
+        MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
+        MGRSPoint(54, "WD", 4000, 50000, precision=5),
+    ]
+
+    for pt in pts:
+        for other in pts: 
+            assert pt.distance_to(other) >= 0
