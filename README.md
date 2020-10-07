@@ -1,4 +1,5 @@
 # Vicmap
+[![Build status](https://badge.buildkite.com/82cfc45a6dfec63cdf429b9e2b2037fe2416b3729d1db9aa94.svg)](https://buildkite.com/thompsonfilm/vicmap)
 
 Python tools for working with common victorian map projections
 
@@ -32,6 +33,15 @@ or use some of the provided utils to specify points from common reference system
 ```python
 pt = MGRSPoint.from_6FIG(55, "fu", "275882")
 pt.transform_to(WGS84)
+```
+
+## Geodesic Distance
+Use the ```distance_to``` method on ```GeoPoint``` instances to compute geodesic distance across the surface of the reference ellipsoid. This method handles different datums by projecting to a common ellipsoid.
+```python
+p1 = GeoPoint(dLat=-37.95103342, dLng=144.4248679, datum=GDA20)
+p2 = GeoPoint(dLat=-37.65282114, dLng=143.9264955, datum=GDA94)
+p1.distance_to(p2) 
+>>> 54972.274
 ```
 
 ## Declination / Grid Magnetic Angles
@@ -95,3 +105,6 @@ returns:
 ```
 
 `pyproj` is used for reverse (inverse) transformations.
+
+#### CI 
+Run buildkite agent using ```buildkite-agent start```
