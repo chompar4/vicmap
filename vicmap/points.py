@@ -180,6 +180,23 @@ class PlanePoint(Point):
         date = datetime.today()
         return declination(φ, λ, z, date)
 
+    def distance_to(self, other):
+        """
+        Euclidian distance in the plane
+        accepts: 
+            - other : instance of PlanePoint
+        returns 
+            - s : euclidian distance (meters)
+        """
+
+        assert isinstance(other, PlanePoint), f"please provide a PlanePoint"
+
+        x1, y1 = self.E, self.N
+        x2, y2 = other.E, other.N
+
+        s = sqrt((x1 - x2)**2 + (y1-y2)**2)
+        return s
+
     @property
     def E(self):
         return self.u + self.grid.E0

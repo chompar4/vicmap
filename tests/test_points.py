@@ -315,3 +315,33 @@ def test_distance_to_transform_geo_datum():
 
             assert p1.distance_to(p2)
 
+def test_distance_to_euclidian_u1km():
+
+    delta = 1000
+    for i in range(5600000, 6300000, 1000):
+
+        p1 = MGAPoint(zone=55, E=700000, N=i, grid=MGA94)
+        p2 = MGAPoint(zone=55, E=700000, N=i + delta, grid=MGA94)
+
+        assert p1.distance_to(p2) == delta
+
+def test_distance_to_euclidian_v1km():
+
+    delta = 1000
+    for i in range(200000, 800000, 1000):
+
+        p1 = MGAPoint(zone=55, E=i, N=6300000, grid=MGA94)
+        p2 = MGAPoint(zone=55, E=i + delta, N=6300000, grid=MGA94)
+
+        assert p1.distance_to(p2) == delta
+
+
+def test_distance_to_euclidian_uv1km():
+
+    delta = 1000
+    for i in range(200000, 800000, 1000):
+
+        p1 = MGAPoint(zone=55, E=i, N=6200000, grid=MGA94)
+        p2 = MGAPoint(zone=55, E=i + delta, N=6201000, grid=MGA94)
+
+        assert p1.distance_to(p2) - 1414.21356 < 1e-4
