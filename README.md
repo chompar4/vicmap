@@ -44,6 +44,9 @@ p1.distance_to(p2)
 >>> 54972.274
 ```
 
+## Grid Distance
+Use the ```distance_to``` method on a ```PlanePoint``` to compute grid distances.
+
 ## Declination / Grid Magnetic Angles
 
 Every instance of a point class can evaluate the grid convergence, magnetic declination and grid magnetic angle of it's position.
