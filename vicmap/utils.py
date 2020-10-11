@@ -226,18 +226,6 @@ def krueger_coefficients(n):
 
     return {2: α2, 4: α4, 6: α6, 8: α8, 10: α10, 12: α12, 14: α14, 16: α16}
 
-
-def try_declination_import():
-    try:
-        from geomag import declination
-
-        return declination
-    except ImportError:
-        print(
-            "ImportError: please install https://github.com/chompar4/isogonic-api from source for geomagnetic calculations"
-        )
-
-
 def ellipsoidal_distance(φ1, λ1, φ2, λ2, a, b, f):
     """
     Use Vincenty's inverse formula along an ellipsoidal geodesic 

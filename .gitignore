@@ -3,3 +3,4 @@
 *.venv
 *.vscode
 *.coverage
+*.python-version

@@ -1,17 +1,17 @@
 [tool.poetry]
-name = "gda20"
+name = "vicmap"
 version = "0.1.0"
 description = "cartographic tools for working with the MGA & GDA20"
 authors = ["Sam <chompar4@gmail.com>"]
 
 [tool.poetry.dependencies]
-python = "3.8.2"
+python = "3.7.7"
 numpy = "^1.19.0"
 pyproj = "^2.6.1"
+geomag = { git = "https://github.com/chompar4/isogonic-api.git", tag = "v6.0" }
 
 [tool.poetry.dev-dependencies]
 ipdb = "^0.13.2"
-pytest-cov = "^2.10.1"
 pytest = "^5.4.3"
 
 [build-system]

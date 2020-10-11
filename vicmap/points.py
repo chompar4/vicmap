@@ -1,10 +1,11 @@
 import math
+from geomag import declination
 from pyproj import CRS, Transformer
 from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.datums import GDA94, WGS84, Datum
 from vicmap.grids import VICGRID94, Grid, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
 from datetime import date as datetime
-from vicmap.utils import try_declination_import, ellipsoidal_distance
+from vicmap.utils import ellipsoidal_distance
 from math import radians, sqrt
 
 
@@ -93,11 +94,6 @@ class GeoPoint(Point):
         The horizontal angle at a place between true north and 
         magnetic north. Varies with location and time.
         """
-        declination = try_declination_import()
-        if declination == None:
-            print("error: geomag library not installed")
-            exit(1)
-
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
         return declination(self.dLat, self.dLng, z, date)
@@ -171,11 +167,6 @@ class PlanePoint(Point):
         The horizontal angle at a place between true north and 
         magnetic north. Varies with location and time.
         """
-        declination = try_declination_import()
-        if declination == None:
-            print("error: geomag library not installed")
-            exit(1)
-
         (φ, λ) = self.invert()
         z = 0  # TODO: compute height using AHD/DTM
         date = datetime.today()
