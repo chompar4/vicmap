@@ -1,6 +1,8 @@
 import math
-from vicmap.datums import GDA20, GDA94, AGD66
+
 from pyproj import CRS
+
+from vicmap.datums import AGD66, GDA20, GDA94
 
 
 class Grid:
@@ -35,8 +37,8 @@ class MGAGrid(Grid):
 
     def epsg_code(self, zone):
         """
-        MGA has a different epsg code for each zone, 
-        following the pattern: `283{z}` 
+        MGA has a different epsg code for each zone,
+        following the pattern: `283{z}`
         where z is the zone of projection.
         """
         return int(f"{self.base_code}{zone}")
@@ -135,9 +137,9 @@ class VICGRID(Grid):
         """
         Representation of the VICGRID plane.
         Contains all constants required for projection.
-        Origin Datum 
+        Origin Datum
             AGD66 only
-        accepts 
+        accepts
             φ1, φ2: standard parralels
             E0: false easting (m)
             N0: false northing (m)
@@ -172,9 +174,9 @@ class VICGRID94(VICGRID):
         Representation of the VICGRID94 plane.
         Identical to VICGRID with a different false northing.
         Contains all constants required for projection.
-        Origin Datum 
+        Origin Datum
             AGD66 only
-        accepts 
+        accepts
             φ1, φ2: standard parralels
             E0: false easting (m)
             N0: false northing (m)

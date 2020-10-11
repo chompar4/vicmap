@@ -1,9 +1,9 @@
 import pytest
+from vicmap.datums import AGD66, GDA20, GDA94
+from vicmap.grids import MGA20, MGA94
 from vicmap.points import GeoPoint, PlanePoint
 from vicmap.projections import utm
 from vicmap.utils import dms_to_dd
-from vicmap.datums import GDA20, GDA94, AGD66
-from vicmap.grids import MGA20, MGA94
 
 """
 UNIVERSAL TRANSVERSE MERCATOR TESTS
@@ -50,7 +50,7 @@ def test_utm_point_scale_factor():
 
 def test_mga_datum_invariance():
     """
-    same coordinates in different datums should be invariant if 
+    same coordinates in different datums should be invariant if
     ellipsoidal constants are the same
     """
 

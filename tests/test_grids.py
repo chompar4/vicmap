@@ -1,6 +1,6 @@
-import pytest
-from vicmap.grids import MGA94, MGA20, VICGRID, VICGRID94
 import numpy as np
+import pytest
+from vicmap.grids import MGA20, MGA94, VICGRID, VICGRID94
 
 zones = [
     (108, 114, 49),

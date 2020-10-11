@@ -1,17 +1,16 @@
-import pytest
-from vicmap.utils import dms_to_dd, try_declination_import
-from vicmap.datums import GDA94, AGD66, GDA20, __all_datums__
-from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
-from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS, __all_grids__
-
 import math
 
-geomag = try_declination_import()
+import geomag
+import pytest
+from vicmap.datums import AGD66, GDA20, GDA94, __all_datums__
+from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, MGAGrid, __all_grids__
+from vicmap.points import GeoPoint, MGAPoint, MGRSPoint, PlanePoint, VICPoint
+from vicmap.utils import dms_to_dd
 
 
 def test_grid_convergence_central_meridian_vicgrid():
     """
-    Convergence along central meridian of vicgrid should 
+    Convergence along central meridian of vicgrid should
     equal 0
     """
     sf = 100000
@@ -34,7 +33,6 @@ def test_grid_convergence_signs_vicgrid():
     assert east_pt.grid_convergence > 0
 
 
-@pytest.mark.skipif(geomag == None, reason="geomag not installed")
 def test_declination_vicgrid():
     sf = 100000
     west_pt = VICPoint(23 * sf, 26 * sf, grid=VICGRID94)
@@ -43,7 +41,7 @@ def test_declination_vicgrid():
 
 def test_grid_convergence_central_meridian_mga():
     """
-    Convergence along central meridian of mga zones should 
+    Convergence along central meridian of mga zones should
     equal 0
     """
     zn = 54
@@ -76,14 +74,12 @@ def test_grid_convergence_zone_invariance_mga():
         assert abs(pt54.grid_convergence - pt55.grid_convergence) < 1e-3
 
 
-@pytest.mark.skipif(geomag == None, reason="geomag not installed")
 def test_declination_mga():
     sf = 100000
     west_pt = MGAPoint(54, 600000, 6200000, grid=MGA20)
     assert abs(west_pt.magnetic_declination - 9.350878790917436) < 1e3
 
 
-@pytest.mark.skipif(geomag == None, reason="geomag not installed")
 def test_declination_mgrs():
     pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
     assert abs(pt.magnetic_declination - 9.816556197562203) < 1e-3
@@ -222,7 +218,6 @@ def test__eq__geo():
     assert p1 == p2
 
 
-@pytest.mark.skipif(geomag == None, reason="geomag not installed")
 def test_magnetic_functions():
 
     """
@@ -321,6 +316,7 @@ def test_distance_to_transform_geo_datum():
 
             assert p1.distance_to(p2)
 
+
 def test_distance_to_euclidian_u1km():
 
     delta = 1000
@@ -330,6 +326,7 @@ def test_distance_to_euclidian_u1km():
         p2 = MGAPoint(zone=55, E=700000, N=i + delta, grid=MGA94)
 
         assert p1.distance_to(p2) == delta
+
 
 def test_distance_to_euclidian_v1km():
 
@@ -367,5 +364,5 @@ def test_distance_to_all_types():
     ]
 
     for pt in pts:
-        for other in pts: 
+        for other in pts:
             assert pt.distance_to(other) >= 0
