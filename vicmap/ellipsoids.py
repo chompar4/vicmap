@@ -24,7 +24,7 @@ class ReferenceEllipsoid:
         a: semi-major axis length (m)
         f: flattening
         _f: reciprocal of flattening
-        e: first eecentricity 
+        e: first eecentricity
         e2: first eecentricity squared
         n: third flattening
     """
@@ -73,4 +73,3 @@ ANS = ReferenceEllipsoid(code="ANS", name="Australian National Spheroid")
 CLARKE = ReferenceEllipsoid(code="CLARKE", name="Clarke 1866 Spheroid")
 
 reference_ellipsoids = {e.code: e for e in [WGS84, GRS80, GRS67, ANS, CLARKE]}
-

@@ -1,5 +1,6 @@
-from vicmap.ellipsoids import reference_ellipsoids
 from pyproj import CRS
+
+from vicmap.ellipsoids import reference_ellipsoids
 
 """
 See: https://www.icsm.gov.au/education/fundamentals-mapping/datums/datums-explained-more-detail

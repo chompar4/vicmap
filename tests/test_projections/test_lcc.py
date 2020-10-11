@@ -1,11 +1,11 @@
-import pytest
-from vicmap.utils import dms_to_dd
-from vicmap.datums import GDA94, AGD66, GDA20
-from vicmap.points import GeoPoint, PlanePoint
-from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID
-from vicmap.projections import lambert_conformal_conic as lcc
-
 import math
+
+import pytest
+from vicmap.datums import AGD66, GDA20, GDA94
+from vicmap.grids import MGA20, MGA94, VICGRID, VICGRID94
+from vicmap.points import GeoPoint, PlanePoint
+from vicmap.projections import lambert_conformal_conic as lcc
+from vicmap.utils import dms_to_dd
 
 """
 LAMBERT CONFORMAL CONIC TESTS

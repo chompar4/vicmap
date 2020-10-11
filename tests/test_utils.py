@@ -1,18 +1,17 @@
-from vicmap.utils import (
-    dms_to_dd,
-    point_scale_factor,
-    grid_convergence,
-    pq_coefficients,
-    transverse_mercator,
-    gauss_schreiber,
-    conformal_latitude,
-    rectifying_radius,
-    krueger_coefficients,
-)
+from math import radians
 
 import pytest
-
-from math import radians
+from vicmap.utils import (
+    conformal_latitude,
+    dms_to_dd,
+    gauss_schreiber,
+    grid_convergence,
+    krueger_coefficients,
+    point_scale_factor,
+    pq_coefficients,
+    rectifying_radius,
+    transverse_mercator,
+)
 
 
 def test_rectifying_radius():

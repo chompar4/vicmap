@@ -1,9 +1,9 @@
-from vicmap.datums import GDA20
-
 import math
+from math import asinh, atan, atan2, atanh, cos, cosh, sin, sinh, sqrt, tan
+
 import numpy as np
 
-from math import atan2, tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt
+from vicmap.datums import GDA20
 
 ln = math.log
 sec = lambda x: 1 / cos(x)
@@ -30,7 +30,7 @@ def TM_e_component(α, r, _ε, _N):
 
 def rectifying_radius(a, n):
     """
-    gives the rectifying radius A of a circle having 
+    gives the rectifying radius A of a circle having
     the same circumference as the meridian ellipse with:
         a: semi major axis
         n: 3rd flattening
@@ -47,7 +47,7 @@ def rectifying_radius(a, n):
 def transverse_mercator(_Nu, _ε, α):
     """
     Compute normalised TM coordinates (ε, Nu)
-    Accepts: 
+    Accepts:
         _Nu: normalised gauss-schreiber northing
         _ε: normalised gauss-schreiber easting
         α: krueger_coefficients
@@ -71,7 +71,7 @@ def gauss_schreiber(_t, ω, a):
         - t: tan of conformal latitude
         - ω: longitudal difference
         - a: ellipsoidal semi major axis
-    returns: 
+    returns:
         - _ε, _Nu : normalised gauss-schreiber coords
     """
 
@@ -94,7 +94,7 @@ def p_component(α, r, _ε, _N):
 def pq_coefficients(α, _ε, _N):
     """
     gives the p, q coefficients for eq (70-75)
-    accepts: 
+    accepts:
         _N: normalised gauss-schreiber northing
         _ε: normalised gauss-schreiber easting
         α: krueger_coefficients
@@ -108,11 +108,11 @@ def pq_coefficients(α, _ε, _N):
 
 def conformal_latitude(φ, e):
     """
-    gives the latitude of the conformal sphere 
-    with radius a. Accepts: 
+    gives the latitude of the conformal sphere
+    with radius a. Accepts:
         φ: geographical latitude in radians
         e: ellipsoidal eecentricity
-    returns 
+    returns
         t, σ : geographical properties
         _t, _σ: conformal properties
 
@@ -226,20 +226,21 @@ def krueger_coefficients(n):
 
     return {2: α2, 4: α4, 6: α6, 8: α8, 10: α10, 12: α12, 14: α14, 16: α16}
 
+
 def ellipsoidal_distance(φ1, λ1, φ2, λ2, a, b, f):
     """
-    Use Vincenty's inverse formula along an ellipsoidal geodesic 
+    Use Vincenty's inverse formula along an ellipsoidal geodesic
     (assumes radians are specified as input)
-    accepts: 
+    accepts:
         - φ1 : decimal latitude in radians
         - λ1 : decimal longitude in radians
         - φ2 : decimal latitude in radians
         - λ1 : decimal longitude in radians
         - a, b, f : ellipsoidal constants
-    returns 
+    returns
         - s : ellipsoidal arc distance (meters)
-    Reference (pg 49): 
-    https://www.icsm.gov.au/sites/default/files/2020-08/GDA2020%20Technical%20Manual%20V1.4_0.pdf 
+    Reference (pg 49):
+    https://www.icsm.gov.au/sites/default/files/2020-08/GDA2020%20Technical%20Manual%20V1.4_0.pdf
     """
 
     U1 = atan((1 - f) * tan(φ1))

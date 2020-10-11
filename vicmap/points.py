@@ -1,12 +1,14 @@
 import math
+from datetime import date as datetime
+from math import radians, sqrt
+
 from geomag import declination
 from pyproj import CRS, Transformer
-from vicmap.projections import lambert_conformal_conic, utm
+
 from vicmap.datums import GDA94, WGS84, Datum
-from vicmap.grids import VICGRID94, Grid, VICGRID, MGAGrid, MGRSGrid, MGRS, MGA20, MGA94
-from datetime import date as datetime
+from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, Grid, MGAGrid, MGRSGrid
+from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.utils import ellipsoidal_distance
-from math import radians, sqrt
 
 
 class Point:
@@ -50,7 +52,7 @@ class Point:
     @property
     def grid_magnetic_angle(self):
         """
-        The horizontal angle at a place between grid north 
+        The horizontal angle at a place between grid north
         and magnetic north. Varies with location, time, grid.
         """
 
@@ -91,7 +93,7 @@ class GeoPoint(Point):
     @property
     def magnetic_declination(self):
         """
-        The horizontal angle at a place between true north and 
+        The horizontal angle at a place between true north and
         magnetic north. Varies with location and time.
         """
         z = 0  # TODO: compute height using AHD/DTM
@@ -101,20 +103,20 @@ class GeoPoint(Point):
     @property
     def grid_convergence(self):
         """
-        The horizontal angle at a place between true north and grid north. 
-        Proportional to the longitude difference between the place and 
+        The horizontal angle at a place between true north and grid north.
+        Proportional to the longitude difference between the place and
         the central meridian.
-        returns 
+        returns
             γ: grid convergence degrees, East >0, West <0
         """
         return 0
 
     def distance_to(self, other):
         """
-        Vincenty's inverse formula along an ellipsoidal geodesic 
-        accepts: 
+        Vincenty's inverse formula along an ellipsoidal geodesic
+        accepts:
             - other : instance of GeoPoint
-        returns 
+        returns
             - s : ellipsoidal arc distance (meters)
         """
 
@@ -164,7 +166,7 @@ class PlanePoint(Point):
     @property
     def magnetic_declination(self):
         """
-        The horizontal angle at a place between true north and 
+        The horizontal angle at a place between true north and
         magnetic north. Varies with location and time.
         """
         (φ, λ) = self.invert()
@@ -175,20 +177,20 @@ class PlanePoint(Point):
     def distance_to(self, other):
         """
         Euclidian distance in the plane
-        accepts: 
+        accepts:
             - other : instance of Point
-        returns 
+        returns
             - s : euclidian distance (meters)
         """
 
         x1, y1 = self.E, self.N
         if isinstance(other, PlanePoint):
             x2, y2 = other.E, other.N
-        else: 
+        else:
             new = other.transform_to(self.grid)
             x2, y2 = new[-2:]
 
-        s = sqrt((x1 - x2)**2 + (y1-y2)**2)
+        s = sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         return s
 
     @property
@@ -225,10 +227,10 @@ class VICPoint(PlanePoint):
     @property
     def grid_convergence(self):
         """
-        The horizontal angle at a place between true north and grid north. 
-        Proportional to the longitude difference between the place and 
+        The horizontal angle at a place between true north and grid north.
+        Proportional to the longitude difference between the place and
         the central meridian.
-        returns 
+        returns
             γ: grid convergence degrees, East >0, West <0
         """
         (φ, λ) = self.invert()
@@ -268,10 +270,10 @@ class MGAPoint(PlanePoint):
     @property
     def grid_convergence(self):
         """
-        The horizontal angle at a place between true north and grid north. 
-        Proportional to the longitude difference between the place and 
+        The horizontal angle at a place between true north and grid north.
+        Proportional to the longitude difference between the place and
         the central meridian.
-        returns 
+        returns
             γ: grid convergence degrees, East >0, West <0
         """
         (φ, λ) = self.invert()
@@ -343,22 +345,22 @@ class MGRSPoint(MGAPoint):
     def distance_to(self, other):
         """
         Euclidian distance in the plane
-        accepts: 
+        accepts:
             - other : instance of Point
-        returns 
+        returns
             - s : euclidian distance (meters)
         """
 
         x1, y1 = self.E, self.N
         if isinstance(other, PlanePoint):
             x2, y2 = other.E, other.N
-        else: 
+        else:
             zone, usi, e, n = other.transform_to(self.grid)
             GR6 = e[0:3] + n[0:3]
             pt = MGRSPoint.from_6FIG(zone, usi, GR6)
             x2, y2 = pt.E, pt.N
 
-        s = sqrt((x1 - x2)**2 + (y1-y2)**2)
+        s = sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         return s
 
     @classmethod

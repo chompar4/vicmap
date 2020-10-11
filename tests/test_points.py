@@ -1,16 +1,16 @@
-import pytest
-import geomag
-from vicmap.utils import dms_to_dd
-from vicmap.datums import GDA94, AGD66, GDA20, __all_datums__
-from vicmap.points import GeoPoint, PlanePoint, VICPoint, MGAPoint, MGRSPoint
-from vicmap.grids import MGA94, MGA20, VICGRID94, VICGRID, MGAGrid, MGRS, __all_grids__
-
 import math
+
+import geomag
+import pytest
+from vicmap.datums import AGD66, GDA20, GDA94, __all_datums__
+from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, MGAGrid, __all_grids__
+from vicmap.points import GeoPoint, MGAPoint, MGRSPoint, PlanePoint, VICPoint
+from vicmap.utils import dms_to_dd
 
 
 def test_grid_convergence_central_meridian_vicgrid():
     """
-    Convergence along central meridian of vicgrid should 
+    Convergence along central meridian of vicgrid should
     equal 0
     """
     sf = 100000
@@ -41,7 +41,7 @@ def test_declination_vicgrid():
 
 def test_grid_convergence_central_meridian_mga():
     """
-    Convergence along central meridian of mga zones should 
+    Convergence along central meridian of mga zones should
     equal 0
     """
     zn = 54
@@ -316,6 +316,7 @@ def test_distance_to_transform_geo_datum():
 
             assert p1.distance_to(p2)
 
+
 def test_distance_to_euclidian_u1km():
 
     delta = 1000
@@ -325,6 +326,7 @@ def test_distance_to_euclidian_u1km():
         p2 = MGAPoint(zone=55, E=700000, N=i + delta, grid=MGA94)
 
         assert p1.distance_to(p2) == delta
+
 
 def test_distance_to_euclidian_v1km():
 
@@ -362,5 +364,5 @@ def test_distance_to_all_types():
     ]
 
     for pt in pts:
-        for other in pts: 
+        for other in pts:
             assert pt.distance_to(other) >= 0

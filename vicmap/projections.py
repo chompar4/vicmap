@@ -4,17 +4,18 @@ cot = lambda x: 1 / tan(x)
 π = math.pi
 ln = math.log
 
-from math import tan, cos, cosh, sin, sinh, atan, atanh, asinh, sqrt, radians, degrees
+
+from math import asinh, atan, atanh, cos, cosh, degrees, radians, sin, sinh, sqrt, tan
 
 from vicmap.utils import (
     conformal_latitude,
     gauss_schreiber,
-    transverse_mercator,
-    pq_coefficients,
-    krueger_coefficients,
-    rectifying_radius,
     grid_convergence,
+    krueger_coefficients,
     point_scale_factor,
+    pq_coefficients,
+    rectifying_radius,
+    transverse_mercator,
 )
 
 
@@ -28,7 +29,7 @@ def lambert_conformal_conic(dLat, dLng, ellipsoid, grid):
         dLng: longitude in decimal degrees (-180, 180]
         ellipsoidal: reference ellipsoid containing ellipsoidal constants
         grid: plane specification containing grid constants
-    returns: 
+    returns:
         X: easting (m) relative to false origin
         Y: northing (m) relative to false origin
         m: point scale factor
@@ -107,14 +108,14 @@ def utm(dLat, dLng, ellipsoid, grid):
     Perform a UTM projection from ellipsoid to grid
     using the Krueger n-series equations, up to order 8.
     See: https://www.icsm.gov.au/sites/default/files/GDA2020TechnicalManualV1.1.1.pdf
-    In theory these calculations should be accurate 
+    In theory these calculations should be accurate
     to the nearest micrometer.
     Accepts:
         dLat: latitude in decimal degrees (-90, 90]
         dLng: longitude in decimal degrees (-180, 180]
         ellipsoidal: reference ellipsoid containing ellipsoidal constants
         grid: plane specification containing grid constants
-    returns: 
+    returns:
         z: zone
         E: UTM easting (m) relative to false origin
         N: UTM northing (m) relative to false origin
