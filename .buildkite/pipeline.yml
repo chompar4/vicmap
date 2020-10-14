@@ -2,7 +2,7 @@ steps:
   - label: "pytest"
     commands:
       - pyenv local 3.7.7
-      - poetry update
+      - poetry install
       - poetry run pytest
     timeout_in_minutes: 5 
     branches: 
