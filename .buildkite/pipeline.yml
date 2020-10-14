@@ -4,6 +4,7 @@ steps:
       - pyenv local 3.7.7
       - poetry install
       - poetry run pytest
+      - rm -rf .venv
     timeout_in_minutes: 5 
     branches: 
       - master
