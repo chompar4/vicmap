@@ -6,7 +6,8 @@ from geomag import declination
 from pyproj import CRS, Transformer
 
 from vicmap.datums import GDA94, WGS84, Datum
-from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, Grid, MGAGrid, MGRSGrid
+from vicmap.grids import (MGA20, MGA94, MGRS, VICGRID, VICGRID94, Grid,
+                          MGAGrid, MGRSGrid, OKGrid)
 from vicmap.projections import lambert_conformal_conic, utm
 from vicmap.utils import ellipsoidal_distance
 
@@ -127,6 +128,7 @@ class GeoPoint(Point):
         ):
             """ geodesics depend on base ellipsoid, transform if required """
             φ2, λ2 = other.transform_to(self.datum)
+            φ2, λ2 = math.radians(φ2), math.radians(λ2)
         else:
             φ2, λ2 = other.rLat, other.rLng
 
@@ -239,6 +241,22 @@ class VICPoint(PlanePoint):
 
     def __repr__(self):
         return f"<VicPt_({self.E},{self.N})_{self.grid.code}>"
+
+
+class OKPoint(PlanePoint):
+
+    grid = OKGrid
+
+    def __init__(self, E, N):
+
+        assert -1e4 <= E <= 1e4, f"easting out of bounds: {E}"
+        assert -1e4 <= N <= 1e4, f"northing out of bounds: {N}"
+
+        super().__init__(u=E, v=N, grid=self.grid)
+
+    @property
+    def crs(self):
+        return self.grid.crs
 
 
 class MGAPoint(PlanePoint):

@@ -62,7 +62,7 @@ class ReferenceEllipsoid:
 
 
 # supported reference ellipsoids
-WGS84 = ReferenceEllipsoid(code="WGS84", name="World Geodetic System WGS84 Spheroid")
+WGS84Ell = ReferenceEllipsoid(code="WGS84", name="World Geodetic System WGS84 Spheroid")
 
 GRS80 = ReferenceEllipsoid(code="GRS80", name="Geodetic Reference System 1980 Spheroid")
 
@@ -72,4 +72,4 @@ ANS = ReferenceEllipsoid(code="ANS", name="Australian National Spheroid")
 
 CLARKE = ReferenceEllipsoid(code="CLARKE", name="Clarke 1866 Spheroid")
 
-reference_ellipsoids = {e.code: e for e in [WGS84, GRS80, GRS67, ANS, CLARKE]}
+reference_ellipsoids = {e.code: e for e in [WGS84Ell, GRS80, GRS67, ANS, CLARKE]}

@@ -1,7 +1,9 @@
 import math
+from datetime import date
 
 import geomag
 import pytest
+from mock import patch
 from vicmap.datums import AGD66, GDA20, GDA94, __all_datums__
 from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, MGAGrid, __all_grids__
 from vicmap.points import GeoPoint, MGAPoint, MGRSPoint, PlanePoint, VICPoint
@@ -81,8 +83,10 @@ def test_declination_mga():
 
 
 def test_declination_mgrs():
-    pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
-    assert abs(pt.magnetic_declination - 9.816556197562203) < 1e-3
+    with patch("datetime.date") as mock_date:
+        mock_date.today.return_value = date(2020, 1, 1)
+        pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
+        assert abs(pt.magnetic_declination - 9.817756197562203) < 1e-3
 
 
 def test_from_6FIG_mgrs():

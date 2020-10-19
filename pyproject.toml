@@ -8,7 +8,8 @@ authors = ["Sam <chompar4@gmail.com>"]
 python = "3.7.7"
 numpy = "^1.19.0"
 pyproj = "^2.6.1"
-geomag = { git = "https://github.com/chompar4/geomag.git", tag = "v7.0" }
+geomag = { url = "https://github.com/chompar4/geomag/releases/download/v8.0/geomag-8.0.tar.gz" }
+mock = "^4.0.2"
 
 [tool.poetry.dev-dependencies]
 ipdb = "^0.13.2"
