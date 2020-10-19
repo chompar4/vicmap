@@ -10,7 +10,6 @@ numpy = "^1.19.0"
 pyproj = "^2.6.1"
 geomag = { git = "https://github.com/chompar4/geomag.git", tag = "v7.0" }
 mock = "^4.0.2"
-freezegun = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 ipdb = "^0.13.2"
