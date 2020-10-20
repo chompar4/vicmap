@@ -1,9 +1,9 @@
-from vicmap.ellipsoids import ANS, CLARKE, GRS67, GRS80, WGS84
+from vicmap.ellipsoids import ANS, CLARKE, GRS67, GRS80, WGS84Ell
 
 
 def test_wgs84():
 
-    ellipsoid = WGS84
+    ellipsoid = WGS84Ell
 
     assert ellipsoid.a == 6378137
     assert ellipsoid._f == 298.257223563
