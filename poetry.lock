@@ -105,6 +105,14 @@ pycodestyle = ">=2.6.0a1,<2.7.0"
 pyflakes = ">=2.2.0,<2.3.0"
 
 [[package]]
+name = "geojson"
+version = "2.5.0"
+description = "Python bindings and utilities for GeoJSON"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "geomag"
 version = "8.0"
 description = "magnetic field strength values and declination calculator"
@@ -115,6 +123,7 @@ python-versions = "*"
 [package.source]
 type = "url"
 url = "https://github.com/chompar4/geomag/releases/download/v8.0/geomag-8.0-py3-none-any.whl"
+
 [[package]]
 name = "importlib-metadata"
 version = "2.0.0"
@@ -484,7 +493,7 @@ testing = ["pytest (>=3.5,<3.7.3 || >3.7.3)", "pytest-checkdocs (>=1.2.3)", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "3.7.7"
-content-hash = "e1c66582514edc5c1c1f671755baf42908c3408cc75bf29befdec12edab1c243"
+content-hash = "0d49b0b12e55bc5e4816e27729160f7b512e105327a0f2f06e98f6e4bbbcfc97"
 
 [metadata.files]
 appdirs = [
@@ -525,6 +534,10 @@ decorator = [
 flake8 = [
     {file = "flake8-3.8.4-py2.py3-none-any.whl", hash = "sha256:749dbbd6bfd0cf1318af27bf97a14e28e5ff548ef8e5b1566ccfb25a11e7c839"},
     {file = "flake8-3.8.4.tar.gz", hash = "sha256:aadae8761ec651813c24be05c6f7b4680857ef6afaae4651a4eccaef97ce6c3b"},
+]
+geojson = [
+    {file = "geojson-2.5.0-py2.py3-none-any.whl", hash = "sha256:ccbd13368dd728f4e4f13ffe6aaf725b6e802c692ba0dde628be475040c534ba"},
+    {file = "geojson-2.5.0.tar.gz", hash = "sha256:6e4bb7ace4226a45d9c8c8b1348b3fc43540658359f93c3f7e03efa9f15f658a"},
 ]
 geomag = []
 importlib-metadata = [
