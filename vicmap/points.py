@@ -264,7 +264,7 @@ class MGAPoint(PlanePoint):
 
         assert 200000 <= E <= 800000, f"invalid easting: {E}"
         assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
-        assert zone in [54, 55], f"invalid zone: {zone}"
+        assert zone in [54, 55, 56], f"invalid zone: {zone}"
         assert grid in [MGA20, MGA94, MGRS], f"invalid MGA grid: {grid.code}"
 
         super().__init__(u=E, v=N, grid=grid)
@@ -298,6 +298,14 @@ class MGAPoint(PlanePoint):
         _, _, _, _, γ = utm(φ, λ, ellipsoid=self.datum.ellipsoid, grid=self.grid)
         return γ
 
+    def from_brennan(cls, GR6, nsw_map_num):
+        """
+        Allow specification from the Tom Brennan (OzCanyons) guidebook.
+        Points in NSW are specified by 6 fig GR (GR6) and a NSW Topo map number.
+        Each map number implies a UTM zone.
+        """
+
+
     def __repr__(self):
         return f"<MGAPt_({self.E},{self.N})_{self.grid.code}>"
 
@@ -306,9 +314,14 @@ class MGRSPoint(MGAPoint):
 
     grid = MGRS
 
-    def __init__(self, zone, usi, x, y, precision=5):
+    def __init__(self, zone, gzd, usi, x, y, precision=5):
         """
-        MGRS : MGA with a 100k square alpha identifier (usi)
+        MGRS : MGA with
+            (zone): 6 degree wide UTM zone
+            (gzd): a grid zone designator for each 8 degree latitude band. C -> X 
+            (usi): a 100k square alpha identifier
+            (x) : 5 figure (default) Easting
+            (y) : 5 figure (default) Northing
         accepts:
             precision:
                 0 fig = 100k
@@ -320,22 +333,23 @@ class MGRSPoint(MGAPoint):
         """
 
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
-        assert zone in [54, 55], f"invalid MGRS zone: {zone}"
+        assert zone in [54, 55, 56], f"invalid MGRS zone: {zone}"
+        assert gzd in ['H', 'J', 'K'], f'invalid grid zone designator: {gzd}'
         colName, rowName = usi[0].capitalize(), usi[1].capitalize()
         assert isinstance(usi, str) and len(usi) == 2, f"invalid MGRS usi: {usi}"
-        col = colName in self.grid.cols54 if zone == 54 else colName in self.grid.cols55
-        row = rowName in self.grid.rows54 if zone == 54 else rowName in self.grid.rows55
-        assert col, f"usi column entry: {usi[0]} not found in zone: {zone}"
-        assert row, f"usi row entry: {usi[1]} not found in zone: {zone}"
+        col = getattr(self.grid, f'cols{zone}')
+        row = getattr(self.grid, f'rows{zone}')
+        assert colName in col, f"usi column entry: {usi[0]} not found in zone: {zone}"
+        assert rowName in row, f"usi row entry: {usi[1]} not found in zone: {zone}"
         assert 0 <= float(x) <= 10 ** precision, f"invalid MGRS x: {x}"
         assert 0 <= float(y) <= 10 ** precision, f"invalid MGRS y: {y}"
 
         def get_E(grid, zn, usi, x):
-            lb = grid.cols54[colName][0] if zn == 54 else grid.cols55[colName][0]
+            lb = getattr(grid, f'cols{zn}')[colName][0]
             return lb + float(x)
 
         def get_N(grid, zn, usi, y):
-            lb = grid.rows54[rowName][0] if zn == 54 else grid.rows55[rowName][0]
+            lb = getattr(grid, f'rows{zn}')[rowName][0]
             return lb + float(y)
 
         E = get_E(self.grid, zone, usi, x)

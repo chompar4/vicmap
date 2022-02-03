@@ -87,17 +87,58 @@ class MGAGrid94(MGAGrid):
 
 
 class MGRSGrid(MGAGrid20):
+    """
+    Columns:
+    Near the equator, the columns of UTM zone 1 have the letters A–H,
+    the columns of UTM zone 2 have the letters J–R (omitting O),
+    and the columns of UTM zone 3 have the letters S–Z.
+    At zone 4, the column letters start over from A, and so on around
+    the world.
+    """
+
     name = "Military Grid Reference System (MGA20)"
     code = "MGRS"
 
     # TODO: make me a nice function / expression. This is yuck
-    sf = 1e5
+
+    sf = 1e5  # meters
     cols54 = {
-        "Y": [7 * sf, 8 * sf],
-        "X": [6 * sf, 7 * sf],
-        "W": [5 * sf, 6 * sf],
+        "S": [1 * sf, 2 * sf],
+        "T": [2 * sf, 3 * sf],
+        "U": [3 * sf, 4 * sf],
         "V": [4 * sf, 5 * sf],
+        "W": [5 * sf, 6 * sf],
+        "X": [6 * sf, 7 * sf],
+        "Y": [7 * sf, 8 * sf],
+        "Z": [8 * sf, 9 * sf],
     }
+
+    cols55 = {
+        "A": [1 * sf, 2 * sf],
+        "B": [2 * sf, 3 * sf],
+        "C": [3 * sf, 4 * sf],
+        "D": [4 * sf, 5 * sf],
+        "E": [5 * sf, 6 * sf],
+        "F": [6 * sf, 7 * sf],
+        "G": [7 * sf, 8 * sf],
+        "H": [8 * sf, 9 * sf],
+    }
+
+    cols56 = {
+        "J": [1 * sf, 2 * sf],
+        "K": [2 * sf, 3 * sf],
+        "L": [3 * sf, 4 * sf],
+        "M": [4 * sf, 5 * sf],
+        "N": [5 * sf, 6 * sf],
+        "P": [6 * sf, 7 * sf],
+        "Q": [7 * sf, 8 * sf],
+        "R": [8 * sf, 9 * sf],
+    }
+
+    columns = [cols54, cols55, cols56]
+    assert all('I' not in r for r in columns), '`I` should not be an MGRS column name'
+    assert all('O' not in r for r in columns), '`O` should not be an MGRS column name'
+    assert all(len(r.keys()) == 8 for r in columns), 'all mgrs cols must have 8 entries'
 
     rows54 = {
         "H": [62 * sf, 63 * sf],
@@ -106,15 +147,6 @@ class MGRSGrid(MGAGrid20):
         "E": [59 * sf, 60 * sf],
         "D": [58 * sf, 59 * sf],
         "C": [57 * sf, 58 * sf],
-    }
-
-    cols55 = {
-        "B": [2 * sf, 3 * sf],
-        "C": [3 * sf, 4 * sf],
-        "D": [4 * sf, 5 * sf],
-        "E": [5 * sf, 6 * sf],
-        "F": [6 * sf, 7 * sf],
-        "G": [7 * sf, 8 * sf],
     }
 
     rows55 = {
