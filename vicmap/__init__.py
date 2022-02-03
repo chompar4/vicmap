@@ -1,6 +1,6 @@
 from .datums import AGD66, AGD84, GDA20, GDA94, WGS84
 from .ellipsoids import ANS, CLARKE, GRS67, GRS80, WGS84Ell, reference_ellipsoids
-from .grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, OKGrid
+from .grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94
 from .points import GeoPoint, MGAPoint, MGRSPoint, OKPoint, VICPoint
 from .projections import lambert_conformal_conic, utm
 
@@ -22,7 +22,6 @@ __all__ = [
     VICGRID,
     VICGRID94,
     GeoPoint,
-    OKGrid,
     OKPoint,
     MGAPoint,
     MGRSPoint,

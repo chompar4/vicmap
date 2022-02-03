@@ -224,37 +224,6 @@ class VICGRID94(VICGRID):
         self.r0 = 8472630.5
 
 
-class OakeyCreekGrid(Grid):
-
-    datum = GDA20
-    code = "OKGrid"
-
-    def __init__(self):
-        """
-        Representation of a plane centered on Little Oakey Ck.
-        Origin Datum
-            GDA20
-        accepts
-            φ1, φ2: standard parralels
-            E0: false easting (m)
-            N0: false northing (m)
-            φ0: origin parrallel latitude (degrees)
-            λ0: central meridian longitude (degrees)
-        """
-
-        self.E0 = 0
-        self.N0 = 0
-        self.φ1 = -36
-        self.φ2 = -38
-        self.λ0 = 148.8384340
-        self.φ0 = -37.3505135
-        self.r0 = 8472630.5
-
-        self.proj_string = f"+proj=lcc +lat_1={self.φ1} +lat_2={self.φ2} +lat_0={self.φ0} +lon_0={self.λ0} +x_0={self.E0} +y_0={self.N0} +ellps={self.datum.ellipsoid.code} +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
-
-    @property
-    def crs(self):
-        return CRS.from_string(self.proj_string)
 
 
 MGA94 = MGAGrid94()
@@ -262,6 +231,5 @@ MGA20 = MGAGrid20()
 VICGRID = VICGRID()
 VICGRID94 = VICGRID94()
 MGRS = MGRSGrid()
-OKGrid = OakeyCreekGrid()
 
-__all_grids__ = [MGA94, MGA20, VICGRID, VICGRID94, MGRS, OKGrid]
+__all_grids__ = [MGA94, MGA20, VICGRID, VICGRID94, MGRS]
