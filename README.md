@@ -109,5 +109,11 @@ returns:
 
 `pyproj` is used for reverse (inverse) transformations.
 
+# NSW Topo Maps
+The relevant data for these maps can be grabbed by running
+```
+https://portal.spatial.nsw.gov.au/server/rest/services/Hosted/Topo_Map_Index/FeatureServer/0/query?text=&geometry&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=objectid%3E-1&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=false&maxAllowableOffset=&outSR=&outFields=mapnumber%2Cmapname%2Cmapseries%2Cadjmapindexx%2Clabel%2Cadjmapindexy&f=pjson
+```
+
 #### CI 
 Run buildkite agent using ```buildkite-agent start```

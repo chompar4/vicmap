@@ -247,7 +247,7 @@ class MGAPoint(PlanePoint):
     def __init__(self, zone, E, N, grid):
 
         assert 200000 <= E <= 800000, f"invalid easting: {E}"
-        assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
+        assert 5600000 <= N <= 6900000, f"invalid northing: {N}"
         assert zone in [54, 55, 56], f"invalid zone: {zone}"
         assert grid in [MGA20, MGA94, MGRS], f"invalid MGA grid: {grid.code}"
 
