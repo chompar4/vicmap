@@ -26,14 +26,15 @@ class Point:
 
         coords = self.proj_coords[-2:]
 
-        if isinstance(other, MGAGrid):
-            # dont what MGA zone other is in, project to wgs first
-            to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
-            dLat, dLng = to_wgs.transform(*coords)
+        # transform to wgs84 to get latitude band
+        to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
+        dLat, dLng = to_wgs.transform(*coords)
+        lat_band = MGRS.get_latitude_band(dLat)
 
+        if isinstance(other, MGAGrid):
+            # work out zone
             zone = other.get_zone(dLng)
             other_crs = other.crs(zone)
-
         else:
             other_crs = other.crs
             zone = None
@@ -45,8 +46,12 @@ class Point:
 
         if isinstance(other, MGRSGrid):
             E, N = new
-            pt = MGRSPoint.from_mga(zone=zone, E=E, N=N)
+            pt = MGRSPoint.from_mga(zone=zone, lat_band=lat_band, E=E, N=N)
             return pt.display_coords
+
+        elif isinstance(other, MGAGrid):
+            E, N = new
+            return (zone, lat_band, E, N)
 
         return (zone, *new) if zone else new
 
@@ -244,15 +249,16 @@ class VICPoint(PlanePoint):
 
 
 class MGAPoint(PlanePoint):
-    def __init__(self, zone, E, N, grid):
+    def __init__(self, zone, lat_band, E, N, grid):
 
         assert 100000 <= E <= 800000, f"invalid easting: {E}"
-        assert 5600000 <= N <= 6900000, f"invalid northing: {N}"
+        assert 5500000 <= N <= 7500000, f"invalid northing: {N}"
         assert zone in [54, 55, 56], f"invalid zone: {zone}"
         assert grid in [MGA20, MGA94, MGRS], f"invalid MGA grid: {grid.code}"
 
         super().__init__(u=E, v=N, grid=grid)
         self.zone = zone
+        self.lat_band = lat_band
 
     @property
     def crs(self):
@@ -303,8 +309,8 @@ class MGAPoint(PlanePoint):
         if not dLng:
             assert False, f'Could not find a map for {map}'
         geo_pt = GeoPoint(dLat=dLat, dLng=dLng)
-        zn, E, N = geo_pt.transform_to(grid)
-        centre_point = MGAPoint(zone=zn, E=E, N=N, grid=grid)
+        zn, lat_band, E, N = geo_pt.transform_to(grid)
+        centre_point = MGAPoint(zone=zn, lat_band=lat_band, E=E, N=N, grid=grid)
 
         # deal with GR
         assert isinstance(GR6, str), 'please specify 6 Figure GRs as a string'
@@ -329,7 +335,7 @@ class MGAPoint(PlanePoint):
         point = None
         for delta_x in [0, 1e5, -1e5]:
             for delta_y in [0, 1e5, -1e5]:
-                potential_pt = MGAPoint(zone=zn, E=E1 + delta_x, N=N1 + delta_y, grid=grid)
+                potential_pt = MGAPoint(zone=zn, lat_band=lat_band, E=E1 + delta_x, N=N1 + delta_y, grid=grid)
                 distance = potential_pt.distance_to(centre_point)
                 if distance < shortest:
                     shortest = distance
@@ -344,11 +350,11 @@ class MGRSPoint(MGAPoint):
 
     grid = MGRS
 
-    def __init__(self, zone, usi, x, y, precision=5, gzd='H'):
+    def __init__(self, zone, lat_band, usi, x, y, precision=5):
         """
         MGRS : MGA with
             (zone): 6 degree wide UTM zone
-            (gzd): a grid zone designator for each 8 degree latitude band. C -> X 
+            (lat_band): a grid zone designator for each 8 degree latitude band. C -> X 
             (usi): a 100k square alpha identifier
             (x) : 5 figure (default) Easting
             (y) : 5 figure (default) Northing
@@ -364,13 +370,13 @@ class MGRSPoint(MGAPoint):
 
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
         assert zone in [54, 55, 56], f"invalid MGRS zone: {zone}"
-        assert gzd in ['H', 'J', 'K'], f'invalid grid zone designator: {gzd}'
+        assert lat_band in ['H', 'J', 'K'], f'invalid latitude band: {lat_band}'
         colName, rowName = usi[0].capitalize(), usi[1].capitalize()
         assert isinstance(usi, str) and len(usi) == 2, f"invalid MGRS usi: {usi}"
-        col = getattr(self.grid, f'cols{zone}')
-        row = getattr(self.grid, f'rows{zone}')
-        assert colName in col, f"usi column entry: {usi[0]} not found in zone: {zone}"
-        assert rowName in row, f"usi row entry: {usi[1]} not found in zone: {zone}"
+        cols = getattr(self.grid, f'cols{zone}')
+        rows = self.grid.getrows(zone)
+        assert colName in cols, f"usi column entry: {usi[0]} not found in zone: {zone}"
+        assert rowName in rows, f"usi row entry: {usi[1]} not found in zone: {zone}"
         assert 0 <= float(x) <= 10 ** precision, f"invalid MGRS x: {x}"
         assert 0 <= float(y) <= 10 ** precision, f"invalid MGRS y: {y}"
 
@@ -379,20 +385,21 @@ class MGRSPoint(MGAPoint):
             return lb + float(x)
 
         def get_N(grid, zn, usi, y):
-            lb = getattr(grid, f'rows{zn}')[rowName][0]
+            lb = grid.getrows(zn)[rowName][0]
             return lb + float(y)
 
         E = get_E(self.grid, zone, usi, x)
         N = get_N(self.grid, zone, usi, y)
 
-        super().__init__(E=E, N=N, grid=self.grid, zone=zone)
+        super().__init__(E=E, N=N, grid=self.grid, lat_band=lat_band, zone=zone)
         self.x = self.__class__.get_x(E, precision)
         self.y = self.__class__.get_y(N, precision)
         self.precision = precision
         self.usi = usi
+        self.lat_band = lat_band
 
     @classmethod
-    def from_6FIG(cls, zone, usi, GR6, gzd='H'):
+    def from_6FIG(cls, zone, lat_band, usi, GR6):
         """
         Allow creation from 6 fig grid reference with a usi
         """
@@ -401,7 +408,7 @@ class MGRSPoint(MGAPoint):
         ), f"please specify GR {GR6} as a 6 digit string"
         assert 0 <= float(GR6) <= 999999, f"invalid grid reference: {GR6}"
 
-        pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5, gzd=gzd)
+        pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5, lat_band=lat_band)
         return pt
 
     def distance_to(self, other):
@@ -417,35 +424,36 @@ class MGRSPoint(MGAPoint):
         if isinstance(other, PlanePoint):
             x2, y2 = other.E, other.N
         else:
-            zone, usi, e, n = other.transform_to(self.grid)
+            zone, lat_band, usi, e, n = other.transform_to(self.grid)
             GR6 = e[0:3] + n[0:3]
-            pt = MGRSPoint.from_6FIG(zone, usi, GR6)
+            pt = MGRSPoint.from_6FIG(zone, lat_band, usi, GR6)
             x2, y2 = pt.E, pt.N
 
         s = sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         return s
 
     @classmethod
-    def from_mga(cls, zone, E, N, precision=5):
+    def from_mga(cls, zone, lat_band, E, N, precision=5):
         """
         Allow user to create from mga coords
         """
 
         assert 100000 <= E <= 800000, f"invalid easting: {E}"
-        assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
-        assert zone in [54, 55], f"invalid zone: {zone}"
+        assert 5500000 <= N <= 7500000, f"invalid northing: {N}"
+        assert zone in [54, 55, 56], f"invalid zone: {zone}"
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
+        assert lat_band in ['H', 'K', 'J']
 
         x = cls.get_x(E, precision)
         y = cls.get_y(N, precision)
         usi = cls.get_usi(grid=cls.grid, zone=zone, E=E, N=N)
-        pt = cls(zone=zone, usi=usi, x=x, y=y, precision=precision)
+        pt = cls(zone=zone, lat_band=lat_band, usi=usi, x=x, y=y, precision=precision)
         return pt
 
     @classmethod
     def get_usi(cls, grid, zone, E, N):
-        cols = grid.cols54 if zone == 54 else grid.cols55
-        rows = grid.rows54 if zone == 54 else grid.rows55
+        cols = getattr(grid, f'cols{zone}')
+        rows = grid.getrows(zone)
         X = next(code for code, (lb, ub) in cols.items() if lb <= E < ub)
         Y = next(code for code, (lb, ub) in rows.items() if lb <= N < ub)
         return f"{X}{Y}"
@@ -466,9 +474,9 @@ class MGRSPoint(MGAPoint):
 
     @property
     def display_coords(self):
-        return (self.zone, self.usi, self.x, self.y)
+        return (self.zone, self.lat_band, self.usi, self.x, self.y)
 
     def __repr__(self):
         return (
-            f"<MGRSPt_({self.zone}, {self.usi}, {self.x}, {self.y})_{self.grid.code}>"
+            f"<MGRSPt_({self.zone}, {self.lat_band}, {self.usi}, {self.x}, {self.y})_{self.grid.code}>"
         )

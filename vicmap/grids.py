@@ -99,7 +99,21 @@ class MGRSGrid(MGAGrid20):
     name = "Military Grid Reference System (MGA20)"
     code = "MGRS"
 
-    # TODO: make me a nice function / expression. This is yuck
+    """
+    The intersection of a UTM zone and a latitude band is (normally) a
+    6° × 8° polygon called a grid zone, whose designation in MGRS is
+    formed by the zone number followed by the latitude band letter (uppercase).
+    """
+
+    latitude_bands = {
+        "G": [-48, -40],
+        "H": [-40, -32],
+        "J": [-32, -24],
+        "K": [-24, -16],
+        "L": [-16, 8]
+    }
+
+    # TODO: make me a nice function / expression. This is yuck. It repeats every 3 zones.
 
     sf = 1e5  # meters
     cols54 = {
@@ -201,13 +215,18 @@ class MGRSGrid(MGAGrid20):
     assert all('O' not in r for r in even_rows), '`O` should not be an MGRS row name'
     assert all('O' not in r for r in even_rows), '`O` should not be an MGRS row name'
 
-    def __getattr__(self, name):
-        if 'rows' in name:
-            zone = int(name.split('rows')[1])
-            if zone % 2 == 0:
-                return self.even_rows
-            return self.odd_rows
-        return self[name]
+    def getrows(self, zone_num):
+        """
+        Rows change depending on the UTM zone.
+        """
+        if zone_num % 2 == 0:
+            return self.even_rows
+        return self.odd_rows
+
+    def get_latitude_band(self, dLat):
+        band = next((k for k, (lb, ub) in self.latitude_bands.items() if lb <= dLat <= ub), None)
+        assert band, f'Could not find a latitude band in AUS for {dLat}'
+        return band
 
 
 class VICGRID(Grid):
