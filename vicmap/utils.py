@@ -2,13 +2,37 @@ import math
 from math import asinh, atan, atan2, atanh, cos, cosh, sin, sinh, sqrt, tan
 
 import numpy as np
-
-from vicmap.datums import GDA20
+import json
+import os
+from pathlib import Path
 
 ln = math.log
 sec = lambda x: 1 / cos(x)
 cot = lambda x: 1 / tan(x)
 π = math.pi
+
+
+def relative_path():
+    """
+    Use pathlib to handle cross platform file paths. Thanks
+    """
+
+    dirname = Path(os.getcwd())
+    full_path = dirname
+    return full_path
+
+
+def load_nsw_map_numbers():
+    """
+    Pre-load and cache the NSW map indices.
+    """
+    with open(relative_path() / 'data' / 'nswtopo.json', 'r') as file:
+        maps = json.load(file)
+        out = {
+            mapp["attributes"]["mapnumber"] + mapp['attributes']['mapname']: (mapp['attributes']['adjmapindexy'], mapp['attributes']['adjmapindexx'])
+            for mapp in maps['maps']
+        }
+        return out
 
 
 def dms_to_dd(d, m, s):

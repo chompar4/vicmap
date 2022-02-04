@@ -5,9 +5,8 @@ import geomag
 import pytest
 from mock import patch
 from vicmap.datums import AGD66, GDA20, GDA94, __all_datums__
-from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, MGAGrid, __all_grids__
-from vicmap.points import GeoPoint, MGAPoint, MGRSPoint, PlanePoint, VICPoint
-from vicmap.utils import dms_to_dd
+from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, __all_grids__
+from vicmap.points import GeoPoint, MGAPoint, MGRSPoint, VICPoint
 
 
 def test_grid_convergence_central_meridian_vicgrid():
@@ -46,11 +45,10 @@ def test_grid_convergence_central_meridian_mga():
     Convergence along central meridian of mga zones should
     equal 0
     """
-    zn = 54
     sf = 100000
 
     for n in range(57, 62):
-        mga_pt = MGAPoint(54, 500000, n * sf, grid=MGA20)
+        mga_pt = MGAPoint(54, 'H', 500000, n * sf, grid=MGA20)
         assert mga_pt.grid_convergence < 1e-5
 
 
@@ -65,36 +63,52 @@ known_convergence_mga = [
 
 def test_grid_convergence_known_vals_mga():
     for zn, e, n, γ in known_convergence_mga:
-        pt = MGAPoint(zone=zn, E=e, N=n, grid=MGA20)
+        pt = MGAPoint(zone=zn, lat_band='H', E=e, N=n, grid=MGA20)
         assert abs(pt.grid_convergence - γ) < 1e-3
 
 
 def test_grid_convergence_zone_invariance_mga():
     for _, e, n, _ in known_convergence_mga:
-        pt54 = MGAPoint(zone=54, E=e, N=n, grid=MGA20)
-        pt55 = MGAPoint(zone=55, E=e, N=n, grid=MGA20)
+        pt54 = MGAPoint(zone=54, lat_band='H', E=e, N=n, grid=MGA20)
+        pt55 = MGAPoint(zone=55, lat_band='H', E=e, N=n, grid=MGA20)
         assert abs(pt54.grid_convergence - pt55.grid_convergence) < 1e-3
 
 
 def test_declination_mga():
-    sf = 100000
-    west_pt = MGAPoint(54, 600000, 6200000, grid=MGA20)
+    west_pt = MGAPoint(54, 'H', 600000, 6200000, grid=MGA20)
     assert abs(west_pt.magnetic_declination - 9.350878790917436) < 1e3
-
-
-def test_declination_mgrs():
-    with patch("datetime.date") as mock_date:
-        mock_date.today.return_value = date(2020, 1, 1)
-        pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
-        assert abs(pt.magnetic_declination - 9.817756197562203) < 1e-3
 
 
 def test_from_6FIG_mgrs():
 
-    pt = MGRSPoint.from_6FIG(55, "fu", "275882")
-    pt2 = MGAPoint(55, 627500, 5888200, grid=MGA20)
+    pt = MGRSPoint.from_6FIG(55, 'H', "fu", "275882")
+    pt2 = MGAPoint(55, 'H', 627500, 5888200, grid=MGA20)
 
     assert pt.E == pt2.E and pt.N == pt2.N
+
+
+def test_from_brennan():
+
+    """
+    Can use either map number or map name
+    """
+
+    known_vals = [
+        ('991885', '7339', 29.027865, 142.017699), 
+        ('991885', 'Tibooburra', 29.027865, 142.017699),
+        ('452278', 'Mount Morgan', -33.15865, 150.26792),  # pipeline canyon
+        ('452278', '8931-1S', -33.15865, 150.26792),  # pipeline canyon
+        ('491177', 'Rock Hill', -33.25056, 150.30691),  # galah canyon
+        ('491177', '8931-2N', -33.25056, 150.30691),  # galah canyon
+        ('537885', 'Mount Wilson', -33.51472, 150.34826),  # mt wilson saddle
+        ('537885', '8930-1N', -33.51472, 150.34826),  # mt wilson saddle
+    ]
+
+    for g6, mapp, eLat, eLng in known_vals:
+        pt = MGAPoint.from_brennan(GR6=g6, map=mapp)
+        dLat, dLng = pt.transform_to(pt.grid.datum)
+        assert abs(dLat - eLat) <= 1e6
+        assert abs(dLng - eLng) <= 1e6
 
 
 def test_transform_to_compatible_types():
@@ -108,34 +122,37 @@ def test_transform_to_compatible_types():
         GeoPoint(dLat=-37, dLng=145, datum=GDA94),
         VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
-        MGAPoint(zone=55, E=700000, N=6200000, grid=MGA94),
-        MGAPoint(zone=55, E=700000, N=6200000, grid=MGA20),
-        MGRSPoint.from_mga(zone=54, E=5.04 * 1e5, N=5.85 * 1e6),
+        MGAPoint(zone=55, lat_band='H', E=700000, N=6200000, grid=MGA94),
+        MGAPoint(zone=55, lat_band='H', E=700000, N=6200000, grid=MGA20),
+        MGRSPoint.from_mga(zone=54, lat_band='H', E=5.04 * 1e5, N=5.85 * 1e6),
     ]
 
     for pt in pts:
         for other in __all_grids__ + __all_datums__:
-            assert pt.transform_to(other)
+            try:
+                pt.transform_to(other)
+            except:
+                assert False, f'{pt} -> {other}'
 
 
 def test_transform_to_mgrs():
 
     o = GeoPoint(dLat=-37, dLng=145, datum=GDA94)
-    assert o.transform_to(MGRS) == (55, "CV", "22038", "03258")
+    assert o.transform_to(MGRS) == (55, "H", "CV", "22038", "03258")
 
 
 def test_known_vals_mgrs():
 
     pts = [
-        (MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6), (54, "WD", "04000", "50000")),
-        (MGRSPoint.from_mga(54, 6.5 * 1e5, 6.15 * 1e6), (54, "XG", "50000", "50000")),
+        (MGRSPoint.from_mga(54, "K", 5.04 * 1e5, 5.85 * 1e6), (54, "K", "WD", "04000", "50000")),
+        (MGRSPoint.from_mga(54, "H", 6.5 * 1e5, 6.15 * 1e6), (54, "H", "XG", "50000", "50000")),
         (
-            MGRSPoint.from_mga(55, 4.567 * 1e5, 6.1556 * 1e6),
-            (55, "DB", "56700", "55600"),
+            MGRSPoint.from_mga(55, "K", 4.567 * 1e5, 6.1556 * 1e6),
+            (55, "K", "DB", "56700", "55600"),
         ),
         (
-            MGRSPoint.from_mga(55, 6.78997 * 1e5, 5.8514 * 1e6),
-            (55, "FU", "78997", "51400"),
+            MGRSPoint.from_mga(55, "K", 6.78997 * 1e5, 5.8514 * 1e6),
+            (55, "K", "FU", "78997", "51400"),
         ),
     ]
 
@@ -144,49 +161,52 @@ def test_known_vals_mgrs():
         assert pt.display_coords == val
 
 
+def test_bounds():
+
+    top_left = MGRSPoint.from_mga(54, 'J', 486103, 6666177)
+    bottom_left = MGRSPoint.from_mga(54, 'H', 489461, 5644232)
+    top_right = MGRSPoint.from_mga(56, 'J', 736152, 6845294)
+    bottom_right = MGRSPoint.from_mga(54, 'H', 697286, 5671991)
+
+    assert all([top_left, top_right, bottom_right, bottom_left])
+
+
 def test_lower_left_mgrs():
 
     """
     Lower left corner of all mgrs grids should
-    return origin
+    have 6 figure GR 000000
     """
 
-    pts = [
-        MGRSPoint.from_mga(54, cols[0], rows[0])
-        for k, cols in MGRS.cols54.items()
-        for k, rows in MGRS.rows54.items()
-    ]
-    for pt in pts:
-        assert pt.x == "00000" and pt.y == "00000"
+    for zone in [54, 55, 56]:
+        for lat_band in ['H', 'J', 'K']:
 
-    pts = [
-        MGRSPoint.from_mga(55, cols[0], rows[0])
-        for k, cols in MGRS.cols55.items()
-        for k, rows in MGRS.rows55.items()
-    ]
-    for pt in pts:
-        assert pt.x == "00000" and pt.y == "00000"
+            for col in getattr(MGRS, f'cols{zone}').values():
+                for row in MGRS.getrows(zone).values():
+
+                    pt = MGRSPoint.from_mga(zone, lat_band, col[0], row[0])
+                    assert pt.x == "00000" and pt.y == "00000"
 
 
 def test_mgrs_precision():
 
-    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=5)
+    p1 = MGRSPoint.from_mga(54, 'H', 7e5, 6.2e6, precision=5)
     assert p1.x == "00000"
     assert p1.x == "00000"
 
-    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=4)
+    p1 = MGRSPoint.from_mga(54, 'H', 7e5, 6.2e6, precision=4)
     assert p1.x == "0000"
     assert p1.x == "0000"
 
-    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=3)
+    p1 = MGRSPoint.from_mga(54, 'H', 7e5, 6.2e6, precision=3)
     assert p1.x == "000"
     assert p1.x == "000"
 
-    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=2)
+    p1 = MGRSPoint.from_mga(54, 'H', 7e5, 6.2e6, precision=2)
     assert p1.x == "00"
     assert p1.x == "00"
 
-    p1 = MGRSPoint.from_mga(54, 7e5, 6.2e6, precision=1)
+    p1 = MGRSPoint.from_mga(54, 'H', 7e5, 6.2e6, precision=1)
     assert p1.x == "0"
     assert p1.x == "0"
 
@@ -201,16 +221,16 @@ def test__eq__vic():
 
 def test__eq__mga():
 
-    p1 = MGAPoint(zone=55, E=250000, N=5600000, grid=MGA94)
-    p2 = MGAPoint(zone=55, E=250000, N=5600000, grid=MGA94)
+    p1 = MGAPoint(zone=55, lat_band='H', E=250000, N=5600000, grid=MGA94)
+    p2 = MGAPoint(zone=55, lat_band='H', E=250000, N=5600000, grid=MGA94)
 
     assert p1 == p2
 
 
 def test__eq__mgrs():
 
-    p1 = MGRSPoint(zone=55, usi="FU", x=30, y=20)
-    p2 = MGRSPoint(zone=55, usi="FU", x=30, y=20)
+    p1 = MGRSPoint(zone=55, lat_band='H', usi="FU", x=30, y=20)
+    p2 = MGRSPoint(zone=55, lat_band='H', usi="FU", x=30, y=20)
 
     assert p1 == p2
 
@@ -233,9 +253,9 @@ def test_magnetic_functions():
         GeoPoint(dLat=-37, dLng=145, datum=GDA94),
         VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
-        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
-        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
-        MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
+        MGAPoint(zone=55, lat_band='H', E=800000, N=6300000, grid=MGA94),
+        MGAPoint(zone=55, lat_band='H', E=800000, N=6300000, grid=MGA20),
+        MGRSPoint.from_mga(54, 'H', 5.04 * 1e5, 5.85 * 1e6),
     ]
 
     for pt in pts:
@@ -247,31 +267,31 @@ def test_magnetic_functions():
 def test_repr__():
 
     pts = [
-        (GeoPoint(dLat=-37, dLng=145, datum=GDA20), f"<GeoPt_(-37,145)_GDA20>"),
-        (GeoPoint(dLat=-37, dLng=145, datum=GDA94), f"<GeoPt_(-37,145)_GDA94>"),
+        (GeoPoint(dLat=-37, dLng=145, datum=GDA20), "<GeoPt_(-37,145)_GDA20>"),
+        (GeoPoint(dLat=-37, dLng=145, datum=GDA94), "<GeoPt_(-37,145)_GDA94>"),
         (
             VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
-            f"<VicPt_(2500000,4500000)_VICGRID>",
+            "<VicPt_(2500000,4500000)_VICGRID>",
         ),
         (
             VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
-            f"<VicPt_(2500000,2500000)_VICGRID94>",
+            "<VicPt_(2500000,2500000)_VICGRID94>",
         ),
         (
-            MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
-            f"<MGAPt_(800000,6300000)_MGA94>",
+            MGAPoint(zone=55, lat_band='H', E=800000, N=6300000, grid=MGA94),
+            "<MGAPt_(800000,6300000)_MGA94>",
         ),
         (
-            MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
-            f"<MGAPt_(800000,6300000)_MGA20>",
+            MGAPoint(zone=55, lat_band='H', E=800000, N=6300000, grid=MGA20),
+            "<MGAPt_(800000,6300000)_MGA20>",
         ),
         (
-            MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
-            f"<MGRSPt_(54, WD, 04000, 50000)_MGRS>",
+            MGRSPoint.from_mga(54, 'K', 5.04 * 1e5, 5.85 * 1e6),
+            "<MGRSPt_(54, K, WD, 04000, 50000)_MGRS>",
         ),
         (
-            MGRSPoint(54, "WD", 4000, 50000, precision=5),
-            f"<MGRSPt_(54, WD, 04000, 50000)_MGRS>",
+            MGRSPoint(54, 'H', "WD", 4000, 50000, precision=5),
+            "<MGRSPt_(54, H, WD, 04000, 50000)_MGRS>",
         ),
     ]
 
@@ -326,8 +346,8 @@ def test_distance_to_euclidian_u1km():
     delta = 1000
     for i in range(5600000, 6300000, 1000):
 
-        p1 = MGAPoint(zone=55, E=700000, N=i, grid=MGA94)
-        p2 = MGAPoint(zone=55, E=700000, N=i + delta, grid=MGA94)
+        p1 = MGAPoint(zone=55, lat_band='H', E=700000, N=i, grid=MGA94)
+        p2 = MGAPoint(zone=55, lat_band='H', E=700000, N=i + delta, grid=MGA94)
 
         assert p1.distance_to(p2) == delta
 
@@ -337,8 +357,8 @@ def test_distance_to_euclidian_v1km():
     delta = 1000
     for i in range(200000, 800000, 1000):
 
-        p1 = MGAPoint(zone=55, E=i, N=6300000, grid=MGA94)
-        p2 = MGAPoint(zone=55, E=i + delta, N=6300000, grid=MGA94)
+        p1 = MGAPoint(zone=55, lat_band='H', E=i, N=6300000, grid=MGA94)
+        p2 = MGAPoint(zone=55, lat_band='H', E=i + delta, N=6300000, grid=MGA94)
 
         assert p1.distance_to(p2) == delta
 
@@ -348,8 +368,8 @@ def test_distance_to_euclidian_uv1km():
     delta = 1000
     for i in range(200000, 800000, 1000):
 
-        p1 = MGAPoint(zone=55, E=i, N=6200000, grid=MGA94)
-        p2 = MGAPoint(zone=55, E=i + delta, N=6201000, grid=MGA94)
+        p1 = MGAPoint(zone=55, lat_band='H', E=i, N=6200000, grid=MGA94)
+        p2 = MGAPoint(zone=55, lat_band='H', E=i + delta, N=6201000, grid=MGA94)
 
         assert p1.distance_to(p2) - 1414.21356 < 1e-4
 
@@ -361,10 +381,10 @@ def test_distance_to_all_types():
         GeoPoint(dLat=-37, dLng=145, datum=GDA94),
         VICPoint(E=VICGRID.E0, N=VICGRID.N0, grid=VICGRID),
         VICPoint(E=VICGRID94.E0, N=VICGRID94.N0, grid=VICGRID94),
-        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA94),
-        MGAPoint(zone=55, E=800000, N=6300000, grid=MGA20),
-        MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6),
-        MGRSPoint(54, "WD", 4000, 50000, precision=5),
+        MGAPoint(zone=55, lat_band='H', E=800000, N=6300000, grid=MGA94),
+        MGAPoint(zone=55, lat_band='H', E=800000, N=6300000, grid=MGA20),
+        MGRSPoint.from_mga(54, 'H', 5.04 * 1e5, 5.85 * 1e6),
+        MGRSPoint(54, 'H', "WD", 4000, 50000, precision=5),
     ]
 
     for pt in pts:

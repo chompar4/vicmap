@@ -1,7 +1,7 @@
 # Vicmap
 [![Build status](https://badge.buildkite.com/82cfc45a6dfec63cdf429b9e2b2037fe2416b3729d1db9aa94.svg)](https://buildkite.com/thompsonfilm/vicmap)
 
-Python tools for working with common victorian map projections
+Python tools for working with common victorian (+ nsw) map projections
 
 ## Installation
 
@@ -24,14 +24,14 @@ To define a point, specify the coordinates and the datum/grid.
 
 ```python
 geo_pt = GeoPoint(φ=-37, λ=145, datum=GDA20)
-mga_pt = MGAPoint(zone=54, E=250,000, N=5,600,000, grid=MGA94)
+mga_pt = MGAPoint(zone=54, lat_band='H', E=250,000, N=5,600,000, grid=MGA94)
 ```
 
 or use some of the provided utils to specify points from common reference systems. 
 (e.g a 6 figure GR)
 
 ```python
-pt = MGRSPoint.from_6FIG(55, "fu", "275882")
+pt = MGRSPoint.from_6FIG(55, "H", "fu", "275882")
 pt.transform_to(WGS84)
 ```
 
@@ -59,55 +59,24 @@ https://github.com/chompar4/isogonic-api
 
 ```python
 sf = 10,000
-pt = MGAPoint(zone=54, E=24 * sf, N= 250 * sf, grid=MGA20)
+pt = MGAPoint(zone=54, lat_band='H', E=24 * sf, N= 250 * sf, grid=MGA20)
 print(pt.declination, pt.grid_convergence, pt.grid_magnetic_angle)
 ```
 
-## Projections
-
-Functions for performing forward transformations can be found in the `vicmap.projections` module. The following projections are relevant for victoria:
-
-#### Lambert Conformal Conic
-
-```python
-E, N, m, γ = lambert_conformal_conic(φ, λ, ellipsoidal_constants, grid_constants)
+# NSW Topo Maps
+The relevant data for these maps can be grabbed by running
+```
+https://portal.spatial.nsw.gov.au/server/rest/services/Hosted/Topo_Map_Index/FeatureServer/0/query?text=&geometry&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=objectid%3E-1&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=false&maxAllowableOffset=&outSR=&outFields=mapnumber%2Cmapname%2Cmapseries%2Cadjmapindexx%2Clabel%2Cadjmapindexy&f=pjson
 ```
 
-```
-Accepts:
-    φ: latitude in decimal degrees (-90, 90]
-    λ: longitude in decimal degrees (-180, 180]
-    ellipsoidal constants: (cm, a, b, 1/f, e, e2, n)
-    grid constants: (λ0, φ0, E0, N0 φ1, φ2)
-returns:
-    X: easting (m)
-    Y: northing (m)
-    m: point scale factor
-    γ: grid convergence
-```
-
-#### Universal Transverse Mercator (UTM)
-
-```python
-E, N, m, γ = utm(φ, λ, cm, ellipsoidal_constants, grid_constants)
-```
+## Brennan Coordinates
+MGA Points can handle creation using the Brennan system of describing coordinates (see https://ozultimate.com/canyoning/track_notes/du_faur_creek.htm). These consist of a 6 Figure MGA Grid Reference and a Map Sheet Number (e.g '8930-1N' or 'Mount Wilson').
+Only MGA coordinates are currently supported in this method. The following example gives the decimal coordinates of the start of Pipeline Canyon.
 
 ```
-Accepts:
-    φ: latitude in decimal degrees (-90, 90]
-    λ: longitude in decimal degrees (-180, 180]
-    cm: central meridian of zone containing (dLat, dLng)
-    ellipsoidal constants: (cm, a, b, 1/f, e, e2, n)
-    grid constants: (m0, E0, N0)
-returns:
-    z: zone
-    E: UTM easting (m)
-    N: UTM northing (m)
-    m: point scale factor
-    γ: grid convergence
+pt = MGAPoint.from_brennan('452278', '8931-1S')
+dLat, dLng = pt.transform_to(pt.grid.datum)
 ```
-
-`pyproj` is used for reverse (inverse) transformations.
 
 #### CI 
 Run buildkite agent using ```buildkite-agent start```

@@ -5,11 +5,11 @@ from math import radians, sqrt
 from geomag import declination
 from pyproj import CRS, Transformer
 
-from vicmap.datums import GDA94, WGS84, Datum
+from vicmap.datums import AGD66, GDA94, WGS84, Datum
 from vicmap.grids import (MGA20, MGA94, MGRS, VICGRID, VICGRID94, Grid,
-                          MGAGrid, MGRSGrid, OKGrid)
+                          MGAGrid, MGRSGrid)
 from vicmap.projections import lambert_conformal_conic, utm
-from vicmap.utils import ellipsoidal_distance
+from vicmap.utils import ellipsoidal_distance, load_nsw_map_numbers
 
 
 class Point:
@@ -26,14 +26,15 @@ class Point:
 
         coords = self.proj_coords[-2:]
 
-        if isinstance(other, MGAGrid):
-            # dont what MGA zone other is in, project to wgs first
-            to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
-            dLat, dLng = to_wgs.transform(*coords)
+        # transform to wgs84 to get latitude band
+        to_wgs = Transformer.from_crs(self.crs, WGS84.crs)
+        dLat, dLng = to_wgs.transform(*coords)
+        lat_band = MGRS.get_latitude_band(dLat)
 
+        if isinstance(other, MGAGrid):
+            # work out zone
             zone = other.get_zone(dLng)
             other_crs = other.crs(zone)
-
         else:
             other_crs = other.crs
             zone = None
@@ -45,8 +46,12 @@ class Point:
 
         if isinstance(other, MGRSGrid):
             E, N = new
-            pt = MGRSPoint.from_mga(zone=zone, E=E, N=N)
+            pt = MGRSPoint.from_mga(zone=zone, lat_band=lat_band, E=E, N=N)
             return pt.display_coords
+
+        elif isinstance(other, MGAGrid):
+            E, N = new
+            return (zone, lat_band, E, N)
 
         return (zone, *new) if zone else new
 
@@ -243,32 +248,17 @@ class VICPoint(PlanePoint):
         return f"<VicPt_({self.E},{self.N})_{self.grid.code}>"
 
 
-class OKPoint(PlanePoint):
-
-    grid = OKGrid
-
-    def __init__(self, E, N):
-
-        assert -1e4 <= E <= 1e4, f"easting out of bounds: {E}"
-        assert -1e4 <= N <= 1e4, f"northing out of bounds: {N}"
-
-        super().__init__(u=E, v=N, grid=self.grid)
-
-    @property
-    def crs(self):
-        return self.grid.crs
-
-
 class MGAPoint(PlanePoint):
-    def __init__(self, zone, E, N, grid):
+    def __init__(self, zone, lat_band, E, N, grid):
 
-        assert 200000 <= E <= 800000, f"invalid easting: {E}"
-        assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
-        assert zone in [54, 55], f"invalid zone: {zone}"
+        assert 100000 <= E <= 800000, f"invalid easting: {E}"
+        assert 5500000 <= N <= 7500000, f"invalid northing: {N}"
+        assert zone in [54, 55, 56], f"invalid zone: {zone}"
         assert grid in [MGA20, MGA94, MGRS], f"invalid MGA grid: {grid.code}"
 
         super().__init__(u=E, v=N, grid=grid)
         self.zone = zone
+        self.lat_band = lat_band
 
     @property
     def crs(self):
@@ -298,6 +288,60 @@ class MGAPoint(PlanePoint):
         _, _, _, _, γ = utm(φ, λ, ellipsoid=self.datum.ellipsoid, grid=self.grid)
         return γ
 
+    @classmethod
+    def from_brennan(cls, GR6, map, grid=MGA94):
+        """
+        Allow specification from the Tom Brennan (OzCanyons) guidebook.
+        Points in NSW are specified by 6 fig GR (GR6) and a NSW Topo map number
+        Brennan claims the NSW maps use MGA94 (GDA94).
+        # TODO: Older references may use AMG (AGD66)
+            (GR6) : 6 Figure Grid Reference (str)
+            (map) : NSW Topo Map Number or Map Name (str)
+        """
+
+        # TODO: AMG
+        assert grid in [MGA94, MGA20], 'Only MGA94 & MGA20 supported currently'
+
+        # determine center of map
+        assert isinstance(map, str), 'please pass map index as a string'
+        maps = load_nsw_map_numbers()
+        dLat, dLng = next((v for k, v in maps.items() if map in k), (None, None))
+        if not dLng:
+            assert False, f'Could not find a map for {map}'
+        geo_pt = GeoPoint(dLat=dLat, dLng=dLng)
+        zn, lat_band, E, N = geo_pt.transform_to(grid)
+        centre_point = MGAPoint(zone=zn, lat_band=lat_band, E=E, N=N, grid=grid)
+
+        # deal with GR
+        assert isinstance(GR6, str), 'please specify 6 Figure GRs as a string'
+        assert len(GR6) == 6, 'please use a 6 fig GR only'
+        gr_east = float(GR6[:3]) * 1e2
+        gr_north = float(GR6[3:]) * 1e2
+
+        """
+        We know the 6 Figure GR is somewhere within a 100k square, but
+        which one? The NSW maps can potentially span multiple of these
+        100k squares. Check the GR in all of the surrounding 9 squares
+        (including square of centre point) and determine which one is
+        closest to the centre.
+        """
+
+        # round easting & northing to start of the square for centre point
+        E1 = E - E % 1e5 + gr_east
+        N1 = N - N % 1e5 + gr_north
+
+        # go around the 9 100k squares (including the centre square)
+        shortest = 99999999
+        point = None
+        for delta_x in [0, 1e5, -1e5]:
+            for delta_y in [0, 1e5, -1e5]:
+                potential_pt = MGAPoint(zone=zn, lat_band=lat_band, E=E1 + delta_x, N=N1 + delta_y, grid=grid)
+                distance = potential_pt.distance_to(centre_point)
+                if distance < shortest:
+                    shortest = distance
+                    point = potential_pt
+        return point
+
     def __repr__(self):
         return f"<MGAPt_({self.E},{self.N})_{self.grid.code}>"
 
@@ -306,9 +350,14 @@ class MGRSPoint(MGAPoint):
 
     grid = MGRS
 
-    def __init__(self, zone, usi, x, y, precision=5):
+    def __init__(self, zone, lat_band, usi, x, y, precision=5):
         """
-        MGRS : MGA with a 100k square alpha identifier (usi)
+        MGRS : MGA with
+            (zone): 6 degree wide UTM zone
+            (lat_band): a grid zone designator for each 8 degree latitude band. C -> X 
+            (usi): a 100k square alpha identifier
+            (x) : 5 figure (default) Easting
+            (y) : 5 figure (default) Northing
         accepts:
             precision:
                 0 fig = 100k
@@ -320,35 +369,37 @@ class MGRSPoint(MGAPoint):
         """
 
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
-        assert zone in [54, 55], f"invalid MGRS zone: {zone}"
+        assert zone in [54, 55, 56], f"invalid MGRS zone: {zone}"
+        assert lat_band in ['H', 'J', 'K'], f'invalid latitude band: {lat_band}'
         colName, rowName = usi[0].capitalize(), usi[1].capitalize()
         assert isinstance(usi, str) and len(usi) == 2, f"invalid MGRS usi: {usi}"
-        col = colName in self.grid.cols54 if zone == 54 else colName in self.grid.cols55
-        row = rowName in self.grid.rows54 if zone == 54 else rowName in self.grid.rows55
-        assert col, f"usi column entry: {usi[0]} not found in zone: {zone}"
-        assert row, f"usi row entry: {usi[1]} not found in zone: {zone}"
+        cols = getattr(self.grid, f'cols{zone}')
+        rows = self.grid.getrows(zone)
+        assert colName in cols, f"usi column entry: {usi[0]} not found in zone: {zone}"
+        assert rowName in rows, f"usi row entry: {usi[1]} not found in zone: {zone}"
         assert 0 <= float(x) <= 10 ** precision, f"invalid MGRS x: {x}"
         assert 0 <= float(y) <= 10 ** precision, f"invalid MGRS y: {y}"
 
         def get_E(grid, zn, usi, x):
-            lb = grid.cols54[colName][0] if zn == 54 else grid.cols55[colName][0]
+            lb = getattr(grid, f'cols{zn}')[colName][0]
             return lb + float(x)
 
         def get_N(grid, zn, usi, y):
-            lb = grid.rows54[rowName][0] if zn == 54 else grid.rows55[rowName][0]
+            lb = grid.getrows(zn)[rowName][0]
             return lb + float(y)
 
         E = get_E(self.grid, zone, usi, x)
         N = get_N(self.grid, zone, usi, y)
 
-        super().__init__(E=E, N=N, grid=self.grid, zone=zone)
+        super().__init__(E=E, N=N, grid=self.grid, lat_band=lat_band, zone=zone)
         self.x = self.__class__.get_x(E, precision)
         self.y = self.__class__.get_y(N, precision)
         self.precision = precision
         self.usi = usi
+        self.lat_band = lat_band
 
     @classmethod
-    def from_6FIG(cls, zone, usi, GR6):
+    def from_6FIG(cls, zone, lat_band, usi, GR6):
         """
         Allow creation from 6 fig grid reference with a usi
         """
@@ -357,7 +408,7 @@ class MGRSPoint(MGAPoint):
         ), f"please specify GR {GR6} as a 6 digit string"
         assert 0 <= float(GR6) <= 999999, f"invalid grid reference: {GR6}"
 
-        pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5)
+        pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5, lat_band=lat_band)
         return pt
 
     def distance_to(self, other):
@@ -373,35 +424,36 @@ class MGRSPoint(MGAPoint):
         if isinstance(other, PlanePoint):
             x2, y2 = other.E, other.N
         else:
-            zone, usi, e, n = other.transform_to(self.grid)
+            zone, lat_band, usi, e, n = other.transform_to(self.grid)
             GR6 = e[0:3] + n[0:3]
-            pt = MGRSPoint.from_6FIG(zone, usi, GR6)
+            pt = MGRSPoint.from_6FIG(zone, lat_band, usi, GR6)
             x2, y2 = pt.E, pt.N
 
         s = sqrt((x1 - x2) ** 2 + (y1 - y2) ** 2)
         return s
 
     @classmethod
-    def from_mga(cls, zone, E, N, precision=5):
+    def from_mga(cls, zone, lat_band, E, N, precision=5):
         """
         Allow user to create from mga coords
         """
 
-        assert 200000 <= E <= 800000, f"invalid easting: {E}"
-        assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
-        assert zone in [54, 55], f"invalid zone: {zone}"
+        assert 100000 <= E <= 800000, f"invalid easting: {E}"
+        assert 5500000 <= N <= 7500000, f"invalid northing: {N}"
+        assert zone in [54, 55, 56], f"invalid zone: {zone}"
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
+        assert lat_band in ['H', 'K', 'J']
 
         x = cls.get_x(E, precision)
         y = cls.get_y(N, precision)
         usi = cls.get_usi(grid=cls.grid, zone=zone, E=E, N=N)
-        pt = cls(zone=zone, usi=usi, x=x, y=y, precision=precision)
+        pt = cls(zone=zone, lat_band=lat_band, usi=usi, x=x, y=y, precision=precision)
         return pt
 
     @classmethod
     def get_usi(cls, grid, zone, E, N):
-        cols = grid.cols54 if zone == 54 else grid.cols55
-        rows = grid.rows54 if zone == 54 else grid.rows55
+        cols = getattr(grid, f'cols{zone}')
+        rows = grid.getrows(zone)
         X = next(code for code, (lb, ub) in cols.items() if lb <= E < ub)
         Y = next(code for code, (lb, ub) in rows.items() if lb <= N < ub)
         return f"{X}{Y}"
@@ -422,9 +474,9 @@ class MGRSPoint(MGAPoint):
 
     @property
     def display_coords(self):
-        return (self.zone, self.usi, self.x, self.y)
+        return (self.zone, self.lat_band, self.usi, self.x, self.y)
 
     def __repr__(self):
         return (
-            f"<MGRSPt_({self.zone}, {self.usi}, {self.x}, {self.y})_{self.grid.code}>"
+            f"<MGRSPt_({self.zone}, {self.lat_band}, {self.usi}, {self.x}, {self.y})_{self.grid.code}>"
         )
