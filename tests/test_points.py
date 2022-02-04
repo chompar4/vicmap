@@ -164,9 +164,11 @@ def test_known_vals_mgrs():
 def test_bounds():
 
     top_left = MGRSPoint.from_mga(54, 'J', 486103, 6666177)
-    top_right = MGRSPoint.from_mga(54, 'H', 489461, 5644232)
+    bottom_left = MGRSPoint.from_mga(54, 'H', 489461, 5644232)
+    top_right = MGRSPoint.from_mga(56, 'J', 736152, 6845294)
+    bottom_right = MGRSPoint.from_mga(54, 'H', 697286, 5671991)
 
-    assert all([top_left, top_right])
+    assert all([top_left, top_right, bottom_right, bottom_left])
 
 
 def test_lower_left_mgrs():
