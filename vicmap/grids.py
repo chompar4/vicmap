@@ -140,23 +140,74 @@ class MGRSGrid(MGAGrid20):
     assert all('O' not in r for r in columns), '`O` should not be an MGRS column name'
     assert all(len(r.keys()) == 8 for r in columns), 'all mgrs cols must have 8 entries'
 
-    rows54 = {
-        "H": [62 * sf, 63 * sf],
-        "G": [61 * sf, 62 * sf],
-        "F": [60 * sf, 61 * sf],
-        "E": [59 * sf, 60 * sf],
-        "D": [58 * sf, 59 * sf],
+    """
+    In the AA scheme,[2] also known as MGRS-New,
+    [3] which is used for WGS84 and some other modern geodetic datums,
+    the letter for the first row – just north of the equator – is A in
+    odd-numbered zones, and F in even-numbered zones, as shown in figure 1.
+
+    NOTE: both the even & odd rows here will repeat, but we only care about
+    VIC/NSW. TODO: handle repeating.
+    """
+
+    even_rows = {
+        "A": [55 * sf, 56 * sf],
+        "B": [56 * sf, 57 * sf],
         "C": [57 * sf, 58 * sf],
+        "D": [58 * sf, 59 * sf],
+        "E": [59 * sf, 60 * sf],
+        "F": [60 * sf, 61 * sf],
+        "G": [61 * sf, 62 * sf],
+        "H": [62 * sf, 63 * sf],
+        "J": [63 * sf, 64 * sf],
+        "K": [64 * sf, 65 * sf],
+        "L": [65 * sf, 66 * sf],
+        "M": [66 * sf, 67 * sf],
+        "N": [67 * sf, 68 * sf],
+        "P": [68 * sf, 69 * sf],
+        "Q": [69 * sf, 70 * sf],
+        "R": [70 * sf, 71 * sf],
+        "S": [71 * sf, 72 * sf],
+        "T": [72 * sf, 73 * sf],
+        "U": [73 * sf, 74 * sf],
+        "V": [74 * sf, 75 * sf],
     }
 
-    rows55 = {
+    odd_rows = {
+        "R": [55 * sf, 56 * sf],
         "S": [56 * sf, 57 * sf],
         "T": [57 * sf, 58 * sf],
         "U": [58 * sf, 59 * sf],
         "V": [59 * sf, 60 * sf],
         "A": [60 * sf, 61 * sf],
         "B": [61 * sf, 62 * sf],
+        "C": [61 * sf, 62 * sf],
+        "D": [62 * sf, 63 * sf],
+        "E": [63 * sf, 64 * sf],
+        "F": [64 * sf, 65 * sf],
+        "G": [65 * sf, 66 * sf],
+        "H": [66 * sf, 67 * sf],
+        "J": [67 * sf, 68 * sf],
+        "K": [68 * sf, 69 * sf],
+        "L": [69 * sf, 70 * sf],
+        "M": [70 * sf, 71 * sf],
+        "N": [71 * sf, 72 * sf],
+        "P": [72 * sf, 73 * sf],
+        "Q": [73 * sf, 74 * sf]
     }
+
+    assert all('I' not in r for r in even_rows), '`I` should not be an MGRS row name'
+    assert all('I' not in r for r in odd_rows), '`I` should not be an MGRS row name'
+    assert all('O' not in r for r in even_rows), '`O` should not be an MGRS row name'
+    assert all('O' not in r for r in even_rows), '`O` should not be an MGRS row name'
+
+    def __getattr__(self, name):
+        if 'rows' in name:
+            zone = int(name.split('rows')[1])
+            if zone % 2 == 0:
+                return self.even_rows
+            return self.odd_rows
+        return self[name]
 
 
 class VICGRID(Grid):

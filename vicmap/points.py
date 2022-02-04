@@ -344,7 +344,7 @@ class MGRSPoint(MGAPoint):
 
     grid = MGRS
 
-    def __init__(self, zone, usi, x, y, precision=5, gzd = 'H'):
+    def __init__(self, zone, usi, x, y, precision=5, gzd='H'):
         """
         MGRS : MGA with
             (zone): 6 degree wide UTM zone
