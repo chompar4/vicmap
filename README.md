@@ -31,7 +31,7 @@ or use some of the provided utils to specify points from common reference system
 (e.g a 6 figure GR)
 
 ```python
-pt = MGRSPoint.from_6FIG(55, "fu", "275882")
+pt = MGRSPoint.from_6FIG(55, "H", "fu", "275882")
 pt.transform_to(WGS84)
 ```
 
@@ -113,6 +113,15 @@ returns:
 The relevant data for these maps can be grabbed by running
 ```
 https://portal.spatial.nsw.gov.au/server/rest/services/Hosted/Topo_Map_Index/FeatureServer/0/query?text=&geometry&geometryType=esriGeometryEnvelope&inSR=&spatialRel=esriSpatialRelIntersects&relationParam=&objectIds=&where=objectid%3E-1&time=&returnCountOnly=false&returnIdsOnly=false&returnGeometry=false&maxAllowableOffset=&outSR=&outFields=mapnumber%2Cmapname%2Cmapseries%2Cadjmapindexx%2Clabel%2Cadjmapindexy&f=pjson
+```
+
+## Brennan Coordinates
+MGA Points can handle creation using the Brennan system of describing coordinates (see https://ozultimate.com/canyoning/track_notes/du_faur_creek.htm). These consist of a 6 Figure MGA Grid Reference and a Map Sheet Number (e.g '8930-1N' or 'Mount Wilson').
+MGA coordinates supported in this method only. The following example gives the decimal coordinates of the start of Pipeline Canyon.
+
+```
+pt = MGAPoint.from_brennan('452278', '8931-1S')
+dLat, dLng = pt.transform_to(pt.grid.datum)
 ```
 
 #### CI 

@@ -5,9 +5,8 @@ import geomag
 import pytest
 from mock import patch
 from vicmap.datums import AGD66, GDA20, GDA94, __all_datums__
-from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, MGAGrid, __all_grids__
-from vicmap.points import GeoPoint, MGAPoint, MGRSPoint, PlanePoint, VICPoint
-from vicmap.utils import dms_to_dd
+from vicmap.grids import MGA20, MGA94, MGRS, VICGRID, VICGRID94, __all_grids__
+from vicmap.points import GeoPoint, MGAPoint, MGRSPoint, VICPoint
 
 
 def test_grid_convergence_central_meridian_vicgrid():
@@ -82,19 +81,36 @@ def test_declination_mga():
     assert abs(west_pt.magnetic_declination - 9.350878790917436) < 1e3
 
 
-def test_declination_mgrs():
-    with patch("datetime.date") as mock_date:
-        mock_date.today.return_value = date(2020, 1, 1)
-        pt = MGRSPoint.from_mga(54, 5.04 * 1e5, 5.85 * 1e6)
-        assert abs(pt.magnetic_declination - 9.817756197562203) < 1e-3
-
-
 def test_from_6FIG_mgrs():
 
     pt = MGRSPoint.from_6FIG(55, "fu", "275882")
     pt2 = MGAPoint(55, 627500, 5888200, grid=MGA20)
 
     assert pt.E == pt2.E and pt.N == pt2.N
+
+
+def test_from_brennan():
+
+    """
+    Can use either map number or map name
+    """
+
+    known_vals = [
+        ('991885', '7339', 29.027865, 142.017699), 
+        ('991885', 'Tibooburra', 29.027865, 142.017699),
+        ('452278', 'Mount Morgan', -33.15865, 150.26792),  # pipeline canyon
+        ('452278', '8931-1S', -33.15865, 150.26792),  # pipeline canyon
+        ('491177', 'Rock Hill', -33.25056, 150.30691),  # galah canyon
+        ('491177', '8931-2N', -33.25056, 150.30691),  # galah canyon
+        ('537885', 'Mount Wilson', -33.51472, 150.34826),  # mt wilson saddle
+        ('537885', '8930-1N', -33.51472, 150.34826),  # mt wilson saddle
+    ]
+
+    for g6, mapp, eLat, eLng in known_vals:
+        pt = MGAPoint.from_brennan(GR6=g6, map=mapp)
+        dLat, dLng = pt.transform_to(pt.grid.datum)
+        assert abs(dLat - eLat) <= 1e6
+        assert abs(dLng - eLng) <= 1e6
 
 
 def test_transform_to_compatible_types():

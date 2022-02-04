@@ -5,11 +5,11 @@ from math import radians, sqrt
 from geomag import declination
 from pyproj import CRS, Transformer
 
-from vicmap.datums import GDA94, WGS84, Datum
+from vicmap.datums import AGD66, GDA94, WGS84, Datum
 from vicmap.grids import (MGA20, MGA94, MGRS, VICGRID, VICGRID94, Grid,
                           MGAGrid, MGRSGrid)
 from vicmap.projections import lambert_conformal_conic, utm
-from vicmap.utils import ellipsoidal_distance
+from vicmap.utils import ellipsoidal_distance, load_nsw_map_numbers
 
 
 class Point:
@@ -246,7 +246,7 @@ class VICPoint(PlanePoint):
 class MGAPoint(PlanePoint):
     def __init__(self, zone, E, N, grid):
 
-        assert 200000 <= E <= 800000, f"invalid easting: {E}"
+        assert 100000 <= E <= 800000, f"invalid easting: {E}"
         assert 5600000 <= N <= 6900000, f"invalid northing: {N}"
         assert zone in [54, 55, 56], f"invalid zone: {zone}"
         assert grid in [MGA20, MGA94, MGRS], f"invalid MGA grid: {grid.code}"
@@ -282,13 +282,59 @@ class MGAPoint(PlanePoint):
         _, _, _, _, γ = utm(φ, λ, ellipsoid=self.datum.ellipsoid, grid=self.grid)
         return γ
 
-    def from_brennan(cls, GR6, nsw_map_num):
+    @classmethod
+    def from_brennan(cls, GR6, map, grid=MGA94):
         """
         Allow specification from the Tom Brennan (OzCanyons) guidebook.
-        Points in NSW are specified by 6 fig GR (GR6) and a NSW Topo map number.
-        Each map number implies a UTM zone.
+        Points in NSW are specified by 6 fig GR (GR6) and a NSW Topo map number
+        Brennan claims the NSW maps use MGA94 (GDA94).
+        # TODO: Older references may use AMG (AGD66)
+            (GR6) : 6 Figure Grid Reference (str)
+            (map) : NSW Topo Map Number or Map Name (str)
         """
 
+        # TODO: AMG
+        assert grid in [MGA94, MGA20], 'Only MGA94 & MGA20 supported currently'
+
+        # determine center of map
+        assert isinstance(map, str), 'please pass map index as a string'
+        maps = load_nsw_map_numbers()
+        dLat, dLng = next((v for k, v in maps.items() if map in k), (None, None))
+        if not dLng:
+            assert False, f'Could not find a map for {map}'
+        geo_pt = GeoPoint(dLat=dLat, dLng=dLng)
+        zn, E, N = geo_pt.transform_to(grid)
+        centre_point = MGAPoint(zone=zn, E=E, N=N, grid=grid)
+
+        # deal with GR
+        assert isinstance(GR6, str), 'please specify 6 Figure GRs as a string'
+        assert len(GR6) == 6, 'please use a 6 fig GR only'
+        gr_east = float(GR6[:3]) * 1e2
+        gr_north = float(GR6[3:]) * 1e2
+
+        """
+        We know the 6 Figure GR is somewhere within a 100k square, but
+        which one? The NSW maps can potentially span multiple of these
+        100k squares. Check the GR in all of the surrounding 9 squares
+        (including square of centre point) and determine which one is
+        closest to the centre.
+        """
+
+        # round easting & northing to start of the square for centre point
+        E1 = E - E % 1e5 + gr_east
+        N1 = N - N % 1e5 + gr_north
+
+        # go around the 9 100k squares (including the centre square)
+        shortest = 99999999
+        point = None
+        for delta_x in [0, 1e5, -1e5]:
+            for delta_y in [0, 1e5, -1e5]:
+                potential_pt = MGAPoint(zone=zn, E=E1 + delta_x, N=N1 + delta_y, grid=grid)
+                distance = potential_pt.distance_to(centre_point)
+                if distance < shortest:
+                    shortest = distance
+                    point = potential_pt
+        return point
 
     def __repr__(self):
         return f"<MGAPt_({self.E},{self.N})_{self.grid.code}>"
@@ -298,7 +344,7 @@ class MGRSPoint(MGAPoint):
 
     grid = MGRS
 
-    def __init__(self, zone, gzd, usi, x, y, precision=5):
+    def __init__(self, zone, usi, x, y, precision=5, gzd = 'H'):
         """
         MGRS : MGA with
             (zone): 6 degree wide UTM zone
@@ -346,7 +392,7 @@ class MGRSPoint(MGAPoint):
         self.usi = usi
 
     @classmethod
-    def from_6FIG(cls, zone, usi, GR6):
+    def from_6FIG(cls, zone, usi, GR6, gzd='H'):
         """
         Allow creation from 6 fig grid reference with a usi
         """
@@ -355,7 +401,7 @@ class MGRSPoint(MGAPoint):
         ), f"please specify GR {GR6} as a 6 digit string"
         assert 0 <= float(GR6) <= 999999, f"invalid grid reference: {GR6}"
 
-        pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5)
+        pt = cls(zone=zone, usi=usi, x=GR6[0:3] + "00", y=GR6[3:6] + "00", precision=5, gzd=gzd)
         return pt
 
     def distance_to(self, other):
@@ -385,7 +431,7 @@ class MGRSPoint(MGAPoint):
         Allow user to create from mga coords
         """
 
-        assert 200000 <= E <= 800000, f"invalid easting: {E}"
+        assert 100000 <= E <= 800000, f"invalid easting: {E}"
         assert 5600000 <= N <= 6300000, f"invalid northing: {N}"
         assert zone in [54, 55], f"invalid zone: {zone}"
         assert 1 <= precision <= 5, f"invalid MGRS precision: {precision}"
