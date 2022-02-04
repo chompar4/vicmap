@@ -117,7 +117,7 @@ https://portal.spatial.nsw.gov.au/server/rest/services/Hosted/Topo_Map_Index/Fea
 
 ## Brennan Coordinates
 MGA Points can handle creation using the Brennan system of describing coordinates (see https://ozultimate.com/canyoning/track_notes/du_faur_creek.htm). These consist of a 6 Figure MGA Grid Reference and a Map Sheet Number (e.g '8930-1N' or 'Mount Wilson').
-MGA coordinates supported in this method only. The following example gives the decimal coordinates of the start of Pipeline Canyon.
+Only MGA coordinates are currently supported in this method. The following example gives the decimal coordinates of the start of Pipeline Canyon.
 
 ```
 pt = MGAPoint.from_brennan('452278', '8931-1S')
