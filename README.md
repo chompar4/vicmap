@@ -1,7 +1,7 @@
 # Vicmap
 [![Build status](https://badge.buildkite.com/82cfc45a6dfec63cdf429b9e2b2037fe2416b3729d1db9aa94.svg)](https://buildkite.com/thompsonfilm/vicmap)
 
-Python tools for working with common victorian map projections
+Python tools for working with common victorian (+ nsw) map projections
 
 ## Installation
 
